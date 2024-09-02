@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"comment": "Press Ctrl Shift B to Run",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: cpp arquivo de build ativo",
+			"command": "bash",
+			"args": [
+				"/home/ivan/dev/cpp/skydiver-ai/compileAndRun.sh"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
