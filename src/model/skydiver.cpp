@@ -7,11 +7,19 @@
 
 using namespace std;
 
+// Altura Salto de paraquedismo recreativo: A altura mais comum é entre 3.000 a 4.000 metros
+// A 160 km/h, leva aproximadamente 67,5 segundos para percorrer 3.000 metros
+// A 160 km/h, em 10 segundos, você percorreria aproximadamente 444,44 metros
+// Durante a queda livre, um paraquedista pode atingir uma velocidade mínima de 160 km/h em posição de "tracking".
+// Em posição de "mergulho", a velocidade máxima durante a queda livre pode chegar a 320 km/h.
+// Com o paraquedas aberto, a velocidade de descida típica é reduzida para 15 a 30 km/h.
+// Com paraquedas de alta performance, a velocidade máxima durante a descida pode chegar a 50 km/h.
+
 Skydiver::Skydiver() {
-    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 14, 24), true);
+    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 8, 12), true);
     start_pos = sf::FloatRect(672.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
-    velocity = sf::Vector2f(0.f, 0.f);
+    velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
     on_ground = false;
     reset_position();
 }
@@ -27,7 +35,7 @@ void Skydiver::set_position(float left, float top) {
     start_pos.top = top;
 }
 void Skydiver::reset_position() {
-    this->pos = sf::FloatRect(start_pos.left, start_pos.top, 14.f, 24.f);
+    this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::update() {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Joystick::isButtonPressed(0, sf::Joystick::X)) {
@@ -51,15 +59,20 @@ void Skydiver::update() {
         velocity.x -= 0.01;
     }
 
-    if (velocity.x > 2) velocity.x = 2;
-    if (velocity.x < -2) velocity.x = -2;
+    if (velocity.x > 1.80) velocity.x = 1.80;    // 180 km/h
+    if (velocity.x < -1.80) velocity.x = -1.80;  // 180 km/h
+
+    const float gravity = 0.0035;
+    velocity.y += gravity;
+
+    if (velocity.y > 1.6) velocity.y = 1.6;  // 160 km/h de velocidade com os braços de pernas abertas.
 
     pos.left += velocity.x;
-
-    pos.top += 0.3;
+    pos.top += velocity.y;
 
     if (pos.top > 700) {
         pos.top = start_pos.top;
+        velocity.y = 0.0;
     }
 }
 
@@ -72,7 +85,10 @@ void Skydiver::draw(sf::RenderWindow *w) {
     rectangle.setOutlineColor(sf::Color::Red);
     rectangle.setOutlineThickness(2.f);
     rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
-    w->draw(rectangle);
+    // w->draw(rectangle);
 
-    Tools::say(w, to_string(this->velocity.x), pos.left, pos.top - 14);
+    int offset = 30;
+
+    Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x), pos.left + 24, pos.top - offset + (15 * 0));
+    Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
 }

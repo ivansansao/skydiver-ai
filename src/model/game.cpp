@@ -31,7 +31,7 @@ void Game::play() {
 
     view.reset(sf::FloatRect(0.f, 0.f, 1280, 736.f));
     window.setView(this->view);
-    window.clear(sf::Color(255, 255, 255, 255));
+    window.clear(sf::Color(255, 255, 255, 80));
 
     skydiver.update();
     skydiver.draw(&window);
