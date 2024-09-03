@@ -14,7 +14,7 @@ else
 endif
 CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(SFML) $(CPPVERSION)
 LD=g++
-OBJS= main.o game.o tools.o animation.o skydiver.o force.o plane.o
+OBJS= main.o game.o tools.o animation.o skydiver.o force.o plane.o Layer.o NeuralNetwork.o Neuron.o
 all: $(OBJS)
 	$(LD) -o $(TARGET) $(OBJS) $(CXXFLAGS)
 	@$(REMOVE)
@@ -27,3 +27,6 @@ animation.o: ./src/model/animation.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/anima
 force.o: ./src/model/force.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/force.cpp -o force.o
 skydiver.o: ./src/model/skydiver.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/skydiver.cpp -o skydiver.o
 plane.o: ./src/model/plane.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/plane.cpp -o plane.o
+Layer.o: ./src/model/mynn/Layer.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/mynn/Layer.cpp -o Layer.o
+NeuralNetwork.o: ./src/model/mynn/NeuralNetwork.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/mynn/NeuralNetwork.cpp -o NeuralNetwork.o
+Neuron.o: ./src/model/mynn/Neuron.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/mynn/Neuron.cpp -o Neuron.o

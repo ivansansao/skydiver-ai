@@ -7,7 +7,7 @@
 using namespace std;
 
 Plane::Plane() {
-    plane.init(2, 0.3f, "./src/asset/image/plane.png", sf::IntRect(0, 0, 152, 47), true, 0, 0);
+    plane.init(2, 0.01f, "./src/asset/image/plane.png", sf::IntRect(0, 0, 152, 47), true, 0, 0);
 
     start_pos = sf::FloatRect(1600, 50, 152, 47);
     abs_pos = pos;
@@ -35,4 +35,5 @@ void Plane::update() {
 
 void Plane::draw(sf::RenderWindow *w) {
     plane.draw(pos.left, pos.top, w);
+    plane.anime(sf::IntRect(plane.getFrame() * pos.width, 0, pos.width, pos.height), 1);
 }

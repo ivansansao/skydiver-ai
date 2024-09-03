@@ -7,11 +7,15 @@
 
 #include "animation.hpp"
 #include "force.hpp"
+#include "mynn/NeuralNetwork.hpp"
 #include "plane.hpp"
 
 class Skydiver {
    public:
     Skydiver();
+
+    NeuralNetwork mind = NeuralNetwork(3);
+
     Animation skydiverFall;
 
     Animation skydiverParaOpening00;
@@ -70,8 +74,13 @@ class Skydiver {
     void reset_position();
     // Force wind_force_x = Force(0.997, 1, 0, 0.0000001);  // Value, max, min, ratio
 
-    void
-    add_gravity();
+    void parachutesOpen();
+    void parachutesGoRight();
+    void parachutesGoLeft();
+    void parachutesGoUp();
+    void parachutesGoDown();
+
+    void add_gravity();
     void jump();
     void think(Plane plane);
 };

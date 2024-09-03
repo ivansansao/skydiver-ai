@@ -34,6 +34,11 @@ Skydiver::Skydiver() {
     skydiverParaOpening50.setColor(color);
     skydiverParaCenter.setColor(color);
     reset_position();
+
+    mind.addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind.compile();
+    mind.mutate(4 * 6);
 }
 
 void Skydiver::add_gravity() {
@@ -50,8 +55,83 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::think(Plane plane) {
+    const float inpState = state;                                  // On the air?
+    const float inpParachuteState = parachuteState;                // Is parachutes flying?
+    const float inpPosLeftMid = 1 / (pos.left + (pos.width / 2));  // Pos mid os skydiver
+    const float inpPosBotton = 1 / (pos.top + pos.height);         // Foot position os skydiver
+    const float inpVelocityX = 1 / velocity.x;                     // Pos x of skydiver
+    const float inpVelocityY = 1 / velocity.y;                     // Pos y of skydiver
+
+    std::vector<double> input = {inpState, inpParachuteState, inpPosLeftMid, inpPosBotton, inpVelocityX, inpVelocityY};
+    std::vector<double> output = mind.think(input);
+
+    // std::cout << "Output -> output: " << output[0];
+    // std::cout << std::endl;
+    // for (const auto &value : output) {
+    //     std::cout << value << " ";
+    // }
+    // std::cout << std::endl;
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
         jump();
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) {
+        mind.mutate(4 * 6);
+        std::cout << "Mutated: " << std::endl;
+    }
+
+    if (output[0] > 0.5) {
+        jump();
+        // std::cout << "jump" << std::endl;
+    } else if (output[1] > 0.5) {
+        parachutesOpen();
+        // std::cout << "parachutesOpen" << std::endl;
+    } else if (output[2] > 0.5) {
+        parachutesGoRight();
+        // std::cout << "parachutesGoRight" << std::endl;
+    } else if (output[3] > 0.5) {
+        parachutesGoLeft();
+        // std::cout << "parachutesGoLeft" << std::endl;
+    } else if (output[4] > 0.5) {
+        parachutesGoUp();
+        // std::cout << "parachutesGoUp" << std::endl;
+    } else if (output[5] > 0.5) {
+        parachutesGoDown();
+        // std::cout << "parachutesGoDown" << std::endl;
+    }
+}
+void Skydiver::jump() {
+    if (state == State::ON_PLANE) {
+        if (pos.left > 0 && pos.left + pos.width < 1600) {
+            state = State::ON_AIR;
+        }
+    }
+}
+void Skydiver::parachutesOpen() {
+    if (parachuteState == ParachutesState::CLOSED) {
+        if (parachuteState != ParachutesState::OPENING) {
+            parachuteState = ParachutesState::OPENING;
+        }
+    }
+}
+void Skydiver::parachutesGoRight() {
+    if (parachuteState == ParachutesState::FLYING) {
+        velocity.x += 0.01;
+    }
+}
+void Skydiver::parachutesGoLeft() {
+    if (parachuteState == ParachutesState::FLYING) {
+        velocity.x -= 0.01;
+    }
+}
+void Skydiver::parachutesGoUp() {
+    if (parachuteState == ParachutesState::FLYING) {
+        parachutes_brake.increase();
+    }
+}
+void Skydiver::parachutesGoDown() {
+    if (parachuteState == ParachutesState::FLYING) {
+        parachutes_brake.decrease();
     }
 }
 void Skydiver::update(Plane plane) {
@@ -67,29 +147,25 @@ void Skydiver::update(Plane plane) {
     // SKYDIVER
     if (parachuteState == ParachutesState::FLYING) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            velocity.x += 0.01;
+            parachutesGoRight();
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            velocity.x -= 0.01;
+            parachutesGoLeft();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            parachutes_brake.increase();
+            parachutesGoUp();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            parachutes_brake.decrease();
+            parachutesGoDown();
         }
 
     } else if (parachuteState == ParachutesState::CLOSED) {
         if (this->state == State::ON_AIR) {
-            velocity.x = velocity.x * 0.998;  // Considera o vento!
+            velocity.x = velocity.x * 0.9974;  // Consider the wind!
         }
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        if (parachuteState == ParachutesState::CLOSED) {
-            if (parachuteState != ParachutesState::OPENING) {
-                parachuteState = ParachutesState::OPENING;
-            }
-        }
+        parachutesOpen();
     }
 
     if (velocity.x > max_slide_speed) velocity.x = max_slide_speed;    // 180 km/h
@@ -129,12 +205,6 @@ void Skydiver::update(Plane plane) {
         parachuteState = ParachutesState::CLOSED;
         parachutes_brake.reset();
         state = State::ON_PLANE;
-    }
-}
-
-void Skydiver::jump() {
-    if (state == State::ON_PLANE) {
-        state = State::ON_AIR;
     }
 }
 

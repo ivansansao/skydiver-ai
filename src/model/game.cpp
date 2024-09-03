@@ -40,7 +40,7 @@ Game::Game() {
     // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
 
     skydivers.clear();
-    for (int i{}; i < 1; ++i) {
+    for (int i{}; i < 100; ++i) {
         Skydiver* skydiver = new Skydiver();
         // int x = dist(gen);
         // int y = disty(gen);
