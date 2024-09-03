@@ -14,7 +14,7 @@ else
 endif
 CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(SFML) $(CPPVERSION)
 LD=g++
-OBJS= main.o game.o tools.o animation.o skydiver.o
+OBJS= main.o game.o tools.o animation.o skydiver.o force.o
 all: $(OBJS)
 	$(LD) -o $(TARGET) $(OBJS) $(CXXFLAGS)
 	@$(REMOVE)
@@ -24,4 +24,5 @@ main.o: ./src/main.cpp ; $(CXX) -c $(CXXFLAGS) ./src/main.cpp -o main.o
 game.o: ./src/model/game.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/game.cpp -o game.o
 tools.o: ./src/model/tools.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/tools.cpp -o tools.o
 animation.o: ./src/model/animation.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/animation.cpp -o animation.o
+force.o: ./src/model/force.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/force.cpp -o force.o
 skydiver.o: ./src/model/skydiver.cpp ; $(CXX) -c $(CXXFLAGS) ./src/model/skydiver.cpp -o skydiver.o

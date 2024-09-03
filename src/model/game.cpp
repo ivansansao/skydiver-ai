@@ -12,12 +12,12 @@ using namespace std;
 
 Game::Game() {
     // window.create(sf::VideoMode::getDesktopMode(), "Skydiver-ai", sf::Style::Fullscreen);
-    window.create(sf::VideoMode(1280, 736), "Skydiver-ai", sf::Style::Titlebar | sf::Style::Close);
+    window.create(sf::VideoMode(1600, 900), "Skydiver-ai", sf::Style::Titlebar | sf::Style::Close);
     window.setVerticalSyncEnabled(true);  // Don't allow more FPS than your monitor support.
     window.setFramerateLimit(60);         // There is a relation between framerate and setVerticalSyncEnabled.
 
     window.setPosition(sf::Vector2i(0, 0));
-    view.reset(sf::FloatRect(0.f, 0.f, 1280.f, 736.f));
+    view.reset(sf::FloatRect(0.f, 0.f, 1600, 900));
 
     font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
     window.setMouseCursorVisible(true);
@@ -29,7 +29,7 @@ enum menuopcs { Play,
 void Game::play() {
     std::stringstream ss;
 
-    view.reset(sf::FloatRect(0.f, 0.f, 1280, 736.f));
+    view.reset(sf::FloatRect(0.f, 0.f, 1600, 900.f));
     window.setView(this->view);
     window.clear(sf::Color(255, 255, 255, 80));
 

@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "animation.hpp"
+#include "force.hpp"
 
 class Skydiver {
    public:
@@ -22,8 +23,23 @@ class Skydiver {
     sf::FloatRect abs_pos;
     sf::Vector2f velocity;
 
-    enum States { Normal
-    } state = Normal;
+    const float max_slide_speed = 1.8;                    // 180 km/h
+    const float max_fall_speed = 1.6;                     // 160 km/h
+    const float max_opened_parachutes_fall_speed = 0.35;  // 35 km/h
+    const float min_opened_parachutes_fall_speed = 0.08;  // 8 km/h
+    const float parachutes_fall_ratio_brake = 0.03;
+    const float gravity = 0.0035;
+
+    const float parachutes_flying_ratio_brake = 0.005;
+
+    Force parachutes_brake = Force(0.0, 0.27, 0.0, 0.001);  // value, max, min, ratio
+
+    enum ParachutesState {
+        CLOSED,
+        OPENING,
+        FLYING,
+        OPEN_ON_FLOOR,
+    } parachuteState = CLOSED;
 
     bool on_ground;
 
