@@ -15,8 +15,8 @@ class Force {
     float ratio = 0.0;
     float originalValue = 0.0;
 
-    void increase();
-    void decrease();
+    float increase();
+    float decrease();
     void reset();
 };
 #endif

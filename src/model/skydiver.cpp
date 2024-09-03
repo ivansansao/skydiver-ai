@@ -14,6 +14,7 @@ using namespace std;
 // Em posição de "mergulho", a velocidade máxima durante a queda livre pode chegar a 320 km/h.
 // Com o paraquedas aberto, a velocidade de descida típica é reduzida para 15 a 30 km/h.
 // Com paraquedas de alta performance, a velocidade máxima durante a descida pode chegar a 50 km/h.
+// Velocidade do avião, 150km/h
 
 Skydiver::Skydiver() {
     const float moveLeft = -17;
@@ -24,7 +25,6 @@ Skydiver::Skydiver() {
     skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
     start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
-    velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
     on_ground = false;
 
     sf::Color color = sf::Color::Magenta;
@@ -49,7 +49,22 @@ void Skydiver::set_position(float left, float top) {
 void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
-void Skydiver::update() {
+void Skydiver::think(Plane plane) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
+        jump();
+    }
+}
+void Skydiver::update(Plane plane) {
+    // PLANE
+    if (this->state == State::ON_PLANE) {
+        pos.left = plane.pos.left + plane.door.x;
+        pos.top = plane.pos.top + plane.door.y;
+        velocity.x = plane.velocity.x;
+        velocity.y = plane.velocity.y;
+        return;
+    }
+
+    // SKYDIVER
     if (parachuteState == ParachutesState::FLYING) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             velocity.x += 0.01;
@@ -61,6 +76,11 @@ void Skydiver::update() {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
             parachutes_brake.decrease();
+        }
+
+    } else if (parachuteState == ParachutesState::CLOSED) {
+        if (this->state == State::ON_AIR) {
+            velocity.x = velocity.x * 0.998;  // Considera o vento!
         }
     }
 
@@ -102,12 +122,19 @@ void Skydiver::update() {
     pos.left += velocity.x;
     pos.top += velocity.y;
 
-    if (pos.top > 830) {
-        pos.top = start_pos.top;
-        pos.left = start_pos.left;
+    if (pos.top > 790) {
+        // pos.top = start_pos.top;
+        // pos.left = start_pos.left;
+        // velocity.y = 0.0;
         parachuteState = ParachutesState::CLOSED;
         parachutes_brake.reset();
-        velocity.y = 0.0;
+        state = State::ON_PLANE;
+    }
+}
+
+void Skydiver::jump() {
+    if (state == State::ON_PLANE) {
+        state = State::ON_AIR;
     }
 }
 

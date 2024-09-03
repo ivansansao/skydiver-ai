@@ -9,17 +9,25 @@ Force::Force(float value, float max, float min, float ratio)
     this->originalValue = value;
 }
 
-void Force::increase() {
+float Force::increase() {
+    const float oldValue = this->value;
+
     this->value += this->ratio;
     // std::cout << "value:" << this->value << " max: " << this->max << "\n";
 
     if (this->value > this->max) {
         this->value = this->max;
     }
+
+    return oldValue;
 }
-void Force::decrease() {
+float Force::decrease() {
+    const float oldValue = this->value;
+
     this->value -= this->ratio;
     if (this->value < this->min) this->value = this->min;
+
+    return oldValue;
 }
 void Force::reset() {
     this->value = this->originalValue;

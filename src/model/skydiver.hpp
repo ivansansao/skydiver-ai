@@ -7,6 +7,7 @@
 
 #include "animation.hpp"
 #include "force.hpp"
+#include "plane.hpp"
 
 class Skydiver {
    public:
@@ -24,7 +25,7 @@ class Skydiver {
     sf::FloatRect pos;
 
     sf::FloatRect abs_pos;
-    sf::Vector2f velocity;
+    sf::Vector2f velocity = sf::Vector2f(0.f, 0.f);
 
     const float max_slide_speed = 1.8;                    // 180 km/h
     const float max_fall_speed = 1.6;                     // 160 km/h
@@ -37,11 +38,20 @@ class Skydiver {
 
     Force parachutes_brake = Force(0.0, 0.27, 0.0, 0.001);  // value, max, min, ratio
 
+    enum State {
+        ON_PLANE,
+        ON_AIR,
+        ON_WATER,
+        ON_BOAT,
+        DIED
+    } state = ON_PLANE;
+
     enum ParachutesState {
         CLOSED,
         OPENING,
         FLYING,
-        OPEN_ON_FLOOR,
+        OPEN_ON_BOAT,
+        OPEN_ON_WATER,
     } parachuteState = CLOSED;
 
     bool on_ground;
@@ -55,10 +65,14 @@ class Skydiver {
     bool zerokey_released = true;
 
     void draw(sf::RenderWindow *w);
-    void update();
+    void update(Plane plane);
     void set_position(float left, float top);
     void reset_position();
+    // Force wind_force_x = Force(0.997, 1, 0, 0.0000001);  // Value, max, min, ratio
 
-    void add_gravity();
+    void
+    add_gravity();
+    void jump();
+    void think(Plane plane);
 };
 #endif

@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "animation.hpp"
+#include "plane.hpp"
 #include "skydiver.hpp"
 #include "tools.hpp"
 
@@ -20,6 +21,7 @@ class Game {
     std::vector<Skydiver *> skydivers;
 
     Animation scenario;
+    Plane plane;
 
     sf::RenderWindow window;
 
