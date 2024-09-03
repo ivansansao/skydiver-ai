@@ -12,6 +12,9 @@ class Skydiver {
    public:
     Skydiver();
     Animation skydiverFall;
+
+    Animation skydiverParaOpening00;
+    Animation skydiverParaOpening50;
     Animation skydiverParaLeft;
     Animation skydiverParaCenter;
     Animation skydiverParaRight;

@@ -6,6 +6,7 @@ Force::Force() {
 }
 Force::Force(float value, float max, float min, float ratio)
     : value(value), max(max), min(min), ratio(ratio) {
+    this->originalValue = value;
 }
 
 void Force::increase() {
@@ -19,4 +20,7 @@ void Force::increase() {
 void Force::decrease() {
     this->value -= this->ratio;
     if (this->value < this->min) this->value = this->min;
+}
+void Force::reset() {
+    this->value = this->originalValue;
 }

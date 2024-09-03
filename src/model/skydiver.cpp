@@ -17,6 +17,9 @@ using namespace std;
 
 Skydiver::Skydiver() {
     skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 8, 12), true);
+    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 17, 28), true);
+    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 17, 28), true);
+    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 17, 28), true);
     start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
     velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
@@ -39,10 +42,12 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::update() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        velocity.x += 0.01;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        velocity.x -= 0.01;
+    if (parachuteState == ParachutesState::FLYING) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+            velocity.x += 0.01;
+        } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+            velocity.x -= 0.01;
+        }
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -94,12 +99,26 @@ void Skydiver::update() {
 
     if (pos.top > 700) {
         pos.top = start_pos.top;
+        parachuteState = ParachutesState::CLOSED;
+        parachutes_brake.reset();
         velocity.y = 0.0;
     }
 }
 
 void Skydiver::draw(sf::RenderWindow *w) {
-    skydiverFall.draw(pos.left, pos.top, w);
+    if (parachuteState == ParachutesState::CLOSED) {
+        skydiverFall.draw(pos.left, pos.top, w);
+    } else if (parachuteState == ParachutesState::OPENING) {
+        if (velocity.y > max_opened_parachutes_fall_speed * 2) {
+            skydiverParaOpening00.draw(pos.left, pos.top, w);
+        } else {
+            skydiverParaOpening50.draw(pos.left, pos.top, w);
+        }
+    } else if (parachuteState == ParachutesState::FLYING) {
+        skydiverParaCenter.draw(pos.left, pos.top, w);
+    } else {
+        skydiverFall.draw(pos.left, pos.top, w);
+    }
 
     sf::RectangleShape rectangle;
     rectangle.setSize(sf::Vector2f(pos.width, pos.height));

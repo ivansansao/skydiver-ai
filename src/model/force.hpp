@@ -13,8 +13,10 @@ class Force {
     float max = 0.0;
     float min = 0.0;
     float ratio = 0.0;
+    float originalValue = 0.0;
 
     void increase();
     void decrease();
+    void reset();
 };
 #endif
