@@ -7,6 +7,10 @@ sf::Font Tools::font_roboto;
 
 Tools::Tools() {
 }
+void Tools::configure() {
+    font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
+    objText.setFont(font_roboto);
+}
 int Tools::getStartSprite(int index, int direction) {
     if (direction == -1)
         return index + 1;
@@ -99,8 +103,6 @@ std::string Tools::get_lines_from_dtm(std::string filename, std::string tag, std
 }
 
 void Tools::say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize, sf::Color color) {
-    font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
-    objText.setFont(font_roboto);
     objText.setCharacterSize(fontSize);
     objText.setFillColor(color);
     objText.setString(text);

@@ -55,7 +55,7 @@ void Animation::setPosition(float i, float j) {
 int Animation::getFrame() {
     return (int)this->i_frame;
 }
-void Animation::setRandomColor() {
+sf::Color Animation::setRandomColor() {
     // Gerador de números aleatórios
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -66,4 +66,9 @@ void Animation::setRandomColor() {
 
     // Aplicar a cor ao sprite
     this->sprite.setColor(randomColor);
+
+    return randomColor;
+}
+void Animation::setColor(sf::Color color) {
+    this->sprite.setColor(color);
 }

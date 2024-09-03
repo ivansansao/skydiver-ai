@@ -16,19 +16,19 @@ using namespace std;
 // Com paraquedas de alta performance, a velocidade máxima durante a descida pode chegar a 50 km/h.
 
 Skydiver::Skydiver() {
-    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 8, 12), true);
-    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 17, 28), true);
-    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 17, 28), true);
-    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 17, 28), true);
+    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true);
+    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true);
+    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true);
+    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true);
     start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
     velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
     on_ground = false;
 
-    skydiverFall.setRandomColor();
-    skydiverParaOpening00.setRandomColor();
-    skydiverParaOpening50.setRandomColor();
-    skydiverParaCenter.setRandomColor();
+    sf::Color color = skydiverFall.setRandomColor();
+    skydiverParaOpening00.setColor(color);
+    skydiverParaOpening50.setColor(color);
+    skydiverParaCenter.setColor(color);
     reset_position();
 }
 
@@ -52,6 +52,12 @@ void Skydiver::update() {
         } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             velocity.x -= 0.01;
         }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            parachutes_brake.increase();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            parachutes_brake.decrease();
+        }
     }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
@@ -59,15 +65,6 @@ void Skydiver::update() {
             if (parachuteState != ParachutesState::OPENING) {
                 parachuteState = ParachutesState::OPENING;
             }
-        }
-    }
-
-    if (parachuteState == ParachutesState::FLYING) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            parachutes_brake.increase();
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            parachutes_brake.decrease();
         }
     }
 
@@ -101,7 +98,7 @@ void Skydiver::update() {
     pos.left += velocity.x;
     pos.top += velocity.y;
 
-    if (pos.top > 850) {
+    if (pos.top > 830) {
         pos.top = start_pos.top;
         pos.left = start_pos.left;
         parachuteState = ParachutesState::CLOSED;
@@ -131,7 +128,7 @@ void Skydiver::draw(sf::RenderWindow *w) {
     rectangle.setOutlineColor(sf::Color::Red);
     rectangle.setOutlineThickness(2.f);
     rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
-    // w->draw(rectangle);
+    w->draw(rectangle);
 
     if (pos.left < 0 || pos.left > 1600 + pos.width) {
         sf::CircleShape circle;
@@ -145,10 +142,9 @@ void Skydiver::draw(sf::RenderWindow *w) {
         w->draw(circle);
     }
 
-    // int offset = 30;
-
-    // Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
-    // Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
-    // Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
-    // Tools::say(w, "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top), pos.left + 24, pos.top - offset + (15 * 3));
+    int offset = 30;
+    Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
+    Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
+    Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
+    Tools::say(w, "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top), pos.left + 24, pos.top - offset + (15 * 3));
 }

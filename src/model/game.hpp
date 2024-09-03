@@ -11,6 +11,7 @@
 
 #include "animation.hpp"
 #include "skydiver.hpp"
+#include "tools.hpp"
 
 class Game {
    public:
@@ -59,6 +60,5 @@ class Game {
 
     void loop_events();
     void run();
-    bool is_fullscreen();
 };
 #endif

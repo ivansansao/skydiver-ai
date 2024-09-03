@@ -15,6 +15,8 @@ class Tools {
     Tools();
 
     static sf::Text objText;
+    static sf::Font font_roboto;
+    static void configure();
     static int getStartSprite(int, int);
     static float ceil_special(float num, float biggerthan);
     static float floor_special(float num, float lessthan);
@@ -25,6 +27,5 @@ class Tools {
     static bool hasString(std::string line, std::string str);
     static std::string get_lines_from_dtm(std::string filename, std::string tag, std::string endLine);
     static void say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize = 12, sf::Color color = sf::Color::Black);
-    static sf::Font font_roboto;
 };
 #endif
