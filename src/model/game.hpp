@@ -9,11 +9,16 @@
 #include <memory>
 #include <vector>
 
+#include "animation.hpp"
 #include "skydiver.hpp"
 
 class Game {
    public:
     Game();
+
+    std::vector<Skydiver *> skydivers;
+
+    Animation scenario;
 
     sf::RenderWindow window;
 

@@ -42,3 +42,5 @@ build/Makefile
 *.exe
 *.out
 *.app
+
+scenario.png

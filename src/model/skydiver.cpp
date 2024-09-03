@@ -25,6 +25,10 @@ Skydiver::Skydiver() {
     velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
     on_ground = false;
 
+    skydiverFall.setRandomColor();
+    skydiverParaOpening00.setRandomColor();
+    skydiverParaOpening50.setRandomColor();
+    skydiverParaCenter.setRandomColor();
     reset_position();
 }
 
@@ -97,8 +101,9 @@ void Skydiver::update() {
     pos.left += velocity.x;
     pos.top += velocity.y;
 
-    if (pos.top > 700) {
+    if (pos.top > 850) {
         pos.top = start_pos.top;
+        pos.left = start_pos.left;
         parachuteState = ParachutesState::CLOSED;
         parachutes_brake.reset();
         velocity.y = 0.0;
@@ -128,9 +133,22 @@ void Skydiver::draw(sf::RenderWindow *w) {
     rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
     // w->draw(rectangle);
 
-    int offset = 30;
+    if (pos.left < 0 || pos.left > 1600 + pos.width) {
+        sf::CircleShape circle;
+        float radius = std::min(pos.width, pos.height) / 2.0f;
+        circle.setRadius(radius);
+        circle.setFillColor(sf::Color(0, 0, 0, 0));
+        circle.setOutlineColor(sf::Color::Red);
+        circle.setOutlineThickness(2.f);
+        if (pos.left < 0) circle.setPosition(sf::Vector2f(0 + radius, pos.top + radius));
+        if (pos.left > 1600 + pos.width) circle.setPosition(sf::Vector2f(1600 - pos.width - radius, pos.top + radius));
+        w->draw(circle);
+    }
 
-    Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
-    Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
-    Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
+    // int offset = 30;
+
+    // Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
+    // Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
+    // Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
+    // Tools::say(w, "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top), pos.left + 24, pos.top - offset + (15 * 3));
 }
