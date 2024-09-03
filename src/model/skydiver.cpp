@@ -16,16 +16,20 @@ using namespace std;
 // Com paraquedas de alta performance, a velocidade máxima durante a descida pode chegar a 50 km/h.
 
 Skydiver::Skydiver() {
-    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true);
-    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true);
-    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true);
-    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true);
+    const float moveLeft = -17;
+    const float moveTop = -52;
+    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
+    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
+    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
+    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
     start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
     velocity = sf::Vector2f(0.f, 0.f);  // Inicial pode ser 1.8 = 180 km/h
     on_ground = false;
 
-    sf::Color color = skydiverFall.setRandomColor();
+    sf::Color color = sf::Color::Magenta;
+    // sf::Color color = skydiverFall.setRandomColor();
+    skydiverFall.setColor(color);
     skydiverParaOpening00.setColor(color);
     skydiverParaOpening50.setColor(color);
     skydiverParaCenter.setColor(color);

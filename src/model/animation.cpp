@@ -6,10 +6,12 @@ using namespace std;
 
 Animation::Animation() {
 }
-void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite) {
+void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop) {
     this->q_frame = q_frame;  // Needed 'this' cause same name param and prop.
     this->step = step;
     this->circularSprite = circularSprite;
+    this->moveLeft = moveLeft;
+    this->moveTop = moveTop;
     setTexture(file);
     setTextureRect(rect);
 }
@@ -39,7 +41,7 @@ void Animation::next() {
     }
 }
 void Animation::draw(float i, float j, sf::RenderWindow *w) {
-    this->setPosition(i, j);
+    this->setPosition(i + this->moveLeft, j + this->moveTop);
     w->draw(this->sprite);
 }
 void Animation::setTexture(std::string file) {
