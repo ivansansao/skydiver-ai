@@ -31,7 +31,7 @@ Game::Game() {
     font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
     font_spacemono_regular.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf");
 
-    scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0);
+    scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
 
     // Configurando o gerador de números aleatórios
     // std::random_device rd;                            // Obter uma semente para o gerador
@@ -40,7 +40,7 @@ Game::Game() {
     // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
 
     skydivers.clear();
-    for (int i{}; i < 100; ++i) {
+    for (int i{}; i < 40; ++i) {
         Skydiver* skydiver = new Skydiver();
         // int x = dist(gen);
         // int y = disty(gen);

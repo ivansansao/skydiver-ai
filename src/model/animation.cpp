@@ -6,13 +6,14 @@ using namespace std;
 
 Animation::Animation() {
 }
-void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop) {
+void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop, bool onTime) {
     this->q_frame = q_frame;  // Needed 'this' cause same name param and prop.
     this->step = step;
     this->circularSprite = circularSprite;
     this->moveLeft = moveLeft;
     this->moveTop = moveTop;
     this->rect = rect;
+    this->oneTime = onTime;
     setTexture(file);
     setTextureRect(rect);
 }
@@ -25,7 +26,13 @@ void Animation::animeAuto() {
     const float left = this->getFrame() * this->rect.width;
     const sf::IntRect nextImage = sf::IntRect(left, this->rect.top, this->rect.width, this->rect.height);
     this->setTextureRect(nextImage);
-    this->next();
+    if (oneTime) {
+        if (i_frame < q_frame - 1) {
+            this->next();
+        }
+    } else {
+        this->next();
+    }
 }
 void Animation::next() {
     if (circularSprite) {

@@ -19,14 +19,16 @@ using namespace std;
 Skydiver::Skydiver() {
     const float moveLeft = -17;
     const float moveTop = -52;
-    skydiverOnPlane.init(1, 0.5f, "./src/asset/image/skydiver_on_plane.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverParaDiedWater.init(3, 0.15f, "./src/asset/image/skydiver_parachutes_died_on_water.png", sf::IntRect(0, 0, 43, 64), false, moveLeft, moveTop);
-    skydiverDiedWater.init(2, 0.01f, "./src/asset/image/skydiver_died_on_water.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    skydiverDiedBoat.init(1, 0, "./src/asset/image/skydiver_died_on_boat.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
+    skydiverOnPlane.init(1, 0.5f, "./src/asset/image/skydiver_on_plane.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaDiedWater.init(3, 0.15f, "./src/asset/image/skydiver_parachutes_died_on_water.png", sf::IntRect(0, 0, 43, 64), false, moveLeft, moveTop, false);
+    skydiverDiedWater.init(2, 0.01f, "./src/asset/image/skydiver_died_on_water.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverDiedBoat.init(1, 0, "./src/asset/image/skydiver_died_on_boat.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaBoatCenter.init(5, 0.1f, "./src/asset/image/skydiver_parachutes_landing_on_boat_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, true);
+
     // start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     start_pos = sf::FloatRect(1700.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
@@ -39,6 +41,7 @@ Skydiver::Skydiver() {
     skydiverParaOpening50.setColor(color);
     skydiverParaCenter.setColor(color);
     skydiverParaDiedWater.setColor(color);
+    skydiverParaBoatCenter.setColor(color);
     reset_position();
 
     // NeuralNetwork* mind = new NeuralNetwork(3);
@@ -235,7 +238,7 @@ void Skydiver::update(Plane plane, Boat boat) {
 
     if (state == State::ON_BOAT) {
         pos.left = boat.pos.left + boatTouchPlaceLeft;
-        pos.top = boat.pos.top - pos.height;
+        pos.top = boat.pos.top - pos.height - 1;
     }
 }
 float Skydiver::getAltitudeFromBoat(Boat boat) {
@@ -265,6 +268,9 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
         }
     } else if (state == State::ON_PLANE) {
         skydiverOnPlane.draw(pos.left, pos.top, w);
+    } else if (state == State::ON_BOAT) {
+        skydiverParaBoatCenter.draw(pos.left, pos.top, w);
+        skydiverParaBoatCenter.animeAuto();
     } else {
         if (parachuteState == ParachutesState::CLOSED) {
             skydiverFall.draw(pos.left, pos.top, w);
@@ -366,8 +372,8 @@ bool Skydiver::touchedBoat(Boat boat) {
         float footLeft = pos.left + (pos.width / 2);
         float footTop = pos.top + pos.height;
 
-        if (footLeft > boat.pos.left && footLeft < boat.pos.left + boat.pos.width) {    // It is in the boat area
-            if (footTop >= boat.pos.top && footTop < boat.pos.top + boat.pos.height) {  // Touched ground
+        if (footLeft > boat.pos.left && footLeft < boat.pos.left + boat.pos.width) {        // It is in the boat area
+            if (footTop >= boat.pos.top - 1 && footTop < boat.pos.top + boat.pos.height) {  // Touched ground
                 return true;
             }
         }

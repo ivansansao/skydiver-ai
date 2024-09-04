@@ -7,7 +7,7 @@
 using namespace std;
 
 Boat::Boat() {
-    boat.init(2, 0.05f, "./src/asset/image/boat.png", sf::IntRect(0, 0, 110, 40), true, 0, -33);
+    boat.init(2, 0.05f, "./src/asset/image/boat.png", sf::IntRect(0, 0, 110, 40), true, 0, -33, false);
 
     start_pos = sf::FloatRect(735, 783, 106, 8);
     abs_pos = pos;

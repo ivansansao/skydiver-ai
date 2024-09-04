@@ -22,6 +22,7 @@ class Animation {
     float moveLeft = 0.0;
     float moveTop = 0.0;
     sf::IntRect rect;
+    bool oneTime = false;
 
     void anime(sf::IntRect rect, int direction_x);
     void animeAuto();
@@ -32,7 +33,7 @@ class Animation {
     void setPosition(float i, float j);
     int getFrame();
 
-    void init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop);
+    void init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop, bool onTime);
     sf::Color setRandomColor();
     void setColor(sf::Color color);
 };

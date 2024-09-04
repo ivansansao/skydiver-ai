@@ -28,6 +28,7 @@ class Skydiver {
     Animation skydiverParaDiedWater;
     Animation skydiverDiedWater;
     Animation skydiverDiedBoat;
+    Animation skydiverParaBoatCenter;
 
     sf::RenderWindow window;
     sf::FloatRect start_pos;

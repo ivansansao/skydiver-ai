@@ -7,7 +7,7 @@
 using namespace std;
 
 Plane::Plane() {
-    plane.init(2, 0.01f, "./src/asset/image/plane.png", sf::IntRect(0, 0, 152, 47), true, 0, 0);
+    plane.init(2, 0.01f, "./src/asset/image/plane.png", sf::IntRect(0, 0, 152, 47), true, 0, 0, false);
 
     start_pos = sf::FloatRect(1600, 50, 152, 47);
     abs_pos = pos;
