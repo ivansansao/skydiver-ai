@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "animation.hpp"
+#include "boat.hpp"
 #include "plane.hpp"
 #include "skydiver.hpp"
 #include "tools.hpp"
@@ -22,12 +23,14 @@ class Game {
 
     Animation scenario;
     Plane plane;
+    Boat boat;
 
     sf::RenderWindow window;
 
     sf::View view;
     sf::Font font_roboto;
     sf::Text text_gameover;
+    float playTimer = 0;
 
     bool gameover_loaded = false;
     int phase_current = 0;
@@ -49,6 +52,7 @@ class Game {
     bool key_released = true;
     bool editing = false;
     int editing_framecount = 1;
+    int frameCount = 0;
 
     struct profile {
         int completed_phases = 0;

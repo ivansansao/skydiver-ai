@@ -7,7 +7,6 @@
 #include <random>
 
 #include "iostream"
-#include "tools.hpp"
 
 using namespace std;
 
@@ -20,8 +19,8 @@ Game::Game() {
     settings.minorVersion = 1;
 
     window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
-    window.setVerticalSyncEnabled(false);  // Don't allow more FPS than your monitor support.
-    // window.setFramerateLimit(60);          // There is a relation between framerate and setVerticalSyncEnabled.
+    window.setVerticalSyncEnabled(true);  // Don't allow more FPS than your monitor support.
+    window.setFramerateLimit(60);         // There is a relation between framerate and setVerticalSyncEnabled.
     window.setPosition(sf::Vector2i(0, 0));
     view.reset(sf::FloatRect(0.f, 0.f, 1600, 900));
     window.setView(this->view);
@@ -56,15 +55,55 @@ void Game::play() {
     window.clear(sf::Color(255, 255, 255, 255));
 
     scenario.draw(0, 0, &window);
+
     plane.update();
     plane.draw(&window);
+    boat.update();
+    boat.draw(&window);
+
+    uint8_t onPlane = 0;
+    uint8_t onAir = 0;
+    uint8_t onBoat = 0;
+    uint8_t died = 0;
+    uint8_t sdTotal = 0;
 
     for (auto& skydiver : skydivers) {
-        skydiver->think(plane);
+        skydiver->think(plane, boat);
         skydiver->update(plane);
         skydiver->draw(&window);
+
+        if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
+        if (skydiver->state == skydiver->State::ON_AIR) onAir++;
+        if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
+        if (skydiver->state == skydiver->State::DIED) died++;
+        sdTotal++;
     }
+
+    Tools::say(&window, "TOTAL: " + to_string(sdTotal), 4, 12 * 1);
+    Tools::say(&window, "ON PLANE: " + to_string(onPlane), 4, 12 * 2);
+    Tools::say(&window, "ON AIR: " + to_string(onAir), 4, 12 * 3);
+    Tools::say(&window, "ON BOAT: " + to_string(onBoat), 4, 12 * 4);
+    Tools::say(&window, "DIED: " + to_string(died), 4, 12 * 5);
+    Tools::say(&window, "PLAY TIMER: " + to_string(playTimer), 4, 12 * 6);
+
     window.display();
+
+    frameCount++;
+    if (frameCount > 100000) frameCount = 0;
+
+    if (playTimer > 60) {
+        playTimer = 0;
+        plane.reset_position();
+        boat.reset_position();
+        skydivers.clear();
+
+        for (int i{}; i < 100; ++i) {
+            Skydiver* skydiver = new Skydiver();
+            skydivers.push_back(skydiver);
+        }
+    } else {
+        playTimer += 0.02;
+    }
 }
 
 void Game::close() {

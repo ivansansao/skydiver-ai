@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "animation.hpp"
+#include "boat.hpp"
 #include "force.hpp"
 #include "mynn/NeuralNetwork.hpp"
 #include "plane.hpp"
@@ -14,15 +15,18 @@ class Skydiver {
    public:
     Skydiver();
 
-    NeuralNetwork* mind = new NeuralNetwork(6);
+    NeuralNetwork mind = NeuralNetwork(8);
 
     Animation skydiverFall;
+    Animation skydiverOnPlane;
 
     Animation skydiverParaOpening00;
     Animation skydiverParaOpening50;
     Animation skydiverParaLeft;
-    Animation skydiverParaCenter;
     Animation skydiverParaRight;
+    Animation skydiverParaCenter;
+    Animation skydiverParaDiedWater;
+    Animation skydiverDiedWater;
 
     sf::RenderWindow window;
     sf::FloatRect start_pos;
@@ -45,18 +49,30 @@ class Skydiver {
     enum State {
         ON_PLANE,
         ON_AIR,
-        ON_WATER,
         ON_BOAT,
         DIED
     } state = ON_PLANE;
 
+    enum DiedPlace {
+        BOAT,
+        WATER
+    } diedPlace;
+
     enum ParachutesState {
         CLOSED,
         OPENING,
-        FLYING,
-        OPEN_ON_BOAT,
-        OPEN_ON_WATER,
+        OPEN,
     } parachuteState = CLOSED;
+
+    enum Action {
+        NOTHING,
+        JUMP,
+        PARACHUTES_OPEN,
+        PARACHUTES_RIGHT,
+        PARACHUTES_LEFT,
+        PARACHUTES_UP,
+        PARACHUTES_DOWN,
+    } action = NOTHING;
 
     bool on_ground;
 
@@ -82,6 +98,6 @@ class Skydiver {
 
     void add_gravity();
     void jump();
-    void think(Plane plane);
+    void think(Plane plane, Boat boat);
 };
 #endif
