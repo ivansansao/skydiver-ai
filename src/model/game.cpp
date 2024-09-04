@@ -21,7 +21,7 @@ Game::Game() {
 
     window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
     window.setVerticalSyncEnabled(false);  // Don't allow more FPS than your monitor support.
-    window.setFramerateLimit(60);          // There is a relation between framerate and setVerticalSyncEnabled.
+    // window.setFramerateLimit(60);          // There is a relation between framerate and setVerticalSyncEnabled.
     window.setPosition(sf::Vector2i(0, 0));
     view.reset(sf::FloatRect(0.f, 0.f, 1600, 900));
     window.setView(this->view);

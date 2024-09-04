@@ -1,13 +1,13 @@
 #ifndef NEURALNETWORK_HPP
 #define NEURALNETWORK_HPP
 
-#include "Layer.hpp"
-#include <vector>
 #include <string>
+#include <vector>
 
-class NeuralNetwork
-{
-public:
+#include "Layer.hpp"
+
+class NeuralNetwork {
+   public:
     int inputs;
     std::vector<Layer> layers;
     std::vector<std::vector<std::vector<double>>> weights;
@@ -25,8 +25,8 @@ public:
     std::string getWeights() const;
     void printWeights() const;
 
-private:
+   private:
     double getRand();
 };
 
-#endif // NEURALNETWORK_HPP
+#endif  // NEURALNETWORK_HPP

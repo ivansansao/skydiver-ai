@@ -23,22 +23,25 @@ Skydiver::Skydiver() {
     skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
     skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
     skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop);
-    start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
+    // start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
+    start_pos = sf::FloatRect(1700.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
     on_ground = false;
 
-    sf::Color color = sf::Color::Magenta;
-    // sf::Color color = skydiverFall.setRandomColor();
+    // sf::Color color = sf::Color::Magenta;
+    sf::Color color = skydiverFall.setRandomColor();
     skydiverFall.setColor(color);
     skydiverParaOpening00.setColor(color);
     skydiverParaOpening50.setColor(color);
     skydiverParaCenter.setColor(color);
     reset_position();
 
-    mind.addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.compile();
-    mind.mutate(4 * 6);
+    // NeuralNetwork* mind = new NeuralNetwork(3);
+
+    // mind->addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind->addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind->compile();
+    mind->mutate(4 * 6);
 }
 
 void Skydiver::add_gravity() {
@@ -63,7 +66,7 @@ void Skydiver::think(Plane plane) {
     const float inpVelocityY = 1 / velocity.y;                     // Pos y of skydiver
 
     std::vector<double> input = {inpState, inpParachuteState, inpPosLeftMid, inpPosBotton, inpVelocityX, inpVelocityY};
-    std::vector<double> output = mind.think(input);
+    std::vector<double> output = mind->think(input);
 
     // std::cout << "Output -> output: " << output[0];
     // std::cout << std::endl;
@@ -76,8 +79,8 @@ void Skydiver::think(Plane plane) {
         jump();
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) {
-        mind.mutate(4 * 6);
-        std::cout << "Mutated: " << std::endl;
+        mind->mutate(4 * 6);
+        // std::cout << "Mutated: " << std::endl;
     }
 
     if (output[0] > 0.5) {
@@ -205,10 +208,11 @@ void Skydiver::update(Plane plane) {
         parachuteState = ParachutesState::CLOSED;
         parachutes_brake.reset();
         state = State::ON_PLANE;
+        mind->mutate(400);
     }
 }
 
-void Skydiver::draw(sf::RenderWindow *w) {
+void Skydiver::draw(sf::RenderWindow* w) {
     if (parachuteState == ParachutesState::CLOSED) {
         skydiverFall.draw(pos.left, pos.top, w);
     } else if (parachuteState == ParachutesState::OPENING) {
@@ -223,14 +227,6 @@ void Skydiver::draw(sf::RenderWindow *w) {
         skydiverFall.draw(pos.left, pos.top, w);
     }
 
-    sf::RectangleShape rectangle;
-    rectangle.setSize(sf::Vector2f(pos.width, pos.height));
-    rectangle.setFillColor(sf::Color(0, 0, 0, 0));
-    rectangle.setOutlineColor(sf::Color::Red);
-    rectangle.setOutlineThickness(2.f);
-    rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
-    w->draw(rectangle);
-
     if (pos.left < 0 || pos.left > 1600 + pos.width) {
         sf::CircleShape circle;
         float radius = std::min(pos.width, pos.height) / 2.0f;
@@ -243,9 +239,19 @@ void Skydiver::draw(sf::RenderWindow *w) {
         w->draw(circle);
     }
 
-    int offset = 30;
-    Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
-    Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
-    Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
-    Tools::say(w, "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top), pos.left + 24, pos.top - offset + (15 * 3));
+    if (0) {
+        sf::RectangleShape rectangle;
+        rectangle.setSize(sf::Vector2f(pos.width, pos.height));
+        rectangle.setFillColor(sf::Color(0, 0, 0, 0));
+        rectangle.setOutlineColor(sf::Color::Red);
+        rectangle.setOutlineThickness(2.f);
+        rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
+        w->draw(rectangle);
+
+        int offset = 30;
+        Tools::say(w, "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState), pos.left + 24, pos.top - offset + (15 * 0));
+        Tools::say(w, "Velocidade vertical: " + to_string(this->velocity.y), pos.left + 24, pos.top - offset + (15 * 1));
+        Tools::say(w, "Parachutes brake: " + to_string(parachutes_brake.value), pos.left + 24, pos.top - offset + (15 * 2));
+        Tools::say(w, "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top), pos.left + 24, pos.top - offset + (15 * 3));
+    }
 }
