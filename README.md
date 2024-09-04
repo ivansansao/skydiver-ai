@@ -4,6 +4,8 @@ Skydiver learning how to land on Boat!
 
 ![Alt Text](src/asset/image/show1.gif)
 
+![Alt Text](src/asset/image/show2.gif)
+
 ## Compile on Linux
 
 Here we are using Makefile.
