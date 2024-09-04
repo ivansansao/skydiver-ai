@@ -40,7 +40,7 @@ Game::Game() {
     // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
 
     skydivers.clear();
-    for (int i{}; i < 60; ++i) {
+    for (int i{}; i < 100; ++i) {
         Skydiver* skydiver = new Skydiver();
         // int x = dist(gen);
         // int y = disty(gen);
@@ -58,14 +58,11 @@ void Game::play() {
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
         paused = false;
     }
-    window.clear(sf::Color(255, 255, 255, 255));
 
-    scenario.draw(0, 0, &window);
+    // UPDATE
 
     if (!paused) plane.update();
-    plane.draw(&window);
     if (!paused) boat.update();
-    boat.draw(&window);
 
     uint8_t onPlane = 0;
     uint8_t onAir = 0;
@@ -75,23 +72,29 @@ void Game::play() {
 
     for (auto& skydiver : skydivers) {
         if (!paused) skydiver->think(plane, boat);
-        if (!paused) skydiver->update(plane);
-        skydiver->draw(&window, boat);
-
+        if (!paused) skydiver->update(plane, boat);
         if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
         if (skydiver->state == skydiver->State::ON_AIR) onAir++;
         if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
-        if (skydiver->state == skydiver->State::DIED) died++;
+        if (skydiver->died) died++;
         sdTotal++;
     }
 
+    // DRAW
+
+    window.clear(sf::Color(255, 255, 255, 255));
+    scenario.draw(0, 0, &window);
+    plane.draw(&window);
+    boat.draw(&window);
+    for (auto& skydiver : skydivers) {
+        skydiver->draw(&window, boat);
+    }
     Tools::say(&window, "TOTAL: " + to_string(sdTotal), 4, 12 * 1);
     Tools::say(&window, "ON PLANE: " + to_string(onPlane), 4, 12 * 2);
     Tools::say(&window, "ON AIR: " + to_string(onAir), 4, 12 * 3);
     Tools::say(&window, "ON BOAT: " + to_string(onBoat), 4, 12 * 4);
     Tools::say(&window, "DIED: " + to_string(died), 4, 12 * 5);
     Tools::say(&window, "PLAY TIMER: " + to_string(playTimer), 4, 12 * 6);
-
     window.display();
 
     if (!paused) frameCount++;

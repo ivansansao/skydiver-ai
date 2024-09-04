@@ -27,6 +27,7 @@ class Skydiver {
     Animation skydiverParaCenter;
     Animation skydiverParaDiedWater;
     Animation skydiverDiedWater;
+    Animation skydiverDiedBoat;
 
     sf::RenderWindow window;
     sf::FloatRect start_pos;
@@ -34,6 +35,8 @@ class Skydiver {
 
     sf::FloatRect abs_pos;
     sf::Vector2f velocity = sf::Vector2f(0.f, 0.f);
+
+    float boatTouchPlaceLeft = 0;
 
     const float max_slide_speed = 1.8;                    // 180 km/h
     const float max_fall_speed = 1.6;                     // 160 km/h
@@ -45,12 +48,12 @@ class Skydiver {
     const float parachutes_flying_ratio_brake = 0.005;
 
     Force parachutes_brake = Force(0.0, 0.27, 0.0, 0.001);  // value, max, min, ratio
+    bool died = false;
 
     enum State {
         ON_PLANE,
         ON_AIR,
         ON_BOAT,
-        DIED
     } state = ON_PLANE;
 
     enum DiedPlace {
@@ -85,7 +88,7 @@ class Skydiver {
     bool zerokey_released = true;
 
     void draw(sf::RenderWindow* w, Boat boat);
-    void update(Plane plane);
+    void update(Plane plane, Boat boat);
     void set_position(float left, float top);
     void reset_position();
     // Force wind_force_x = Force(0.997, 1, 0, 0.0000001);  // Value, max, min, ratio
@@ -102,5 +105,9 @@ class Skydiver {
     float getAltitudeFromBoat(Boat boat);
     float getGroundTop();
     float getLandingPointDistanceH(Boat boat);
+
+    bool touchedBoat(Boat boat);
+    bool isLand(Boat boat);
+    void setBoatTouchPlace(Boat boat);
 };
 #endif
