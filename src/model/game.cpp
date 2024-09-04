@@ -40,7 +40,7 @@ Game::Game() {
     // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
 
     skydivers.clear();
-    for (int i{}; i < 40; ++i) {
+    for (int i{}; i < 30; ++i) {
         Skydiver* skydiver = new Skydiver();
         // int x = dist(gen);
         // int y = disty(gen);
@@ -57,6 +57,9 @@ void Game::play() {
         paused = true;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
         paused = false;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
+        window.setVerticalSyncEnabled(false);
+        window.setFramerateLimit(999);
     }
 
     // UPDATE
@@ -89,12 +92,12 @@ void Game::play() {
     for (auto& skydiver : skydivers) {
         skydiver->draw(&window, boat);
     }
-    Tools::say(&window, "TOTAL: " + to_string(sdTotal), 4, 12 * 1);
-    Tools::say(&window, "ON PLANE: " + to_string(onPlane), 4, 12 * 2);
-    Tools::say(&window, "ON AIR: " + to_string(onAir), 4, 12 * 3);
-    Tools::say(&window, "ON BOAT: " + to_string(onBoat), 4, 12 * 4);
-    Tools::say(&window, "DIED: " + to_string(died), 4, 12 * 5);
-    Tools::say(&window, "PLAY TIMER: " + to_string(playTimer), 4, 12 * 6);
+    // Tools::say(&window, "TOTAL: " + to_string(sdTotal), 4, 12 * 1);
+    // Tools::say(&window, "ON PLANE: " + to_string(onPlane), 4, 12 * 2);
+    // Tools::say(&window, "ON AIR: " + to_string(onAir), 4, 12 * 3);
+    // Tools::say(&window, "ON BOAT: " + to_string(onBoat), 4, 12 * 4);
+    // Tools::say(&window, "DIED: " + to_string(died), 4, 12 * 5);
+    // Tools::say(&window, "PLAY TIMER: " + to_string(playTimer), 4, 12 * 6);
     window.display();
 
     if (!paused) frameCount++;
