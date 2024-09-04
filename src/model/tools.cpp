@@ -3,13 +3,13 @@
 #include <chrono>
 
 sf::Text Tools::objText;
-sf::Font Tools::font_roboto;
+sf::Font Tools::font_spacemono_regular;
 
 Tools::Tools() {
 }
 void Tools::configure() {
-    font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
-    objText.setFont(font_roboto);
+    font_spacemono_regular.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf");
+    objText.setFont(font_spacemono_regular);
 }
 int Tools::getStartSprite(int index, int direction) {
     if (direction == -1)

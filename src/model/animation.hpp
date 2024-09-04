@@ -21,8 +21,10 @@ class Animation {
     bool circularSprite = true;  // true = 0,1,2,3 then 0,1,2,3 false = 0,1,2,3 then 3,2,1,0
     float moveLeft = 0.0;
     float moveTop = 0.0;
+    sf::IntRect rect;
 
     void anime(sf::IntRect rect, int direction_x);
+    void animeAuto();
     void next();
     void draw(float i, float j, sf::RenderWindow *w);
     void setTexture(std::string file);

@@ -20,6 +20,7 @@ class Game {
     Game();
 
     std::vector<Skydiver *> skydivers;
+    bool paused = false;
 
     Animation scenario;
     Plane plane;
@@ -29,6 +30,7 @@ class Game {
 
     sf::View view;
     sf::Font font_roboto;
+    sf::Font font_spacemono_regular;
     sf::Text text_gameover;
     float playTimer = 0;
 

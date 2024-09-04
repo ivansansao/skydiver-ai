@@ -12,6 +12,7 @@ void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect
     this->circularSprite = circularSprite;
     this->moveLeft = moveLeft;
     this->moveTop = moveTop;
+    this->rect = rect;
     setTexture(file);
     setTextureRect(rect);
 }
@@ -20,7 +21,12 @@ void Animation::anime(sf::IntRect rect, int direction_x) {
     this->setTextureRect(rect);
     this->next();
 }
-
+void Animation::animeAuto() {
+    const float left = this->getFrame() * this->rect.width;
+    const sf::IntRect nextImage = sf::IntRect(left, this->rect.top, this->rect.width, this->rect.height);
+    this->setTextureRect(nextImage);
+    this->next();
+}
 void Animation::next() {
     if (circularSprite) {
         // 0,1,2,3 then 0,1,2,3

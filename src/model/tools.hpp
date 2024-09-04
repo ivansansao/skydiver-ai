@@ -15,7 +15,7 @@ class Tools {
     Tools();
 
     static sf::Text objText;
-    static sf::Font font_roboto;
+    static sf::Font font_spacemono_regular;
     static void configure();
     static int getStartSprite(int, int);
     static float ceil_special(float num, float biggerthan);

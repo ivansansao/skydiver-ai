@@ -43,7 +43,7 @@ float Boat::getLandingPointRadius() {
 }
 
 void Boat::draw(sf::RenderWindow *w) {
-    if (1) {
+    if (false) {
         sf::RectangleShape rectangle;
         rectangle.setSize(sf::Vector2f(pos.width, pos.height));
         rectangle.setFillColor(sf::Color(0, 0, 0, 0));

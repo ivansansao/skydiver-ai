@@ -15,7 +15,7 @@ class Skydiver {
    public:
     Skydiver();
 
-    NeuralNetwork mind = NeuralNetwork(8);
+    NeuralNetwork mind = NeuralNetwork(7);
 
     Animation skydiverFall;
     Animation skydiverOnPlane;
@@ -84,7 +84,7 @@ class Skydiver {
     bool rcontroll_released = true;
     bool zerokey_released = true;
 
-    void draw(sf::RenderWindow* w);
+    void draw(sf::RenderWindow* w, Boat boat);
     void update(Plane plane);
     void set_position(float left, float top);
     void reset_position();
@@ -99,5 +99,8 @@ class Skydiver {
     void add_gravity();
     void jump();
     void think(Plane plane, Boat boat);
+    float getAltitudeFromBoat(Boat boat);
+    float getGroundTop();
+    float getLandingPointDistanceH(Boat boat);
 };
 #endif
