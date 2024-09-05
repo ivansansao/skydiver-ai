@@ -39,12 +39,23 @@ Game::Game() {
     // std::uniform_int_distribution<> dist(100, 1500);  // Distribuição
     // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
 
+    qtd_skydivers = 40;
+
     skydivers.clear();
-    for (int i{}; i < 30; ++i) {
-        Skydiver* skydiver = new Skydiver();
+
+    // Skydiver* skydiverTest = new Skydiver();
+    // std::cout << "sky TEST " << std::endl;
+    // skydiverTest->mind.setWeights("-0.231753,0.212437,0.363693,0.128851,0.131988,0.98923,0.0639589,-0.0114211,-0.0792374,-0.307554,-0.749453,0.023334,0.366762,0.177239,0.373656,0.191526,-0.299836,-0.00969508,-0.384004,-0.396488,-0.346737,0.538566,0.494882,0.25105,0.0949097,0.785266,0.645206,-0.110854,0.35558,-0.952787,-0.505122,-0.128861,-0.357298,0.258899,-0.0194009,0.00668131,0.455153,0.351084,0.0723921,0.365679,-0.454371,0.512759,-0.0404545,0.202803,-0.531711,0.0443609,-0.511245,-0.841791,-0.223057,0.390155,0.27952,0.391405,-0.0579165,0.684708,-0.655377,0.181777");
+    // skydivers.push_back(skydiverTest);
+
+    // std::cout << "sky TEST getweights " << skydiverTest->mind.getWeights() << std::endl;
+
+    for (int i{}; i < qtd_skydivers; ++i) {
         // int x = dist(gen);
         // int y = disty(gen);
         // skydiver->set_position(x, (float)y);
+        // skydivers.push_back(Skydiver());
+        Skydiver* skydiver = new Skydiver();
         skydivers.push_back(skydiver);
     }
 }
@@ -105,12 +116,38 @@ void Game::play() {
 
     if (playTimer > 60) {
         playTimer = 0;
+
+        // Get better score
+        int better = 0;
+        Skydiver* betterSkydiver = new Skydiver();
+        for (auto skydiver : skydivers) {
+            if (skydiver->getScore() > better) {
+                better = skydiver->getScore();
+                betterSkydiver = skydiver;
+            }
+        }
+
         plane.reset_position();
         boat.reset_position();
         skydivers.clear();
 
-        for (int i{}; i < 100; ++i) {
+        // Add beter to new round
+        if (better > 10) {
+            Skydiver* child = new Skydiver();
+            child->mind.setWeights(betterSkydiver->mind.getWeights());
+            skydivers.push_back(child);
+
+            std::cout << "Weights of better: " << betterSkydiver->mind.getWeights() << std::endl;
+            std::cout << "Weights of child.: " << child->mind.getWeights() << std::endl;
+        }
+
+        for (int i{}; i < (qtd_skydivers - 1); ++i) {
             Skydiver* skydiver = new Skydiver();
+            if (better > 10) {
+                std::cout << "Has better: " << better << std::endl;
+                skydiver->mind.setWeights(betterSkydiver->mind.getWeights());
+                skydiver->mind.mutate(10);
+            }
             skydivers.push_back(skydiver);
         }
     } else {

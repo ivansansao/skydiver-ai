@@ -20,7 +20,10 @@ class Game {
     Game();
 
     std::vector<Skydiver *> skydivers;
+    // std::vector<Skydiver> skydivers;
+    // std::vector<std::unique_ptr<Skydiver>> skydivers;
     bool paused = false;
+    int qtd_skydivers = 0;
 
     Animation scenario;
     Plane plane;

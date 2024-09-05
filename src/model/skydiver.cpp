@@ -49,7 +49,9 @@ Skydiver::Skydiver() {
     // mind.addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
     mind.addLayer(8, [](double x) { return std::max(0.0, x); });
     mind.compile();
-    mind.mutate(100);
+    // mind.mutate(100);
+}
+Skydiver::~Skydiver() {
 }
 
 void Skydiver::add_gravity() {
@@ -118,9 +120,9 @@ void Skydiver::think(Plane plane, Boat boat) {
         action = Action::PARACHUTES_DOWN;
     }
 
-    if (state == State::ON_PLANE) {
-        mind.mutate(10);
-    }
+    // if (state == State::ON_PLANE) {
+    //     mind.mutate(10);
+    // }
 }
 void Skydiver::jump() {
     if (state == State::ON_PLANE) {
@@ -215,12 +217,27 @@ void Skydiver::update(Plane plane, Boat boat) {
         if (velocity.y < min_opened_parachutes_fall_speed) {
             velocity.y = min_opened_parachutes_fall_speed;
         }
+
+        if (state == State::ON_AIR) {
+            // SAVE SCORES.
+            if (velocity.x > grade_max_velocity_right) grade_max_velocity_right = velocity.x;
+            if (velocity.x < grade_max_velocity_left) grade_max_velocity_left = velocity.x;
+
+            if (timer - last_time_change_direction > 100) {
+                const int direction = velocity.x < 0 ? -1 : 1;
+                if (direction != last_direction) grade_direction_changes++;
+                last_direction = direction;
+                last_time_change_direction = timer;
+            }
+        }
     }
 
     if (touchedBoat(boat)) {
         state = State::ON_BOAT;
         setBoatTouchPlace(boat);
-        if (!this->isLand(boat)) {
+        if (this->isLand(boat)) {
+            saveScoreLanding(boat);
+        } else {
             diedPlace = DiedPlace::BOAT;
             died = true;
         }
@@ -336,31 +353,42 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
         rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
         w->draw(rectangle);
     }
-    if (0) {
+    if (0 && !died) {
         std::vector<std::string> messages = {
             // "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState),
             // "Velocidade vertical: " + to_string(this->velocity.y),
             // "Parachutes brake: " + to_string(parachutes_brake.value),
             // "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top),
             // "------",
-            "GPS",
-            "1 Altitude (boat) .....: " + to_string(getAltitudeFromBoat(boat)),
-            "2 Boat velocity .......: " + to_string(boat.velocity.x),
-            "3 Landing point (H): ..: " + to_string(getLandingPointDistanceH(boat)),
+            // "GPS",
+            // "1 Altitude (boat) .....: " + to_string(getAltitudeFromBoat(boat)),
+            // "2 Boat velocity .......: " + to_string(boat.velocity.x),
+            // "3 Landing point (H): ..: " + to_string(getLandingPointDistanceH(boat)),
             "4 Horizontal velocity .: " + to_string(velocity.x),
             "5 Vertical velocity ...: " + to_string(velocity.y),
-            "6 Place ...............: " + to_string(state),
-            "7 Parachutes ..........: " + to_string(parachuteState)};
+            // "6 Place ...............: " + to_string(state),
+            // "7 Parachutes ..........: " + to_string(parachuteState)},
+            "SCORE  " + to_string(getScore()),
+            "Grade - Landing place ..: " + to_string(grade_landing_place),
+            "Grade - Landing softly..: " + to_string(grade_landing_softly),
+            "Grade - Max vel right...: " + to_string(grade_max_velocity_right),
+            "Grade - Max vel left....: " + to_string(grade_max_velocity_left),
+            "Grade - Direc changes...: " + to_string(grade_direction_changes)};
 
         for (int i = 0; i < (int)messages.size(); ++i) {
             Tools::say(w, messages[i], pos.left + 24, pos.top - 30 + (15 * i));
         }
     }
+
+    timer++;
 }
 
 bool Skydiver::isLand(Boat boat) {
     if (parachuteState == ParachutesState::OPEN) {
+        // If it touch speedly, consider died
+        // if (velocity.x < 0.20 && std::abs(velocity.y) < 0.10) {
         return true;
+        // }
     }
     return false;
 }
@@ -383,4 +411,23 @@ bool Skydiver::touchedBoat(Boat boat) {
 
 void Skydiver::setBoatTouchPlace(Boat boat) {
     boatTouchPlaceLeft = pos.left - boat.pos.left;
+}
+int Skydiver::getScore() {
+    return grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
+}
+void Skydiver::saveScoreLanding(Boat boat) {
+    // Landing velocity - Heigher is better.
+    const int max_velocity = max_slide_speed + max_fall_speed;
+    grade_landing_softly = (max_velocity * 100) - (std::abs(velocity.x * 100) + std::abs(velocity.y * 100));
+
+    // Place - How much near center higher
+    int landingLength = std::abs(boat.getLandingPointLeft() - boat.pos.left);
+    float footLeft = pos.left + (pos.width / 2);
+    grade_landing_place = landingLength - std::abs(boat.getLandingPointLeft() - footLeft);
+
+    grade_max_velocity_right = (int)std::abs(grade_max_velocity_right * 100);
+    grade_max_velocity_left = (int)std::abs(grade_max_velocity_left * 100);
+
+    // Means 10 points each change
+    grade_direction_changes = grade_direction_changes * 10;
 }

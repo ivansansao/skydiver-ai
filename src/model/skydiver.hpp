@@ -14,6 +14,7 @@
 class Skydiver {
    public:
     Skydiver();
+    ~Skydiver();
 
     NeuralNetwork mind = NeuralNetwork(7);
 
@@ -50,6 +51,17 @@ class Skydiver {
 
     Force parachutes_brake = Force(0.0, 0.27, 0.0, 0.001);  // value, max, min, ratio
     bool died = false;
+
+    uint grade_landing_softly = 0;
+    uint grade_landing_place = 0;
+    float grade_max_velocity_right = 0;
+    float grade_max_velocity_left = 0;
+    int getScore();
+
+    int timer = 0;
+    int last_time_change_direction = 0;
+    int grade_direction_changes = 0;
+    int last_direction = -1;
 
     enum State {
         ON_PLANE,
@@ -110,5 +122,6 @@ class Skydiver {
     bool touchedBoat(Boat boat);
     bool isLand(Boat boat);
     void setBoatTouchPlace(Boat boat);
+    void saveScoreLanding(Boat boat);
 };
 #endif

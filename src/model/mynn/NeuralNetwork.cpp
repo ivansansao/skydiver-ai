@@ -107,11 +107,26 @@ void NeuralNetwork::clearNeurons() {
 }
 
 void NeuralNetwork::setWeights(const std::string &text) {
+    std::cout << "SETWEIGHTS(): " << std::endl;
     std::istringstream iss(text);
     std::vector<double> imported;
-    double value;
-    while (iss >> value) {
-        imported.push_back(value);
+    // double value;
+    // while (iss >> value) {
+    //     imported.push_back(value);
+    //     std::cout << "Imported weight: " << value << std::endl;
+    // }
+
+    std::string token;
+
+    while (std::getline(iss, token, ',')) {  // Usa vírgula como delimitador
+        try {
+            double value = std::stod(token);  // Converte a string para double
+            imported.push_back(value);
+        } catch (const std::invalid_argument &e) {
+            std::cerr << "Invalid number: " << token << std::endl;
+        } catch (const std::out_of_range &e) {
+            std::cerr << "Number out of range: " << token << std::endl;
+        }
     }
 
     if (imported.size() <= 0) {
