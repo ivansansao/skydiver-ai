@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "animation.hpp"
@@ -19,15 +20,15 @@ class Game {
    public:
     Game();
 
-    std::vector<Skydiver *> skydivers;
-    // std::vector<Skydiver> skydivers;
-    // std::vector<std::unique_ptr<Skydiver>> skydivers;
+    std::vector<Skydiver*> skydivers;
     bool paused = false;
     int qtd_skydivers = 0;
 
     Animation scenario;
     Plane plane;
     Boat boat;
+    Skydiver* lastBetterSkydiver;
+    std::string lastBetterWeight = "";
 
     sf::RenderWindow window;
 
@@ -40,6 +41,7 @@ class Game {
     bool gameover_loaded = false;
     int phase_current = 0;
     int phase_total = 0;
+    int round = 1;
 
     sf::Text text_gamewin;
     sf::Text text_generic;
@@ -58,6 +60,7 @@ class Game {
     bool editing = false;
     int editing_framecount = 1;
     int frameCount = 0;
+    bool show_information = false;
 
     struct profile {
         int completed_phases = 0;
@@ -71,5 +74,8 @@ class Game {
 
     void loop_events();
     void run();
+    void saveWeights(std::string weights);
+    std::string loadWeights();
+    void setWindowIcon(sf::RenderWindow* w);
 };
 #endif

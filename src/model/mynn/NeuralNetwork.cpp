@@ -107,14 +107,8 @@ void NeuralNetwork::clearNeurons() {
 }
 
 void NeuralNetwork::setWeights(const std::string &text) {
-    std::cout << "SETWEIGHTS(): " << std::endl;
     std::istringstream iss(text);
     std::vector<double> imported;
-    // double value;
-    // while (iss >> value) {
-    //     imported.push_back(value);
-    //     std::cout << "Imported weight: " << value << std::endl;
-    // }
 
     std::string token;
 

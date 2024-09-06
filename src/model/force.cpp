@@ -13,7 +13,6 @@ float Force::increase() {
     const float oldValue = this->value;
 
     this->value += this->ratio;
-    // std::cout << "value:" << this->value << " max: " << this->max << "\n";
 
     if (this->value > this->max) {
         this->value = this->max;

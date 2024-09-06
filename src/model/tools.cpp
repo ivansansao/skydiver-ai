@@ -1,6 +1,8 @@
 #include "tools.hpp"
 
 #include <chrono>
+#include <ctime>
+#include <iomanip>
 
 sf::Text Tools::objText;
 sf::Font Tools::font_spacemono_regular;
@@ -102,10 +104,28 @@ std::string Tools::get_lines_from_dtm(std::string filename, std::string tag, std
     return chunk;
 }
 
-void Tools::say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize, sf::Color color) {
+void Tools::say(sf::RenderWindow* w, std::string text, int left, int top, int fontSize, sf::Color color) {
     objText.setCharacterSize(fontSize);
     objText.setFillColor(color);
     objText.setString(text);
     objText.setPosition(sf::Vector2f(left, top));
     w->draw(objText);
+}
+double Tools::getRand() {
+    // Inicializa a semente com o tempo atual
+    static bool initialized = false;
+    if (!initialized) {
+        srand(static_cast<unsigned>(time(nullptr)));
+        initialized = true;
+    }
+
+    // Retorna um valor pseudoaleatório entre -1 e 1
+    return static_cast<double>(rand()) / RAND_MAX - static_cast<double>(rand()) / RAND_MAX;
+}
+
+void Tools::printHour() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+    std::tm* localTime = std::localtime(&currentTime);
+    std::cout << "Hora atual: " << std::put_time(localTime, "%H:%M:%S") << std::endl;
 }

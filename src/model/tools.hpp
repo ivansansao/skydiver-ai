@@ -27,5 +27,7 @@ class Tools {
     static bool hasString(std::string line, std::string str);
     static std::string get_lines_from_dtm(std::string filename, std::string tag, std::string endLine);
     static void say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize = 12, sf::Color color = sf::Color::Black);
+    static double getRand();
+    static void printHour();
 };
 #endif

@@ -29,12 +29,10 @@ Skydiver::Skydiver() {
     skydiverDiedBoat.init(1, 0, "./src/asset/image/skydiver_died_on_boat.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
     skydiverParaBoatCenter.init(5, 0.1f, "./src/asset/image/skydiver_parachutes_landing_on_boat_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, true);
 
-    // start_pos = sf::FloatRect(800.f, 64.f, 64.f, 64.f);
     start_pos = sf::FloatRect(1700.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
     on_ground = false;
 
-    // sf::Color color = sf::Color::Magenta;
     sf::Color color = skydiverOnPlane.setRandomColor();
     skydiverFall.setColor(color);
     skydiverParaOpening00.setColor(color);
@@ -44,10 +42,8 @@ Skydiver::Skydiver() {
     skydiverParaBoatCenter.setColor(color);
     reset_position();
 
-    // NeuralNetwork* mind = new NeuralNetwork(3);
-
     // mind.addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.addLayer(8, [](double x) { return std::max(0.0, x); });
+    mind.addLayer(6, [](double x) { return std::max(0.0, x); });
     mind.compile();
     // mind.mutate(100);
 }
@@ -77,52 +73,27 @@ void Skydiver::think(Plane plane, Boat boat) {
     std::vector<double> input = {skydiverState, inpParachuteState, altitudeFromBoat, landingPointDistanceH, boat.velocity.x, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);
 
-    // std::cout << "Output -> output: " << output[0];
-    // std::cout << std::endl;
-    // for (const auto &value : output) {
-    //     std::cout << value << " ";
-    // }
-    // std::cout << std::endl;
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::T)) {
-        jump();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::M)) {
-        mind.mutate(4 * 6);
-        // std::cout << "Mutated: " << std::endl;
-    }
-
     action = Action::NOTHING;
 
     if (output[0] > 0.5) {
         jump();
-        // std::cout << "jump" << std::endl;
         action = Action::JUMP;
     } else if (output[1] > 0.5) {
         parachutesOpen();
-        // std::cout << "parachutesOpen" << std::endl;
         action = Action::PARACHUTES_OPEN;
     } else if (output[2] > 0.5) {
         parachutesGoRight();
-        // std::cout << "parachutesGoRight " << skydiverFall.sprite.getColor().toInteger() << std::endl;
         action = Action::PARACHUTES_RIGHT;
     } else if (output[3] > 0.5) {
         parachutesGoLeft();
-        // std::cout << "parachutesGoLeft" << std::endl;
         action = Action::PARACHUTES_LEFT;
     } else if (output[4] > 0.5) {
         parachutesGoUp();
-        // std::cout << "parachutesGoUp" << std::endl;
         action = Action::PARACHUTES_UP;
     } else if (output[5] > 0.5) {
         parachutesGoDown();
-        // std::cout << "parachutesGoDown" << std::endl;
         action = Action::PARACHUTES_DOWN;
     }
-
-    // if (state == State::ON_PLANE) {
-    //     mind.mutate(10);
-    // }
 }
 void Skydiver::jump() {
     if (state == State::ON_PLANE) {
@@ -223,9 +194,11 @@ void Skydiver::update(Plane plane, Boat boat) {
             if (velocity.x > grade_max_velocity_right) grade_max_velocity_right = velocity.x;
             if (velocity.x < grade_max_velocity_left) grade_max_velocity_left = velocity.x;
 
-            if (timer - last_time_change_direction > 100) {
-                const int direction = velocity.x < 0 ? -1 : 1;
-                if (direction != last_direction) grade_direction_changes++;
+            const int direction = velocity.x < 0 ? -1 : 1;
+            if (direction != last_direction) {
+                if (timer - last_time_change_direction > 100) {  // 100 is about 2s
+                    grade_direction_changes++;
+                }
                 last_direction = direction;
                 last_time_change_direction = timer;
             }
@@ -236,16 +209,15 @@ void Skydiver::update(Plane plane, Boat boat) {
         state = State::ON_BOAT;
         setBoatTouchPlace(boat);
         if (this->isLand(boat)) {
+            landed = true;
             saveScoreLanding(boat);
         } else {
             diedPlace = DiedPlace::BOAT;
             died = true;
         }
     } else if (pos.top >= getGroundTop()) {
-        // pos.top = start_pos.top;
-        // pos.left = start_pos.left;
-        // velocity.y = 0.0;
         parachutes_brake.reset();
+        state = State::ON_WATER;
         died = true;
         diedPlace = DiedPlace::WATER;
     } else {
@@ -338,7 +310,6 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
                     Tools::say(w, "J", pos.left + 1, pos.top + 16);
                     break;
                 default:
-                    // Tools::say(w, to_string(action), pos.left, pos.top + 8);
                     break;
             }
         }
@@ -369,6 +340,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
             // "6 Place ...............: " + to_string(state),
             // "7 Parachutes ..........: " + to_string(parachuteState)},
             "SCORE  " + to_string(getScore()),
+            "   Timer ...............: " + to_string(timer),
             "Grade - Landing place ..: " + to_string(grade_landing_place),
             "Grade - Landing softly..: " + to_string(grade_landing_softly),
             "Grade - Max vel right...: " + to_string(grade_max_velocity_right),
@@ -413,21 +385,23 @@ void Skydiver::setBoatTouchPlace(Boat boat) {
     boatTouchPlaceLeft = pos.left - boat.pos.left;
 }
 int Skydiver::getScore() {
+    if (died) return 0;
     return grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
 }
 void Skydiver::saveScoreLanding(Boat boat) {
     // Landing velocity - Heigher is better.
     const int max_velocity = max_slide_speed + max_fall_speed;
-    grade_landing_softly = (max_velocity * 100) - (std::abs(velocity.x * 100) + std::abs(velocity.y * 100));
+    grade_landing_softly = (std::abs(velocity.x) + std::abs(velocity.y)) / max_velocity * 100;
 
     // Place - How much near center higher
     int landingLength = std::abs(boat.getLandingPointLeft() - boat.pos.left);
     float footLeft = pos.left + (pos.width / 2);
-    grade_landing_place = landingLength - std::abs(boat.getLandingPointLeft() - footLeft);
+    grade_landing_place = std::abs(boat.getLandingPointLeft() - footLeft) / landingLength * 100;
 
-    grade_max_velocity_right = (int)std::abs(grade_max_velocity_right * 100);
-    grade_max_velocity_left = (int)std::abs(grade_max_velocity_left * 100);
+    grade_max_velocity_right = std::abs(grade_max_velocity_right) / max_slide_speed * 100;
+    grade_max_velocity_left = std::abs(grade_max_velocity_left) / max_slide_speed * 100;
 
     // Means 10 points each change
-    grade_direction_changes = grade_direction_changes * 10;
+    grade_direction_changes = grade_direction_changes > 10 ? 10 : grade_direction_changes;
+    grade_direction_changes = grade_direction_changes / 10 * 100;
 }

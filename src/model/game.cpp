@@ -19,6 +19,7 @@ Game::Game() {
     settings.minorVersion = 1;
 
     window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
+    setWindowIcon(&window);
     window.setVerticalSyncEnabled(true);  // Don't allow more FPS than your monitor support.
     window.setFramerateLimit(60);         // There is a relation between framerate and setVerticalSyncEnabled.
     window.setPosition(sf::Vector2i(0, 0));
@@ -33,28 +34,23 @@ Game::Game() {
 
     scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
 
-    // Configurando o gerador de números aleatórios
-    // std::random_device rd;                            // Obter uma semente para o gerador
-    // std::mt19937 gen(rd());                           // Gerador de números aleatórios
-    // std::uniform_int_distribution<> dist(100, 1500);  // Distribuição
-    // std::uniform_int_distribution<> disty(64, 200);   // Distribuição
-
+    lastBetterSkydiver = new Skydiver();
     qtd_skydivers = 40;
 
     skydivers.clear();
+    lastBetterWeight = loadWeights();
 
-    // Skydiver* skydiverTest = new Skydiver();
-    // std::cout << "sky TEST " << std::endl;
-    // skydiverTest->mind.setWeights("-0.231753,0.212437,0.363693,0.128851,0.131988,0.98923,0.0639589,-0.0114211,-0.0792374,-0.307554,-0.749453,0.023334,0.366762,0.177239,0.373656,0.191526,-0.299836,-0.00969508,-0.384004,-0.396488,-0.346737,0.538566,0.494882,0.25105,0.0949097,0.785266,0.645206,-0.110854,0.35558,-0.952787,-0.505122,-0.128861,-0.357298,0.258899,-0.0194009,0.00668131,0.455153,0.351084,0.0723921,0.365679,-0.454371,0.512759,-0.0404545,0.202803,-0.531711,0.0443609,-0.511245,-0.841791,-0.223057,0.390155,0.27952,0.391405,-0.0579165,0.684708,-0.655377,0.181777");
-    // skydivers.push_back(skydiverTest);
+    if (lastBetterWeight.length() > 0) {
+        std::cout << "Loading weights...";
+        Skydiver* skydiver = new Skydiver();
+        skydivers.push_back(skydiver);
+        skydiver->mind.setWeights(lastBetterWeight);
 
-    // std::cout << "sky TEST getweights " << skydiverTest->mind.getWeights() << std::endl;
+        std::cout << " Weights:" << skydiver->mind.getWeights() << std::endl;
+        std::cout << " done!" << std::endl;
+    }
 
     for (int i{}; i < qtd_skydivers; ++i) {
-        // int x = dist(gen);
-        // int y = disty(gen);
-        // skydiver->set_position(x, (float)y);
-        // skydivers.push_back(Skydiver());
         Skydiver* skydiver = new Skydiver();
         skydivers.push_back(skydiver);
     }
@@ -64,10 +60,12 @@ enum menuopcs { Play,
                 Exit };
 
 void Game::play() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8)) {
         paused = true;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)) {
         paused = false;
+    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) {
+        show_information = !show_information;
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
         window.setVerticalSyncEnabled(false);
         window.setFramerateLimit(999);
@@ -75,23 +73,68 @@ void Game::play() {
 
     // UPDATE
 
-    if (!paused) plane.update();
-    if (!paused) boat.update();
-
     uint8_t onPlane = 0;
     uint8_t onAir = 0;
     uint8_t onBoat = 0;
     uint8_t died = 0;
+    uint8_t landedCount = 0;
     uint8_t sdTotal = 0;
 
-    for (auto& skydiver : skydivers) {
-        if (!paused) skydiver->think(plane, boat);
-        if (!paused) skydiver->update(plane, boat);
-        if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
-        if (skydiver->state == skydiver->State::ON_AIR) onAir++;
-        if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
-        if (skydiver->died) died++;
-        sdTotal++;
+    if (!paused) {
+        plane.update();
+        boat.update();
+        for (auto& skydiver : skydivers) {
+            skydiver->think(plane, boat);
+            skydiver->update(plane, boat);
+            if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
+            if (skydiver->state == skydiver->State::ON_AIR) onAir++;
+            if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
+            if (skydiver->died) died++;
+            if (skydiver->landed) landedCount++;
+            sdTotal++;
+        }
+    }
+
+    if (playTimer > 60) {
+        playTimer = 0;
+        round++;
+
+        // Get better score
+        Skydiver* betterSkydiver = new Skydiver();
+
+        if (landedCount) {
+            for (auto skydiver : skydivers) {
+                if (skydiver->getScore() > betterSkydiver->getScore()) {
+                    betterSkydiver = skydiver;
+                    this->lastBetterSkydiver = skydiver;
+                }
+            }
+        }
+
+        plane.reset_position();
+        boat.reset_position();
+        boat.pos.left = 735 + (Tools::getRand() * 220);
+        skydivers.clear();
+
+        // Add beter to new round
+        if (betterSkydiver->getScore() > 0) {
+            this->lastBetterWeight = betterSkydiver->mind.getWeights();
+            Skydiver* child = new Skydiver();
+            child->mind.setWeights(lastBetterWeight);
+            skydivers.push_back(child);
+            std::cout << "New better Weights: " << lastBetterWeight << std::endl;
+            std::cout << "Has better (Score): " << betterSkydiver->getScore() << std::endl;
+            saveWeights(lastBetterWeight);
+        }
+
+        for (int i{}; i < qtd_skydivers; ++i) {
+            Skydiver* skydiver = new Skydiver();
+            if (betterSkydiver->getScore() > 0 && i > 10) {  // Add 10 without mutate.
+                skydiver->mind.setWeights(this->lastBetterWeight);
+                skydiver->mind.mutate(50);
+            }
+            skydivers.push_back(skydiver);
+        }
     }
 
     // DRAW
@@ -103,55 +146,66 @@ void Game::play() {
     for (auto& skydiver : skydivers) {
         skydiver->draw(&window, boat);
     }
-    // Tools::say(&window, "TOTAL: " + to_string(sdTotal), 4, 12 * 1);
-    // Tools::say(&window, "ON PLANE: " + to_string(onPlane), 4, 12 * 2);
-    // Tools::say(&window, "ON AIR: " + to_string(onAir), 4, 12 * 3);
-    // Tools::say(&window, "ON BOAT: " + to_string(onBoat), 4, 12 * 4);
-    // Tools::say(&window, "DIED: " + to_string(died), 4, 12 * 5);
-    // Tools::say(&window, "PLAY TIMER: " + to_string(playTimer), 4, 12 * 6);
+
+    if (show_information) {
+        std::string info = "";
+        info += "\nROUND.......: " + to_string(round);
+        info += "\n";
+        info += "\nTOTAL.......: " + to_string(sdTotal);
+        info += "\nON PLANE....: " + to_string(onPlane);
+        info += "\nON AIR......: " + to_string(onAir);
+        info += "\nON BOAT.....: " + to_string(onBoat);
+        info += "\nLANDED......: " + to_string(landedCount);
+        info += "\nDIED........: " + to_string(died);
+        info += "\nPLAY TIMER..: " + to_string(playTimer);
+        info += "\n";
+        info += "\nLAST BETTER SKYDIVER";
+        info += "\nLanding place ..: " + to_string(lastBetterSkydiver->grade_landing_place);
+        info += "\nLanding softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
+        info += "\nMax vel right...: " + to_string(lastBetterSkydiver->grade_max_velocity_right);
+        info += "\nMax vel left....: " + to_string(lastBetterSkydiver->grade_max_velocity_left);
+        info += "\nDirec changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
+        info += "\nSCORE...........: " + to_string(lastBetterSkydiver->getScore());
+
+        Tools::say(&window, info, 4, 4);
+    }
     window.display();
 
-    if (!paused) frameCount++;
-    if (frameCount > 100000) frameCount = 0;
+    if (!paused) {
+        playTimer += 0.02;
+        frameCount++;
+        if (frameCount > 100000) frameCount = 0;
+    }
+}
 
-    if (playTimer > 60) {
-        playTimer = 0;
-
-        // Get better score
-        int better = 0;
-        Skydiver* betterSkydiver = new Skydiver();
-        for (auto skydiver : skydivers) {
-            if (skydiver->getScore() > better) {
-                better = skydiver->getScore();
-                betterSkydiver = skydiver;
-            }
-        }
-
-        plane.reset_position();
-        boat.reset_position();
-        skydivers.clear();
-
-        // Add beter to new round
-        if (better > 10) {
-            Skydiver* child = new Skydiver();
-            child->mind.setWeights(betterSkydiver->mind.getWeights());
-            skydivers.push_back(child);
-
-            std::cout << "Weights of better: " << betterSkydiver->mind.getWeights() << std::endl;
-            std::cout << "Weights of child.: " << child->mind.getWeights() << std::endl;
-        }
-
-        for (int i{}; i < (qtd_skydivers - 1); ++i) {
-            Skydiver* skydiver = new Skydiver();
-            if (better > 10) {
-                std::cout << "Has better: " << better << std::endl;
-                skydiver->mind.setWeights(betterSkydiver->mind.getWeights());
-                skydiver->mind.mutate(10);
-            }
-            skydivers.push_back(skydiver);
-        }
+void Game::saveWeights(std::string weights) {
+    std::ofstream outFile("weights.txt");
+    if (outFile.is_open()) {
+        outFile << weights;
+        outFile.close();
     } else {
-        if (!paused) playTimer += 0.02;
+        std::cerr << "Erro opening weights file to save!" << std::endl;
+    }
+}
+std::string Game::loadWeights() {
+    std::ifstream inFile("weights.txt");
+    std::string weights;
+    if (inFile.is_open()) {
+        std::getline(inFile, weights);
+        inFile.close();
+    } else {
+        std::cerr << "Don't used weights.txt file!" << std::endl;
+    }
+
+    return weights;
+}
+
+void Game::setWindowIcon(sf::RenderWindow* w) {
+    sf::Image icon;
+    if (!icon.loadFromFile("./src/asset/image/icon.png")) {
+        std::cerr << "Erro ao carregar o ícone." << std::endl;
+    } else {
+        w->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
     }
 }
 
