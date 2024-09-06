@@ -35,7 +35,7 @@ Game::Game() {
     scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
 
     lastBetterSkydiver = new Skydiver();
-    qtd_skydivers = 50;
+    qtd_skydivers = 40;
 
     skydivers.clear();
     lastBetterWeight = loadWeights();
@@ -156,8 +156,11 @@ void Game::play() {
         info += "\nGRADE: Max vel left....: " + to_string(lastBetterSkydiver->grade_max_velocity_left);
         info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
         info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
+        info += "\n";
+        info += "\nOTHER";
+        info += std::string("\nSYNC...................: ") + (syncronism ? std::string("ON") : std::string("OFF"));
 
-        Tools::say(&window, info, 8, 8);
+        Tools::say(&window, info, 10, 8);
     }
     window.display();
 
@@ -232,11 +235,15 @@ void Game::loop_events() {
             if (window_has_focus) {
                 if (event.key.code == sf::Keyboard::I) {
                     show_information = !show_information;  // Inverte o estado da variável
-                } else if (event.key.code == sf::Keyboard::F8) {
+                } else if (event.key.code == sf::Keyboard::F7) {
                     paused = !paused;
-                } else if (event.key.code == sf::Keyboard::L) {
-                    window.setVerticalSyncEnabled(false);
-                    window.setFramerateLimit(999);
+                } else if (event.key.code == sf::Keyboard::F8) {
+                    syncronism = !syncronism;
+                    window.setVerticalSyncEnabled(syncronism);
+                    if (syncronism)
+                        window.setFramerateLimit(60);
+                    else
+                        window.setFramerateLimit(0);
                 }
             }
         }
