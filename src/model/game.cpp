@@ -222,16 +222,22 @@ void Game::loop_events() {
     while (window.pollEvent(event)) {
         if (event.type == sf::Event::Closed) {
             window.close();
+        } else if (event.type == sf::Event::GainedFocus) {
+            window_has_focus = true;
+        } else if (event.type == sf::Event::LostFocus) {
+            window_has_focus = false;
         } else if (event.type == sf::Event::KeyReleased) {
             key_released = true;
         } else if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::I) {
-                show_information = !show_information;  // Inverte o estado da variável
-            } else if (event.key.code == sf::Keyboard::F8) {
-                paused = !paused;
-            } else if (event.key.code == sf::Keyboard::L) {
-                window.setVerticalSyncEnabled(false);
-                window.setFramerateLimit(999);
+            if (window_has_focus) {
+                if (event.key.code == sf::Keyboard::I) {
+                    show_information = !show_information;  // Inverte o estado da variável
+                } else if (event.key.code == sf::Keyboard::F8) {
+                    paused = !paused;
+                } else if (event.key.code == sf::Keyboard::L) {
+                    window.setVerticalSyncEnabled(false);
+                    window.setFramerateLimit(999);
+                }
             }
         }
     }

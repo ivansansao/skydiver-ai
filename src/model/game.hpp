@@ -78,5 +78,6 @@ class Game {
     std::string loadWeights();
     void setWindowIcon(sf::RenderWindow* w);
     bool hasOnScreenAir();
+    bool window_has_focus = true;
 };
 #endif
