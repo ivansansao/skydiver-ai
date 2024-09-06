@@ -42,16 +42,19 @@ Game::Game() {
 
     if (lastBetterWeight.length() > 0) {
         std::cout << "Loading weights...";
-        Skydiver* skydiver = new Skydiver();
-        skydivers.push_back(skydiver);
-        skydiver->mind.setWeights(lastBetterWeight);
 
-        std::cout << " Weights:" << skydiver->mind.getWeights() << std::endl;
-        std::cout << " done!" << std::endl;
+        lastBetterSkydiver->mind.setWeights(lastBetterWeight);
+        skydivers.push_back(lastBetterSkydiver);
+
+        std::cout << " Weights:" << lastBetterSkydiver->mind.getWeights() << std::endl;
     }
 
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver();
+        if (lastBetterWeight.length() > 0) {
+            skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+            skydiver->mind.mutate(i);
+        }
         skydivers.push_back(skydiver);
     }
 }

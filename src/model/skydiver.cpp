@@ -41,10 +41,10 @@ Skydiver::Skydiver() {
     skydiverParaBoatCenter.setColor(color);
     reset_position();
 
-    // mind.addLayer(4, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind.addLayer(6, [](double x) { return std::max(0.0, x); });
     mind.addLayer(6, [](double x) { return std::max(0.0, x); });
     mind.compile();
-    // mind.mutate(100);
 }
 Skydiver::~Skydiver() {
 }
