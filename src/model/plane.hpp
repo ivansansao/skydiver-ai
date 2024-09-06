@@ -19,9 +19,11 @@ class Plane {
     sf::Vector2f velocity;
     sf::Vector2f door;
 
+    uint round = 1;
     void draw(sf::RenderWindow *w);
     void update();
     void set_position(float left, float top);
     void reset_position();
+    void start_round();
 };
 #endif

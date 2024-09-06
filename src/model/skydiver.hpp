@@ -92,21 +92,10 @@ class Skydiver {
         PARACHUTES_DOWN,
     } action = NOTHING;
 
-    bool on_ground;
-
-    bool key_released = true;
-    bool up_released = true;
-    bool z_released = true;
-    bool space_released = true;
-    bool lcontroll_released = true;
-    bool rcontroll_released = true;
-    bool zerokey_released = true;
-
     void draw(sf::RenderWindow* w, Boat boat);
     void update(Plane plane, Boat boat);
     void set_position(float left, float top);
     void reset_position();
-    // Force wind_force_x = Force(0.997, 1, 0, 0.0000001);  // Value, max, min, ratio
 
     void parachutesOpen();
     void parachutesGoRight();

@@ -31,7 +31,6 @@ Skydiver::Skydiver() {
 
     start_pos = sf::FloatRect(1700.f, 64.f, 64.f, 64.f);
     abs_pos = pos;
-    on_ground = false;
 
     sf::Color color = skydiverOnPlane.setRandomColor();
     skydiverFall.setColor(color);
@@ -93,6 +92,11 @@ void Skydiver::think(Plane plane, Boat boat) {
     } else if (output[5] > 0.5) {
         parachutesGoDown();
         action = Action::PARACHUTES_DOWN;
+    }
+    if (state == State::ON_PLANE) {
+        if (plane.round > 1) {
+            mind.mutate(1);
+        }
     }
 }
 void Skydiver::jump() {
@@ -229,6 +233,8 @@ void Skydiver::update(Plane plane, Boat boat) {
         pos.left = boat.pos.left + boatTouchPlaceLeft;
         pos.top = boat.pos.top - pos.height - 1;
     }
+
+    timer++;
 }
 float Skydiver::getAltitudeFromBoat(Boat boat) {
     const float myFeetTop = pos.top + pos.height;
@@ -324,23 +330,22 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
         rectangle.setPosition(sf::Vector2f(pos.left, pos.top));
         w->draw(rectangle);
     }
-    if (0 && !died) {
+    if (0 && state == State::ON_AIR) {
         std::vector<std::string> messages = {
             // "Velocidade horizontal: " + to_string(this->velocity.x) + " ps:" + to_string(parachuteState),
             // "Velocidade vertical: " + to_string(this->velocity.y),
             // "Parachutes brake: " + to_string(parachutes_brake.value),
             // "pos - left:" + to_string(pos.left) + ". top: " + to_string(pos.top),
             // "------",
-            // "GPS",
-            // "1 Altitude (boat) .....: " + to_string(getAltitudeFromBoat(boat)),
-            // "2 Boat velocity .......: " + to_string(boat.velocity.x),
-            // "3 Landing point (H): ..: " + to_string(getLandingPointDistanceH(boat)),
+            "GPS",
+            "1 Altitude (boat) .....: " + to_string(getAltitudeFromBoat(boat)),
+            "2 Boat velocity .......: " + to_string(boat.velocity.x),
+            "3 Landing point (H): ..: " + to_string(getLandingPointDistanceH(boat)),
             "4 Horizontal velocity .: " + to_string(velocity.x),
             "5 Vertical velocity ...: " + to_string(velocity.y),
-            // "6 Place ...............: " + to_string(state),
-            // "7 Parachutes ..........: " + to_string(parachuteState)},
+            "6 Place ...............: " + to_string(state),
+            "7 Parachutes ..........: " + to_string(parachuteState),
             "SCORE  " + to_string(getScore()),
-            "   Timer ...............: " + to_string(timer),
             "Grade - Landing place ..: " + to_string(grade_landing_place),
             "Grade - Landing softly..: " + to_string(grade_landing_softly),
             "Grade - Max vel right...: " + to_string(grade_max_velocity_right),
@@ -351,8 +356,6 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
             Tools::say(w, messages[i], pos.left + 24, pos.top - 30 + (15 * i));
         }
     }
-
-    timer++;
 }
 
 bool Skydiver::isLand(Boat boat) {
@@ -386,6 +389,7 @@ void Skydiver::setBoatTouchPlace(Boat boat) {
 }
 int Skydiver::getScore() {
     if (died) return 0;
+    if (grade_direction_changes == 0) return 0;
     return grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
 }
 void Skydiver::saveScoreLanding(Boat boat) {
@@ -401,7 +405,9 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_max_velocity_right = std::abs(grade_max_velocity_right) / max_slide_speed * 100;
     grade_max_velocity_left = std::abs(grade_max_velocity_left) / max_slide_speed * 100;
 
-    // Means 10 points each change
-    grade_direction_changes = grade_direction_changes > 10 ? 10 : grade_direction_changes;
-    grade_direction_changes = grade_direction_changes / 10 * 100;
+    grade_max_velocity_right = (int)grade_max_velocity_right;
+    grade_max_velocity_left = (int)grade_max_velocity_left;
+
+    // Means 100 points each direction change
+    grade_direction_changes = grade_direction_changes * 100;
 }

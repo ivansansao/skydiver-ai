@@ -29,6 +29,7 @@ void Plane::reset_position() {
 void Plane::update() {
     pos.left += velocity.x;
     if (pos.left + pos.width < 0) {
+        round++;
         reset_position();
     }
 }
@@ -36,4 +37,9 @@ void Plane::update() {
 void Plane::draw(sf::RenderWindow *w) {
     plane.draw(pos.left, pos.top, w);
     plane.anime(sf::IntRect(plane.getFrame() * pos.width, 0, pos.width, pos.height), 1);
+}
+
+void Plane::start_round() {
+    round = 1;
+    reset_position();
 }

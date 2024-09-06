@@ -43,4 +43,4 @@ build/Makefile
 *.out
 *.app
 
-scenario.png
+weights.txt

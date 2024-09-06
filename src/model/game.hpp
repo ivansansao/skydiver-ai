@@ -77,5 +77,6 @@ class Game {
     void saveWeights(std::string weights);
     std::string loadWeights();
     void setWindowIcon(sf::RenderWindow* w);
+    bool hasOnScreenAir();
 };
 #endif

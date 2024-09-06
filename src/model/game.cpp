@@ -35,7 +35,7 @@ Game::Game() {
     scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
 
     lastBetterSkydiver = new Skydiver();
-    qtd_skydivers = 40;
+    qtd_skydivers = 50;
 
     skydivers.clear();
     lastBetterWeight = loadWeights();
@@ -60,17 +60,6 @@ enum menuopcs { Play,
                 Exit };
 
 void Game::play() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::F8)) {
-        paused = true;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)) {
-        paused = false;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) {
-        show_information = !show_information;
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) {
-        window.setVerticalSyncEnabled(false);
-        window.setFramerateLimit(999);
-    }
-
     // UPDATE
 
     uint8_t onPlane = 0;
@@ -95,7 +84,7 @@ void Game::play() {
         }
     }
 
-    if (playTimer > 60) {
+    if (playTimer > 60 && !hasOnScreenAir()) {
         playTimer = 0;
         round++;
 
@@ -111,7 +100,7 @@ void Game::play() {
             }
         }
 
-        plane.reset_position();
+        plane.start_round();
         boat.reset_position();
         boat.pos.left = 735 + (Tools::getRand() * 220);
         skydivers.clear();
@@ -129,10 +118,10 @@ void Game::play() {
 
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            if (betterSkydiver->getScore() > 0 && i > 10) {  // Add 10 without mutate.
+            if (betterSkydiver->getScore() > 0 && i > (qtd_skydivers * 0.3)) {  // Add 30% without mutate.
                 skydiver->mind.setWeights(this->lastBetterWeight);
-                skydiver->mind.mutate(50);
             }
+            skydiver->mind.mutate(i);
             skydivers.push_back(skydiver);
         }
     }
@@ -149,7 +138,7 @@ void Game::play() {
 
     if (show_information) {
         std::string info = "";
-        info += "\nROUND.......: " + to_string(round);
+        info += "ROUND.......: " + to_string(round);
         info += "\n";
         info += "\nTOTAL.......: " + to_string(sdTotal);
         info += "\nON PLANE....: " + to_string(onPlane);
@@ -159,23 +148,38 @@ void Game::play() {
         info += "\nDIED........: " + to_string(died);
         info += "\nPLAY TIMER..: " + to_string(playTimer);
         info += "\n";
-        info += "\nLAST BETTER SKYDIVER";
-        info += "\nLanding place ..: " + to_string(lastBetterSkydiver->grade_landing_place);
-        info += "\nLanding softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
-        info += "\nMax vel right...: " + to_string(lastBetterSkydiver->grade_max_velocity_right);
-        info += "\nMax vel left....: " + to_string(lastBetterSkydiver->grade_max_velocity_left);
-        info += "\nDirec changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
-        info += "\nSCORE...........: " + to_string(lastBetterSkydiver->getScore());
+        info += "\nLAST BEST SKYDIVER";
+        info += "\n";
+        info += "\nGRADE: Landing place ..: " + to_string(lastBetterSkydiver->grade_landing_place);
+        info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
+        info += "\nGRADE: Max vel right...: " + to_string(lastBetterSkydiver->grade_max_velocity_right);
+        info += "\nGRADE: Max vel left....: " + to_string(lastBetterSkydiver->grade_max_velocity_left);
+        info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
+        info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
 
-        Tools::say(&window, info, 4, 4);
+        Tools::say(&window, info, 8, 8);
     }
     window.display();
+
+    // END DRAW
 
     if (!paused) {
         playTimer += 0.02;
         frameCount++;
         if (frameCount > 100000) frameCount = 0;
     }
+}
+
+bool Game::hasOnScreenAir() {
+    for (auto& skydiver : skydivers) {
+        if (skydiver->state == skydiver->State::ON_AIR) {
+            if (skydiver->pos.left > 0 && skydiver->pos.left + skydiver->pos.width < 1600) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 void Game::saveWeights(std::string weights) {
@@ -220,6 +224,15 @@ void Game::loop_events() {
             window.close();
         } else if (event.type == sf::Event::KeyReleased) {
             key_released = true;
+        } else if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::I) {
+                show_information = !show_information;  // Inverte o estado da variável
+            } else if (event.key.code == sf::Keyboard::F8) {
+                paused = !paused;
+            } else if (event.key.code == sf::Keyboard::L) {
+                window.setVerticalSyncEnabled(false);
+                window.setFramerateLimit(999);
+            }
         }
     }
 }
