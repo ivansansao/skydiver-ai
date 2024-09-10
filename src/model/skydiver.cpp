@@ -388,9 +388,10 @@ void Skydiver::setBoatTouchPlace(Boat boat) {
     boatTouchPlaceLeft = pos.left - boat.pos.left;
 }
 int Skydiver::getScore() {
-    if (died) return 0;
-    if (grade_direction_changes == 0) return 0;
-    return grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
+    return score;
+}
+void Skydiver::setScore(uint score) {
+    this->score = score;
 }
 void Skydiver::saveScoreLanding(Boat boat) {
     // Landing velocity - Heigher is better.
@@ -410,4 +411,12 @@ void Skydiver::saveScoreLanding(Boat boat) {
 
     // Means 100 points each direction change
     grade_direction_changes = grade_direction_changes * 100;
+
+    // Set Score
+
+    if (grade_direction_changes == 0) {
+        score = 0;
+    } else {
+        score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
+    }
 }

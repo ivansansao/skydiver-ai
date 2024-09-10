@@ -34,6 +34,7 @@ class Skydiver {
     sf::RenderWindow window;
     sf::FloatRect start_pos;
     sf::FloatRect pos;
+    uint score = 0;
 
     sf::FloatRect abs_pos;
     sf::Vector2f velocity = sf::Vector2f(0.f, 0.f);
@@ -59,6 +60,7 @@ class Skydiver {
     float grade_max_velocity_left = 0;
     int grade_direction_changes = 0;
     int getScore();
+    void setScore(uint score);
 
     int timer = 0;
     int last_time_change_direction = 0;

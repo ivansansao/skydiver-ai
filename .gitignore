@@ -44,3 +44,4 @@ build/Makefile
 *.app
 
 weights.txt
+score.txt

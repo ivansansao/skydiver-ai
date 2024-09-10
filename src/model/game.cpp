@@ -44,9 +44,11 @@ Game::Game() {
         std::cout << "Loading weights...";
 
         lastBetterSkydiver->mind.setWeights(lastBetterWeight);
-        skydivers.push_back(lastBetterSkydiver);
+        lastBetterSkydiver->setScore(this->loadScore());
 
-        std::cout << " Weights:" << lastBetterSkydiver->mind.getWeights() << std::endl;
+        Skydiver* skydiver = new Skydiver();
+        skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+        skydivers.push_back(skydiver);
     }
 
     for (int i{}; i < qtd_skydivers; ++i) {
@@ -92,37 +94,35 @@ void Game::play() {
         round++;
 
         // Get better score
-        Skydiver* betterSkydiver = new Skydiver();
 
         if (landedCount) {
             for (auto skydiver : skydivers) {
-                if (skydiver->getScore() > betterSkydiver->getScore()) {
-                    betterSkydiver = skydiver;
-                    this->lastBetterSkydiver = skydiver;
+                if (skydiver->getScore() > lastBetterSkydiver->getScore()) {
+                    lastBetterSkydiver = skydiver;
+                    saveWeights(lastBetterSkydiver->mind.getWeights());
+                    saveScore(lastBetterSkydiver->getScore());
                 }
             }
         }
 
         plane.start_round();
         boat.reset_position();
-        boat.pos.left = 735 + (Tools::getRand() * 220);
+        boat.pos.left = 600 + (std::abs(Tools::getRand()) * 800);
         skydivers.clear();
 
         // Add beter to new round
-        if (betterSkydiver->getScore() > 0) {
-            this->lastBetterWeight = betterSkydiver->mind.getWeights();
+        if (lastBetterSkydiver->getScore() > 0) {
             Skydiver* child = new Skydiver();
-            child->mind.setWeights(lastBetterWeight);
+            child->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydivers.push_back(child);
-            std::cout << "New better Weights: " << lastBetterWeight << std::endl;
-            std::cout << "Has better (Score): " << betterSkydiver->getScore() << std::endl;
-            saveWeights(lastBetterWeight);
+            std::cout << "New better Weights: " << lastBetterSkydiver->mind.getWeights() << std::endl;
+            std::cout << "Has better (Score): " << lastBetterSkydiver->getScore() << std::endl;
         }
 
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            if (betterSkydiver->getScore() > 0 && i > (qtd_skydivers * 0.3)) {  // Add 30% without mutate.
-                skydiver->mind.setWeights(this->lastBetterWeight);
+            if (lastBetterSkydiver->getScore() > 0 && i > (qtd_skydivers * 0.3)) {  // Add 30% without mutate.
+                skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             }
             skydiver->mind.mutate(i);
             skydivers.push_back(skydiver);
@@ -208,6 +208,30 @@ std::string Game::loadWeights() {
     }
 
     return weights;
+}
+void Game::saveScore(uint score) {
+    std::ofstream outFile("score.txt");
+    if (outFile.is_open()) {
+        outFile << score;
+        outFile.close();
+    } else {
+        std::cerr << "Erro opening weights file to save!" << std::endl;
+    }
+}
+uint Game::loadScore() {
+    std::ifstream inFile("score.txt");
+    std::string score = "";
+    if (inFile.is_open()) {
+        std::getline(inFile, score);
+        inFile.close();
+    } else {
+        std::cerr << "Don't used weights.txt file!" << std::endl;
+    }
+
+    if (score.length() > 0) {
+        return std::stoi(score);
+    }
+    return 0;
 }
 
 void Game::setWindowIcon(sf::RenderWindow* w) {

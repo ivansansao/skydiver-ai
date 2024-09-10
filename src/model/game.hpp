@@ -77,6 +77,9 @@ class Game {
     void run();
     void saveWeights(std::string weights);
     std::string loadWeights();
+    void saveScore(uint score);
+    uint loadScore();
+
     void setWindowIcon(sf::RenderWindow* w);
     bool hasOnScreenAir();
     bool window_has_focus = true;
