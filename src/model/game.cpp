@@ -90,9 +90,6 @@ void Game::play() {
     }
 
     if (playTimer > 60 && !hasOnScreenAir()) {
-        playTimer = 0;
-        round++;
-
         // Get better score
 
         if (landedCount) {
@@ -111,6 +108,9 @@ void Game::play() {
                 saveScore(lastBetterSkydiver->getScore());
             }
         }
+
+        playTimer = 0;
+        round++;
 
         plane.start_round();
         boat.reset_position();
