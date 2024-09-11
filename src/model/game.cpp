@@ -96,12 +96,19 @@ void Game::play() {
         // Get better score
 
         if (landedCount) {
+            Skydiver* last = new Skydiver();
             for (auto skydiver : skydivers) {
-                if (skydiver->getScore() > lastBetterSkydiver->getScore()) {
-                    lastBetterSkydiver = skydiver;
-                    saveWeights(lastBetterSkydiver->mind.getWeights());
-                    saveScore(lastBetterSkydiver->getScore());
+                if (skydiver->getScore() > last->getScore()) {
+                    last = skydiver;
                 }
+            }
+
+            // It is good to choose the last best round because boat move of place.
+            if (last->getScore() > 0) {
+                lastBetterSkydiver = last;
+                lastBetterSkydiver->round = round;
+                saveWeights(lastBetterSkydiver->mind.getWeights());
+                saveScore(lastBetterSkydiver->getScore());
             }
         }
 
@@ -115,8 +122,8 @@ void Game::play() {
             Skydiver* child = new Skydiver();
             child->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydivers.push_back(child);
-            std::cout << "New better Weights: " << lastBetterSkydiver->mind.getWeights() << std::endl;
-            std::cout << "Has better (Score): " << lastBetterSkydiver->getScore() << std::endl;
+            std::cout << "Better Weights: " << lastBetterSkydiver->mind.getWeights() << std::endl;
+            std::cout << "Better (Score): " << lastBetterSkydiver->getScore() << std::endl;
         }
 
         for (int i{}; i < qtd_skydivers; ++i) {
@@ -155,12 +162,15 @@ void Game::play() {
         info += "\n";
         info += "\nGRADE: Landing place ..: " + to_string(lastBetterSkydiver->grade_landing_place);
         info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
-        info += "\nGRADE: Max vel right...: " + to_string(lastBetterSkydiver->grade_max_velocity_right);
-        info += "\nGRADE: Max vel left....: " + to_string(lastBetterSkydiver->grade_max_velocity_left);
+        info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
+        info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
+        info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
         info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
+        info += "\n---------------------------------";
         info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
         info += "\n";
         info += "\nOTHER";
+        info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
         info += std::string("\nSYNC...................: ") + (syncronism ? std::string("ON") : std::string("OFF"));
 
         Tools::say(&window, info, 10, 8);

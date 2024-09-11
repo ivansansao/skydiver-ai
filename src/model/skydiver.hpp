@@ -47,6 +47,9 @@ class Skydiver {
     const float min_opened_parachutes_fall_speed = 0.08;  // 8 km/h
     const float parachutes_fall_ratio_brake = 0.03;
     const float gravity = 0.0035;
+    uint round = 0;
+    uint leftText = 0;
+    uint topText = 0;
 
     const float parachutes_flying_ratio_brake = 0.005;
 
@@ -59,6 +62,7 @@ class Skydiver {
     float grade_max_velocity_right = 0;
     float grade_max_velocity_left = 0;
     int grade_direction_changes = 0;
+    int grade_time_on_air = 0;
     int getScore();
     void setScore(uint score);
 
