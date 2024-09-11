@@ -417,6 +417,13 @@ void Skydiver::saveScoreLanding(Boat boat) {
     if (grade_direction_changes == 0) {
         score = 0;
     } else {
+        // Define some importance to each grade.
+        grade_landing_softly = grade_landing_softly * 0.2;
+        grade_landing_place = grade_landing_place * 0.2;
+        grade_max_velocity_right = grade_max_velocity_right * 0.1;
+        grade_max_velocity_left = grade_max_velocity_left * 0.1;
+        grade_direction_changes = grade_direction_changes * 0.4;
+
         score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes;
     }
 }
