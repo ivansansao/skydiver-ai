@@ -69,6 +69,7 @@ class Skydiver {
     int timer = 0;
     int last_time_change_direction = 0;
     int last_direction = -1;
+    bool visible = true;
 
     enum State {
         ON_PLANE,

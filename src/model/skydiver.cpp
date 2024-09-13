@@ -66,7 +66,6 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::think(Plane plane, Boat boat) {
-    if (died) return;
     const float altitudeFromBoat = 1 / getAltitudeFromBoat(boat);
     const float landingPointDistanceH = 1 / getLandingPointDistanceH(boat);
     const float skydiverState = 1 / state;
@@ -240,6 +239,14 @@ void Skydiver::update(Plane plane, Boat boat) {
         pos.top = boat.pos.top - pos.height - 1;
     }
 
+    visible = (pos.left + pos.width > 0 && pos.left < 1600);
+
+    if (state == State::ON_AIR) {
+        if (!visible) {
+            died = true;
+        }
+    }
+
     timer++;
 }
 float Skydiver::getAltitudeFromBoat(Boat boat) {
@@ -255,40 +262,42 @@ float Skydiver::getLandingPointDistanceH(Boat boat) {
 }
 
 void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
-    if (died) {
-        if (diedPlace == DiedPlace::WATER) {
-            if (parachuteState == ParachutesState::OPEN) {
-                skydiverParaDiedWater.draw(pos.left, pos.top, w);
-                skydiverParaDiedWater.animeAuto();
-            } else {
-                skydiverDiedWater.draw(pos.left, pos.top, w);
-                skydiverDiedWater.animeAuto();
+    if (visible) {
+        if (died) {
+            if (diedPlace == DiedPlace::WATER) {
+                if (parachuteState == ParachutesState::OPEN) {
+                    skydiverParaDiedWater.draw(pos.left, pos.top, w);
+                    skydiverParaDiedWater.animeAuto();
+                } else {
+                    skydiverDiedWater.draw(pos.left, pos.top, w);
+                    skydiverDiedWater.animeAuto();
+                }
+            } else if (diedPlace == DiedPlace::BOAT) {
+                skydiverDiedBoat.draw(pos.left, pos.top, w);
             }
-        } else if (diedPlace == DiedPlace::BOAT) {
-            skydiverDiedBoat.draw(pos.left, pos.top, w);
-        }
-    } else if (state == State::ON_PLANE) {
-        skydiverOnPlane.draw(pos.left, pos.top, w);
-    } else if (state == State::ON_BOAT) {
-        skydiverParaBoatCenter.draw(pos.left, pos.top, w);
-        skydiverParaBoatCenter.animeAuto();
-    } else {
-        if (parachuteState == ParachutesState::CLOSED) {
-            skydiverFall.draw(pos.left, pos.top, w);
-        } else if (parachuteState == ParachutesState::OPENING) {
-            if (velocity.y > max_opened_parachutes_fall_speed * 2) {
-                skydiverParaOpening00.draw(pos.left, pos.top, w);
-            } else {
-                skydiverParaOpening50.draw(pos.left, pos.top, w);
-            }
-        } else if (parachuteState == ParachutesState::OPEN) {
-            skydiverParaCenter.draw(pos.left, pos.top, w);
+        } else if (state == State::ON_PLANE) {
+            skydiverOnPlane.draw(pos.left, pos.top, w);
+        } else if (state == State::ON_BOAT) {
+            skydiverParaBoatCenter.draw(pos.left, pos.top, w);
+            skydiverParaBoatCenter.animeAuto();
         } else {
-            skydiverFall.draw(pos.left, pos.top, w);
+            if (parachuteState == ParachutesState::CLOSED) {
+                skydiverFall.draw(pos.left, pos.top, w);
+            } else if (parachuteState == ParachutesState::OPENING) {
+                if (velocity.y > max_opened_parachutes_fall_speed * 2) {
+                    skydiverParaOpening00.draw(pos.left, pos.top, w);
+                } else {
+                    skydiverParaOpening50.draw(pos.left, pos.top, w);
+                }
+            } else if (parachuteState == ParachutesState::OPEN) {
+                skydiverParaCenter.draw(pos.left, pos.top, w);
+            } else {
+                skydiverFall.draw(pos.left, pos.top, w);
+            }
         }
-    }
+    } else {
+        // (pos.left < 0 || pos.left > 1600 + pos.width)
 
-    if (pos.left < 0 || pos.left > 1600 + pos.width) {
         sf::CircleShape circle;
         float radius = std::min(pos.width, pos.height) / 2.0f;
         circle.setRadius(radius);
@@ -296,7 +305,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
         circle.setOutlineColor(sf::Color::Red);
         circle.setOutlineThickness(2.f);
         if (pos.left < 0) circle.setPosition(sf::Vector2f(0 + radius, pos.top + radius));
-        if (pos.left > 1600 + pos.width) circle.setPosition(sf::Vector2f(1600 - pos.width - radius, pos.top + radius));
+        if (pos.left > 1600) circle.setPosition(sf::Vector2f(1600 - pos.width - radius, pos.top + radius));
         w->draw(circle);
     }
 

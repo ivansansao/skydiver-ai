@@ -78,8 +78,12 @@ void Game::play() {
         plane.update();
         boat.update();
         for (auto& skydiver : skydivers) {
-            skydiver->think(plane, boat);
-            skydiver->update(plane, boat);
+            if (!skydiver->died) {
+                if (skydiver->state != skydiver->State::ON_BOAT) {
+                    skydiver->think(plane, boat);
+                }
+                skydiver->update(plane, boat);
+            }
             if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
             if (skydiver->state == skydiver->State::ON_AIR) onAir++;
             if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
