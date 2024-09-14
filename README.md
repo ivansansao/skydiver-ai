@@ -62,3 +62,11 @@ make
 ~~~
 
 Done, skydiver-ai.exe has created! I believe!
+
+
+## About Language
+
+Use gdp to debug your application is necessary
+Inside it type: 
+run 2 
+bt

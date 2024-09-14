@@ -21,7 +21,7 @@ void NeuralNetwork::compile() {
     for (int i = 0; i < inputs; ++i) {
         std::vector<double> sub;
         sub.reserve(layers[0].neurons.size());
-        for (uint j = 0; j < layers[0].neurons.size(); ++j) {
+        for (unsigned int j = 0; j < layers[0].neurons.size(); ++j) {
             sub.push_back(getRand());
         }
         weightsLayer0.push_back(sub);
@@ -29,13 +29,13 @@ void NeuralNetwork::compile() {
     weights.push_back(weightsLayer0);
 
     // Hidden layers
-    for (uint lay = 1; lay < layers.size(); ++lay) {
+    for (unsigned int lay = 1; lay < layers.size(); ++lay) {
         std::vector<std::vector<double>> weightsLayer;
         weightsLayer.reserve(layers[lay - 1].neurons.size());
-        for (uint i = 0; i < layers[lay - 1].neurons.size(); ++i) {
+        for (unsigned int i = 0; i < layers[lay - 1].neurons.size(); ++i) {
             std::vector<double> sub;
             sub.reserve(layers[lay].neurons.size());
-            for (uint j = 0; j < layers[lay].neurons.size(); ++j) {
+            for (unsigned int j = 0; j < layers[lay].neurons.size(); ++j) {
                 sub.push_back(getRand());
             }
             weightsLayer.push_back(sub);
@@ -48,31 +48,31 @@ std::vector<double> NeuralNetwork::think(const std::vector<double> &input) {
     clearNeurons();
 
     // First layer
-    for (uint i = 0; i < weights[0].size(); ++i) {
+    for (unsigned int i = 0; i < weights[0].size(); ++i) {
         // Scan weights x input
-        for (uint j = 0; j < weights[0][i].size(); ++j) {
+        for (unsigned int j = 0; j < weights[0][i].size(); ++j) {
             const double mult = input[i] * weights[0][i][j];
             layers[0].neurons[j].weightsSums.push_back(mult);
         }
     }
 
     // Activate the neurons
-    for (uint i = 0; i < layers[0].neurons.size(); ++i) {
+    for (unsigned int i = 0; i < layers[0].neurons.size(); ++i) {
         layers[0].neurons[i].active();
     }
 
     // Hidden layers
-    for (uint l = 1; l < layers.size(); ++l) {
-        for (uint i = 0; i < weights[l].size(); ++i) {
+    for (unsigned int l = 1; l < layers.size(); ++l) {
+        for (unsigned int i = 0; i < weights[l].size(); ++i) {
             // Scan weights x input
-            for (uint j = 0; j < weights[l][i].size(); ++j) {
+            for (unsigned int j = 0; j < weights[l][i].size(); ++j) {
                 const double mult = layers[l - 1].neurons[i].output * weights[l][i][j];
                 layers[l].neurons[j].weightsSums.push_back(mult);
             }
         }
 
         // Activate the neurons
-        for (uint i = 0; i < layers[l].neurons.size(); ++i) {
+        for (unsigned int i = 0; i < layers[l].neurons.size(); ++i) {
             layers[l].neurons[i].active();
         }
     }
@@ -136,7 +136,7 @@ void NeuralNetwork::setWeights(const std::string &text) {
     for (int i = 0; i < inputs; ++i) {
         std::vector<double> sub;
         sub.reserve(layers[0].neurons.size());
-        for (uint j = 0; j < layers[0].neurons.size(); ++j) {
+        for (unsigned int j = 0; j < layers[0].neurons.size(); ++j) {
             sub.push_back(imported[w++]);
         }
         weightsLayer0.push_back(sub);
@@ -144,13 +144,13 @@ void NeuralNetwork::setWeights(const std::string &text) {
     weights.push_back(weightsLayer0);
 
     // Hidden layers
-    for (uint lay = 1; lay < layers.size(); ++lay) {
+    for (unsigned int lay = 1; lay < layers.size(); ++lay) {
         std::vector<std::vector<double>> weightsLayer;
         weightsLayer.reserve(layers[lay - 1].neurons.size());
-        for (uint i = 0; i < layers[lay - 1].neurons.size(); ++i) {
+        for (unsigned int i = 0; i < layers[lay - 1].neurons.size(); ++i) {
             std::vector<double> sub;
             sub.reserve(layers[lay].neurons.size());
-            for (uint j = 0; j < layers[lay].neurons.size(); ++j) {
+            for (unsigned int j = 0; j < layers[lay].neurons.size(); ++j) {
                 sub.push_back(imported[w++]);
             }
             weightsLayer.push_back(sub);

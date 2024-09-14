@@ -223,7 +223,7 @@ std::string Game::loadWeights() {
 
     return weights;
 }
-void Game::saveScore(uint score) {
+void Game::saveScore(unsigned int score) {
     std::ofstream outFile("score.txt");
     if (outFile.is_open()) {
         outFile << score;
@@ -232,7 +232,7 @@ void Game::saveScore(uint score) {
         std::cerr << "Erro opening weights file to save!" << std::endl;
     }
 }
-uint Game::loadScore() {
+unsigned int Game::loadScore() {
     std::ifstream inFile("score.txt");
     std::string score = "";
     if (inFile.is_open()) {

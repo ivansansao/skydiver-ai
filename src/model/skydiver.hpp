@@ -34,7 +34,7 @@ class Skydiver {
     sf::RenderWindow window;
     sf::FloatRect start_pos;
     sf::FloatRect pos;
-    uint score = 0;
+    unsigned int score = 0;
 
     sf::FloatRect abs_pos;
     sf::Vector2f velocity = sf::Vector2f(0.f, 0.f);
@@ -47,9 +47,9 @@ class Skydiver {
     const float min_opened_parachutes_fall_speed = 0.08;  // 8 km/h
     const float parachutes_fall_ratio_brake = 0.03;
     const float gravity = 0.0035;
-    uint round = 0;
-    uint leftText = 0;
-    uint topText = 0;
+    unsigned int round = 0;
+    unsigned int leftText = 0;
+    unsigned int topText = 0;
 
     const float parachutes_flying_ratio_brake = 0.005;
 
@@ -57,14 +57,14 @@ class Skydiver {
     bool landed = false;
     bool died = false;
 
-    uint grade_landing_softly = 0;
-    uint grade_landing_place = 0;
+    unsigned int grade_landing_softly = 0;
+    unsigned int grade_landing_place = 0;
     float grade_max_velocity_right = 0;
     float grade_max_velocity_left = 0;
     int grade_direction_changes = 0;
     int grade_time_on_air = 0;
     int getScore();
-    void setScore(uint score);
+    void setScore(unsigned int score);
 
     int timer = 0;
     int last_time_change_direction = 0;

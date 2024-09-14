@@ -5,11 +5,11 @@ WARN=-Wall
 CPPVERSION=-std=c++17
 ifeq ($(OS), Windows_NT)	
 	TARGET=skydiver-ai.exe
-	REMOVE=del *.o
+	REMOVE=del /Q *.o
 	SFML=-IC:\SFML\include -LC:\SFML\lib -LC:\mingw64\x86_64-w64-mingw32 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 else
 	TARGET=./skydiver-ai
-	REMOVE=rm *.o
+	REMOVE=rm -f *.o
 	SFML=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 endif
 CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(SFML) $(CPPVERSION)

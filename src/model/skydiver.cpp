@@ -68,8 +68,8 @@ void Skydiver::reset_position() {
 void Skydiver::think(Plane plane, Boat boat) {
     const float altitudeFromBoat = 1 / getAltitudeFromBoat(boat);
     const float landingPointDistanceH = 1 / getLandingPointDistanceH(boat);
-    const float skydiverState = 1 / state;
-    const float inpParachuteState = 1 / parachuteState;
+    const float skydiverState = state ? 1 / state : 0;
+    const float inpParachuteState = parachuteState ? 1 / parachuteState : 0;
 
     std::vector<double> input = {skydiverState, inpParachuteState, altitudeFromBoat, landingPointDistanceH, boat.velocity.x, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);
@@ -425,7 +425,7 @@ void Skydiver::setBoatTouchPlace(Boat boat) {
 int Skydiver::getScore() {
     return score;
 }
-void Skydiver::setScore(uint score) {
+void Skydiver::setScore(unsigned int score) {
     this->score = score;
 }
 void Skydiver::saveScoreLanding(Boat boat) {
