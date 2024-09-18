@@ -136,6 +136,13 @@ void Skydiver::parachutesGoDown() {
     }
 }
 void Skydiver::update(Plane plane, Boat boat) {
+    if (died) {
+        if (state == State::ON_BOAT) {
+            pos.left = boat.pos.left + boatTouchPlaceLeft;
+            pos.top = boat.pos.top - pos.height - 1;
+        }
+        return;
+    }
     // PLANE
     if (this->state == State::ON_PLANE) {
         pos.left = plane.pos.left + plane.door.x;

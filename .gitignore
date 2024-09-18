@@ -43,5 +43,5 @@ build/Makefile
 *.out
 *.app
 
-weights.txt
+weights*.txt
 score.txt
