@@ -3,6 +3,7 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <random>
 
 sf::Text Tools::objText;
 sf::Font Tools::font_spacemono_regular;
@@ -111,16 +112,13 @@ void Tools::say(sf::RenderWindow* w, std::string text, int left, int top, int fo
     objText.setPosition(sf::Vector2f(left, top));
     w->draw(objText);
 }
-double Tools::getRand() {
-    // Inicializa a semente com o tempo atual
-    static bool initialized = false;
-    if (!initialized) {
-        srand(static_cast<unsigned>(time(nullptr)));
-        initialized = true;
-    }
 
-    // Retorna um valor pseudoaleatório entre -1 e 1
-    return static_cast<double>(rand()) / RAND_MAX - static_cast<double>(rand()) / RAND_MAX;
+double Tools::getRand() {
+    static std::random_device rd;                     // Obtém uma semente aleatória do hardware
+    static std::mt19937 gen(rd());                    // Inicializa o gerador Mersenne Twister com a semente
+    std::uniform_real_distribution<> dis(-1.0, 1.0);  // Define a distribuição entre -1 e 1
+    // Gera o número aleatório entre -1 e 1
+    return dis(gen);
 }
 
 void Tools::printHour() {

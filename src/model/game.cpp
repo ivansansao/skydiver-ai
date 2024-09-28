@@ -55,8 +55,8 @@ Game::Game() {
         Skydiver* skydiver = new Skydiver();
         if (lastBetterWeight.length() > 0) {
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-            skydiver->mind.mutate(i);
         }
+        skydiver->mind.mutate(i);
         skydivers.push_back(skydiver);
     }
 }
@@ -118,24 +118,19 @@ void Game::play() {
 
         plane.start_round();
         boat.reset_position();
-        boat.pos.left = 600 + (std::abs(Tools::getRand()) * 800);
+        boat.pos.left = 800 - 50 + (Tools::getRand() * 200);
+        boat.pos.left = (int)boat.pos.left;
+        if (Tools::getRand() > 0) boat.velocity.x *= -1;
         skydivers.clear();
-
-        // Add beter to new round
-        if (lastBetterSkydiver->getScore() > 0) {
-            Skydiver* child = new Skydiver();
-            child->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-            skydivers.push_back(child);
-            std::cout << "Better Weights: " << lastBetterSkydiver->mind.getWeights() << std::endl;
-            std::cout << "Better (Score): " << lastBetterSkydiver->getScore() << std::endl;
-        }
 
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            if (lastBetterSkydiver->getScore() > 0 && i > (qtd_skydivers * 0.3)) {  // Add 30% without mutate.
+            if (lastBetterSkydiver->getScore() > 0) {
                 skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             }
-            skydiver->mind.mutate(i);
+            if (i > 0) {
+                skydiver->mind.mutate(i);
+            }
             skydivers.push_back(skydiver);
         }
     }

@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <random>
 #include <sstream>
 
 // int Neuron::neuronIdCounter = 1;
@@ -164,15 +165,11 @@ std::string NeuralNetwork::version() const {
 }
 
 double NeuralNetwork::getRand() {
-    // Inicializa a semente com o tempo atual
-    static bool initialized = false;
-    if (!initialized) {
-        srand(static_cast<unsigned>(time(nullptr)));
-        initialized = true;
-    }
-
-    // Retorna um valor pseudoaleatório entre -1 e 1
-    return static_cast<double>(rand()) / RAND_MAX - static_cast<double>(rand()) / RAND_MAX;
+    static std::random_device rd;                     // Obtém uma semente aleatória do hardware
+    static std::mt19937 gen(rd());                    // Inicializa o gerador Mersenne Twister com a semente
+    std::uniform_real_distribution<> dis(-1.0, 1.0);  // Define a distribuição entre -1 e 1
+    // Gera o número aleatório entre -1 e 1
+    return dis(gen);
 }
 
 std::string NeuralNetwork::getWeights() const {
