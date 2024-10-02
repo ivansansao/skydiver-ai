@@ -85,10 +85,10 @@ void Game::play() {
         // Get better score
 
         if (landedCount) {
-            Skydiver* last = new Skydiver();
-            for (auto skydiver : skydivers) {
-                if (skydiver->getScore() > last->getScore()) {
-                    last = skydiver;
+            Skydiver* last = skydivers[0];
+            for (size_t i = 1; i < skydivers.size(); ++i) {
+                if (skydivers[i]->getScore() > last->getScore()) {
+                    last = skydivers[i];
                 }
             }
 
