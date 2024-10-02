@@ -28,7 +28,6 @@ class Game {
     Plane plane;
     Boat boat;
     Skydiver* lastBetterSkydiver;
-    std::string lastBetterWeight = "";
 
     sf::RenderWindow window;
 

@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "animation.hpp"
+#include "tools.hpp"
 
 class Boat {
    public:
@@ -21,6 +22,7 @@ class Boat {
     void update();
     void set_position(float left, float top);
     void reset_position();
+    void start_position_random();
     float getLandingPointLeft();
     float getLandingPointTop();
     float getLandingPointRadius();

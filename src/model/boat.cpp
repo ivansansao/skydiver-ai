@@ -14,6 +14,7 @@ Boat::Boat() {
     velocity = sf::Vector2f(-0.1f, 0.f);  // 10 km/h
 
     reset_position();
+    start_position_random();
 }
 
 void Boat::set_position(float left, float top) {
@@ -25,11 +26,13 @@ void Boat::set_position(float left, float top) {
 void Boat::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, start_pos.width, start_pos.height);
 }
+void Boat::start_position_random() {
+    pos.left = 800 - 50 + (Tools::getRand() * 200);
+    pos.left = (int)pos.left;
+    if (Tools::getRand() > 0) velocity.x *= -1;
+}
 void Boat::update() {
     pos.left += velocity.x;
-    if (pos.left + pos.width < 0) {
-        reset_position();
-    }
 }
 
 float Boat::getLandingPointLeft() {

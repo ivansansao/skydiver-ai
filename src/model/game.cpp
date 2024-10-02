@@ -34,29 +34,17 @@ Game::Game() {
 
     scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
 
-    lastBetterSkydiver = new Skydiver();
     qtd_skydivers = 40;
 
     skydivers.clear();
-    lastBetterWeight = loadWeights();
 
-    if (lastBetterWeight.length() > 0) {
-        std::cout << "Loading weights...";
-
-        lastBetterSkydiver->mind.setWeights(lastBetterWeight);
-        lastBetterSkydiver->setScore(this->loadScore());
-
-        Skydiver* skydiver = new Skydiver();
-        skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-        skydivers.push_back(skydiver);
-    }
+    lastBetterSkydiver = new Skydiver();
+    lastBetterSkydiver->mind.setWeights(loadWeights());
 
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver();
-        if (lastBetterWeight.length() > 0) {
-            skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-        }
-        skydiver->mind.mutate(i);
+        skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+        if (i > 0) skydiver->mind.mutate(i);
         skydivers.push_back(skydiver);
     }
 }
@@ -117,27 +105,20 @@ void Game::play() {
         round++;
 
         plane.start_round();
-        boat.reset_position();
-        boat.pos.left = 800 - 50 + (Tools::getRand() * 200);
-        boat.pos.left = (int)boat.pos.left;
-        if (Tools::getRand() > 0) boat.velocity.x *= -1;
-        skydivers.clear();
+        boat.start_position_random();
 
+        skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            if (lastBetterSkydiver->getScore() > 0) {
-                skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-            }
-            if (i > 0) {
-                skydiver->mind.mutate(i);
-            }
+            skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+            if (i > 0) skydiver->mind.mutate(i);
             skydivers.push_back(skydiver);
         }
     }
 
     // DRAW
 
-    window.clear(sf::Color(255, 255, 255, 255));
+    // window.clear(sf::Color(255, 255, 255, 255));
     scenario.draw(0, 0, &window);
     plane.draw(&window);
     boat.draw(&window);
