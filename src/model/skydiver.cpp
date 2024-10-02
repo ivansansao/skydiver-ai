@@ -469,6 +469,7 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_max_velocity_left = grade_max_velocity_left * 0.05;
 
     grade_time_on_air = (int)gTimeOnAir;
+    grade_time_on_air = 0;  // Disabled
 
     // Set Score
     score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air;

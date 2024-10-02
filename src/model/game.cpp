@@ -144,7 +144,7 @@ void Game::play() {
         info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
         info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
         info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
-        info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
+        // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
         info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
         info += "\n---------------------------------";
         info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
