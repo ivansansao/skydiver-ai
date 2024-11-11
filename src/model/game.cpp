@@ -44,7 +44,7 @@ Game::Game() {
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver();
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-        if (i > 0) skydiver->mind.mutate(i);
+        if (i > 0) skydiver->mind.mutate(i, true);
         skydivers.push_back(skydiver);
     }
 }
@@ -110,8 +110,8 @@ void Game::play() {
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
-            if (i > 0) skydiver->mind.mutate(i);
+            if (i > qtd_skydivers * 0.3 || i == 0) skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+            if (i > 0) skydiver->mind.mutate(i, true);
             skydivers.push_back(skydiver);
         }
     }

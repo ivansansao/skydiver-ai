@@ -87,15 +87,29 @@ std::vector<double> NeuralNetwork::think(const std::vector<double> &input) {
     return result;
 }
 
-void NeuralNetwork::mutate(int many) {
-    for (int i = 0; i < many; ++i) {
-        const int w = rand() % (weights.size());
-        const int row = rand() % (weights[w].size());
-        const int column = rand() % (weights[w][row].size());
-        weights[w][row][column] += getRand();
+void NeuralNetwork::mutate(int many, bool tryAll) {
+    if (tryAll) {
+        for (unsigned int w = 0; w < weights.size(); ++w) {
+            for (unsigned int row = 0; row < weights[w].size(); ++row) {
+                for (unsigned int column = 0; column < weights[w][row].size(); ++column) {
+                    if (getRand() > 0) {
+                        weights[w][row][column] += getRand();
+                        mutated++;
+                        mutatedNeurons += "N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
+                    }
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < many; ++i) {
+            const int w = rand() % (weights.size());
+            const int row = rand() % (weights[w].size());
+            const int column = rand() % (weights[w][row].size());
+            weights[w][row][column] += getRand();
 
-        mutated++;
-        mutatedNeurons += "N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
+            mutated++;
+            mutatedNeurons += "N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
+        }
     }
 }
 
@@ -203,4 +217,19 @@ void NeuralNetwork::printWeights() const {
             }
         }
     }
+}
+
+void NeuralNetwork::printWeightsNoWrap() const {
+    std::cout << "NN:";
+    for (size_t layerIndex = 0; layerIndex < weights.size(); ++layerIndex) {
+        std::cout << "Layer " << layerIndex << ": ";
+
+        for (size_t rowIndex = 0; rowIndex < weights[layerIndex].size(); ++rowIndex) {
+            for (size_t columnIndex = 0; columnIndex < weights[layerIndex][rowIndex].size(); ++columnIndex) {
+                std::cout << "  W" << layerIndex << "/" << rowIndex << "/" << columnIndex << ": "
+                          << weights[layerIndex][rowIndex][columnIndex];
+            }
+        }
+    }
+    std::cout << std::endl;
 }

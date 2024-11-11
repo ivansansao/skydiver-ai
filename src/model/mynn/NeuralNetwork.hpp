@@ -18,12 +18,13 @@ class NeuralNetwork {
     void addLayer(int size, std::function<double(double)> activationFunction);
     void compile();
     std::vector<double> think(const std::vector<double> &input);
-    void mutate(int many);
+    void mutate(int many, bool tryAll = false);
     void clearNeurons();
     void setWeights(const std::string &text);
     std::string version() const;
     std::string getWeights() const;
     void printWeights() const;
+    void printWeightsNoWrap() const;
 
    private:
     double getRand();
