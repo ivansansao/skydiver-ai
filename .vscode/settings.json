@@ -92,7 +92,10 @@
         "stacktrace": "cpp",
         "stdfloat": "cpp",
         "stop_token": "cpp",
-        "syncstream": "cpp"
+        "syncstream": "cpp",
+        "generator": "cpp",
+        "print": "cpp",
+        "text_encoding": "cpp"
     },
     "editor.fontSize": 14
 }

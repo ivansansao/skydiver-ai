@@ -18,6 +18,15 @@ void NeuralNetwork::addLayer(int size, std::function<double(double)> activationF
 void NeuralNetwork::compile() {
     // Inputs x 1s layer
     std::vector<std::vector<double>> weightsLayer0;
+
+    // Bias
+    std::vector<double> biasesLayer0(layers[0].neurons.size());
+    for (auto &bias : biasesLayer0) {
+        bias = getRand();
+    }
+    biases.push_back(biasesLayer0);
+    // endBias
+
     weightsLayer0.reserve(inputs);
     for (int i = 0; i < inputs; ++i) {
         std::vector<double> sub;
@@ -32,6 +41,15 @@ void NeuralNetwork::compile() {
     // Hidden layers
     for (unsigned int lay = 1; lay < layers.size(); ++lay) {
         std::vector<std::vector<double>> weightsLayer;
+
+        // Bias
+        std::vector<double> biasesLayer(layers[lay].neurons.size());
+        for (auto &bias : biasesLayer) {
+            bias = getRand();
+        }
+        biases.push_back(biasesLayer);
+        // endBias
+
         weightsLayer.reserve(layers[lay - 1].neurons.size());
         for (unsigned int i = 0; i < layers[lay - 1].neurons.size(); ++i) {
             std::vector<double> sub;
@@ -92,14 +110,28 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
         for (unsigned int w = 0; w < weights.size(); ++w) {
             for (unsigned int row = 0; row < weights[w].size(); ++row) {
                 for (unsigned int column = 0; column < weights[w][row].size(); ++column) {
-                    if (getRand() > 0) {
+                    if (getRand() > 0.5) {
                         weights[w][row][column] += getRand();
                         mutated++;
-                        mutatedNeurons += "N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
+                        mutatedNeurons += " N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
                     }
                 }
             }
         }
+
+        // Mutate bias
+        if (getRand() > 0) {
+            for (unsigned int l = 0; l < biases.size(); ++l) {
+                for (unsigned int i = 0; i < biases[l].size(); ++i) {
+                    if (getRand() > 0.5) {
+                        biases[l][i] += getRand();
+                        mutated++;
+                        mutatedNeurons += " B" + std::to_string(l) + "/" + std::to_string(i) + ";";
+                    }
+                }
+            }
+        }
+
     } else {
         for (int i = 0; i < many; ++i) {
             const int w = rand() % (weights.size());
@@ -110,6 +142,14 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
             mutated++;
             mutatedNeurons += "N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);
         }
+
+        // Mutate bias
+        const int l = rand() % biases.size();
+        const int neuronIndex = rand() % biases[l].size();
+        biases[l][neuronIndex] += getRand();
+
+        mutated++;
+        mutatedNeurons += "B" + std::to_string(l) + "/" + std::to_string(neuronIndex) + ";";
     }
 }
 
@@ -232,4 +272,47 @@ void NeuralNetwork::printWeightsNoWrap() const {
         }
     }
     std::cout << std::endl;
+}
+
+void NeuralNetwork::setBias(const std::string &text) {
+    std::istringstream iss(text);
+    std::vector<double> imported;
+
+    std::string token;
+    while (std::getline(iss, token, ',')) {
+        try {
+            imported.push_back(std::stod(token));
+        } catch (...) {
+            std::cerr << "Invalid number: " << token << std::endl;
+        }
+    }
+
+    if (imported.size() <= 0) return;
+
+    biases.clear();
+    int index = 0;
+
+    for (unsigned int l = 0; l < layers.size(); ++l) {
+        std::vector<double> layerBiases(layers[l].neurons.size());
+        for (unsigned int i = 0; i < layers[l].neurons.size(); ++i) {
+            layerBiases[i] = imported[index++];
+        }
+        biases.push_back(layerBiases);
+    }
+}
+
+std::string NeuralNetwork::getBias() const {
+    std::ostringstream oss;
+
+    for (const auto &layerBiases : biases) {
+        for (const auto &bias : layerBiases) {
+            oss << bias << ",";
+        }
+    }
+
+    std::string result = oss.str();
+    if (!result.empty() && result.back() == ',') {
+        result.pop_back();
+    }
+    return result;
 }

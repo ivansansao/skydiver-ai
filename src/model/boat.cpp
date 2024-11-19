@@ -29,7 +29,6 @@ void Boat::reset_position() {
 void Boat::start_position_random() {
     pos.left = 800 - 50 + (Tools::getRand() * 200);
     pos.left = (int)pos.left;
-    if (Tools::getRand() > 0) velocity.x *= -1;
 }
 void Boat::update() {
     pos.left += velocity.x;

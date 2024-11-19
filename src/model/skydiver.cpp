@@ -66,34 +66,39 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::think(Plane plane, Boat boat) {
-    const float altitudeFromBoat = 1 / getAltitudeFromBoat(boat);
-    const float landingPointDistanceH = 1 / getLandingPointDistanceH(boat);
-    const float skydiverState = state ? 1 / state : 0;
-    const float inpParachuteState = parachuteState ? 1 / parachuteState : 0;
+    const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
+    const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
+    const float skydiverState = (state + 0.0) / 100;
+    const float inpParachuteState = (parachuteState + 0.0) / 100;
 
-    std::vector<double> input = {skydiverState, inpParachuteState, altitudeFromBoat, landingPointDistanceH, boat.velocity.x, velocity.x, velocity.y};
+    std::vector<double> input = {skydiverState, inpParachuteState, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);
 
-    action = Action::NOTHING;
+    action = "";
 
     if (output[0] > 0.5) {
         jump();
-        action = Action::JUMP;
-    } else if (output[1] > 0.5) {
+        action += "J";
+    }
+    if (output[1] > 0.5) {
         parachutesOpen();
-        action = Action::PARACHUTES_OPEN;
-    } else if (output[2] > 0.5) {
+        action += "O";
+    }
+    if (output[2] > 0.5) {
         parachutesGoRight();
-        action = Action::PARACHUTES_RIGHT;
-    } else if (output[3] > 0.5) {
+        action += "R";
+    }
+    if (output[3] > 0.5) {
         parachutesGoLeft();
-        action = Action::PARACHUTES_LEFT;
-    } else if (output[4] > 0.5) {
+        action += "L";
+    }
+    if (output[4] > 0.5) {
         parachutesGoUp();
-        action = Action::PARACHUTES_UP;
-    } else if (output[5] > 0.5) {
+        action += "U";
+    }
+    if (output[5] > 0.5) {
         parachutesGoDown();
-        action = Action::PARACHUTES_DOWN;
+        action += "D";
     }
     if (state == State::ON_PLANE) {
         if (plane.round > 1) {
@@ -258,12 +263,12 @@ void Skydiver::update(Plane plane, Boat boat) {
 }
 float Skydiver::getAltitudeFromBoat(Boat boat) {
     const float myFeetTop = pos.top + pos.height;
-    return boat.getLandingPointTop() - myFeetTop;
+    return boat.getLandingPointTop() - myFeetTop - 1;
 }
 float Skydiver::getGroundTop() {
     return 790;
 }
-float Skydiver::getLandingPointDistanceH(Boat boat) {
+float Skydiver::getLongitudeFromBoat(Boat boat) {
     const float myMidLeft = pos.left + (pos.width / 2);
     return myMidLeft - boat.getLandingPointLeft();
 }
@@ -317,29 +322,24 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
     }
 
     if (false) {
-        if (state == State::ON_AIR) {
-            switch (action) {
-                case Action::PARACHUTES_LEFT:
-                    Tools::say(w, "L", pos.left - 4, pos.top - 4);
-                    break;
-                case Action::PARACHUTES_RIGHT:
-                    Tools::say(w, "R", pos.left + 10, pos.top - 4);
-                    break;
-                case Action::PARACHUTES_UP:
-                    Tools::say(w, "U", pos.left + 1, pos.top - 26);
-                    break;
-                case Action::PARACHUTES_DOWN:
-                    Tools::say(w, "D", pos.left + 1, pos.top + 8);
-                    break;
-                case Action::PARACHUTES_OPEN:
-                    Tools::say(w, "O", pos.left + 1, pos.top + 12);
-                    break;
-                case Action::JUMP:
-                    Tools::say(w, "J", pos.left + 1, pos.top + 16);
-                    break;
-                default:
-                    break;
-            }
+        if (action.find("L") != std::string::npos) Tools::say(w, "L", pos.left - 4, pos.top - 4);
+        if (action.find("R") != std::string::npos) Tools::say(w, "R", pos.left + 10, pos.top - 4);
+        if (action.find("U") != std::string::npos) Tools::say(w, "U", pos.left + 1, pos.top - 26);
+        if (action.find("D") != std::string::npos) Tools::say(w, "D", pos.left + 1, pos.top + 8);
+        if (action.find("O") != std::string::npos) Tools::say(w, "O", pos.left + 1, pos.top + 12);
+        if (action.find("J") != std::string::npos) Tools::say(w, "J", pos.left + 1, pos.top + 16);
+
+        if (false) {
+            const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
+            const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
+            const float skydiverState = (state + 0.0) / 100;
+            const float inpParachuteState = (parachuteState + 0.0) / 100;
+
+            Tools::say(w, "altitudeFromBoat: " + to_string(altitudeFromBoat), pos.left + 20, pos.top - 30);
+            Tools::say(w, "longitudeFromBoat: " + to_string(longitudeFromBoat), pos.left + 20, pos.top - 20);
+            Tools::say(w, "skydiverState: " + to_string(skydiverState), pos.left + 20, pos.top - 10);
+            Tools::say(w, "inpParachuteState: " + to_string(inpParachuteState), pos.left + 20, pos.top - 0);
+            Tools::say(w, "Bias mutated: " + to_string(mind.mutated), pos.left + 20, pos.top + 10);
         }
     }
 
@@ -376,7 +376,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
             "GPS",
             "1 Altitude (boat) .....: " + to_string(getAltitudeFromBoat(boat)),
             "2 Boat velocity .......: " + to_string(boat.velocity.x),
-            "3 Landing point (H): ..: " + to_string(getLandingPointDistanceH(boat)),
+            "3 Landing point (H): ..: " + to_string(getLongitudeFromBoat(boat)),
             "4 Horizontal velocity .: " + to_string(velocity.x),
             "5 Vertical velocity ...: " + to_string(velocity.y),
             "6 Place ...............: " + to_string(state),

@@ -40,10 +40,12 @@ Game::Game() {
 
     lastBetterSkydiver = new Skydiver();
     lastBetterSkydiver->mind.setWeights(loadWeights());
+    lastBetterSkydiver->mind.setBias(loadBiases());
 
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver();
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+        skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
         if (i > 0) skydiver->mind.mutate(i, true);
         skydivers.push_back(skydiver);
     }
@@ -97,6 +99,7 @@ void Game::play() {
                 lastBetterSkydiver = last;
                 lastBetterSkydiver->round = round;
                 saveWeights(lastBetterSkydiver->mind.getWeights());
+                saveBiases(lastBetterSkydiver->mind.getBias());
                 saveScore(lastBetterSkydiver->getScore());
             }
         }
@@ -106,11 +109,14 @@ void Game::play() {
 
         plane.start_round();
         boat.start_position_random();
+        boat.velocity.x *= -1;
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver();
-            if (i > qtd_skydivers * 0.3 || i == 0) skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+            skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
+            skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
+
             if (i > 0) skydiver->mind.mutate(i, true);
             skydivers.push_back(skydiver);
         }
@@ -187,6 +193,15 @@ void Game::saveWeights(std::string weights) {
         std::cerr << "Erro opening weights file to save!" << std::endl;
     }
 }
+void Game::saveBiases(std::string biases) {
+    std::ofstream outFile("biases.txt");
+    if (outFile.is_open()) {
+        outFile << biases;
+        outFile.close();
+    } else {
+        std::cerr << "Erro opening biases file to save!" << std::endl;
+    }
+}
 std::string Game::loadWeights() {
     std::ifstream inFile("weights.txt");
     std::string weights;
@@ -198,6 +213,18 @@ std::string Game::loadWeights() {
     }
 
     return weights;
+}
+std::string Game::loadBiases() {
+    std::ifstream inFile("biases.txt");
+    std::string biases;
+    if (inFile.is_open()) {
+        std::getline(inFile, biases);
+        inFile.close();
+    } else {
+        std::cerr << "Don't used biases.txt file!" << std::endl;
+    }
+
+    return biases;
 }
 void Game::saveScore(unsigned int score) {
     std::ofstream outFile("score.txt");

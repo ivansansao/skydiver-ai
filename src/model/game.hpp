@@ -75,7 +75,9 @@ class Game {
     void loop_events();
     void run();
     void saveWeights(std::string weights);
+    void saveBiases(std::string biases);
     std::string loadWeights();
+    std::string loadBiases();
     void saveScore(unsigned int score);
     unsigned int loadScore();
 

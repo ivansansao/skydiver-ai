@@ -11,7 +11,8 @@ class NeuralNetwork {
     int inputs;
     std::vector<Layer> layers;
     std::vector<std::vector<std::vector<double>>> weights;
-    int mutated;
+    std::vector<std::vector<double>> biases;
+    int mutated = 0;
     std::string mutatedNeurons;
 
     NeuralNetwork(int inputs);
@@ -20,11 +21,14 @@ class NeuralNetwork {
     std::vector<double> think(const std::vector<double> &input);
     void mutate(int many, bool tryAll = false);
     void clearNeurons();
-    void setWeights(const std::string &text);
     std::string version() const;
+    void setWeights(const std::string &text);
     std::string getWeights() const;
     void printWeights() const;
     void printWeightsNoWrap() const;
+
+    void setBias(const std::string &text);
+    std::string getBias() const;
 
    private:
     double getRand();

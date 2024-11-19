@@ -89,15 +89,7 @@ class Skydiver {
         OPEN,
     } parachuteState = CLOSED;
 
-    enum Action {
-        NOTHING,
-        JUMP,
-        PARACHUTES_OPEN,
-        PARACHUTES_RIGHT,
-        PARACHUTES_LEFT,
-        PARACHUTES_UP,
-        PARACHUTES_DOWN,
-    } action = NOTHING;
+    std::string action = "";
 
     void draw(sf::RenderWindow* w, Boat boat);
     void update(Plane plane, Boat boat);
@@ -115,7 +107,7 @@ class Skydiver {
     void think(Plane plane, Boat boat);
     float getAltitudeFromBoat(Boat boat);
     float getGroundTop();
-    float getLandingPointDistanceH(Boat boat);
+    float getLongitudeFromBoat(Boat boat);
 
     bool touchedBoat(Boat boat);
     bool isLand(Boat boat);

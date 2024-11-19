@@ -44,4 +44,5 @@ build/Makefile
 *.app
 
 weights*.txt
+biases*.txt
 score.txt
