@@ -53,7 +53,7 @@ class Skydiver {
 
     const float parachutes_flying_ratio_brake = 0.005;
 
-    Force parachutes_brake = Force(0.0, 0.27, 0.0, 0.001);  // value, max, min, ratio
+    Force parachutes_brake = Force(0.14, 0.27, 0.0, 0.001);  // value, max, min, ratio
     bool landed = false;
     bool died = false;
 
