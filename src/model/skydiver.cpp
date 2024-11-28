@@ -42,7 +42,7 @@ Skydiver::Skydiver() {
     reset_position();
 
     // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.addLayer(6, [](double x) { return std::max(0.0, x); });
+    mind.addLayer(12, [](double x) { return std::max(0.0, x); });
     mind.addLayer(6, [](double x) { return std::max(0.0, x); });
     mind.compile();
 
@@ -76,30 +76,36 @@ void Skydiver::think(Plane plane, Boat boat) {
 
     action = "";
 
-    if (output[0] > 0.5) {
+    int16_t greater = -1;
+    double maxValue = -1.0;
+
+    for (size_t i = 0; i < output.size(); ++i) {
+        if (output[i] > maxValue) {
+            maxValue = output[i];
+            greater = static_cast<int16_t>(i);
+        }
+    }
+
+    if (greater == 0) {
         jump();
         action += "J";
-    }
-    if (output[1] > 0.5) {
+    } else if (greater == 1) {
         parachutesOpen();
         action += "O";
-    }
-    if (output[2] > 0.5) {
+    } else if (greater == 2) {
         parachutesGoRight();
         action += "R";
-    }
-    if (output[3] > 0.5) {
+    } else if (greater == 3) {
         parachutesGoLeft();
         action += "L";
-    }
-    if (output[4] > 0.5) {
+    } else if (greater == 4) {
         parachutesGoUp();
         action += "U";
-    }
-    if (output[5] > 0.5) {
+    } else if (greater == 5) {
         parachutesGoDown();
         action += "D";
     }
+
     if (state == State::ON_PLANE) {
         if (plane.round > 1) {
             mind.mutate(1);

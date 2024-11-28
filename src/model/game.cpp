@@ -83,7 +83,7 @@ void Game::play() {
         }
     }
 
-    if (playTimer > 60 && !hasOnScreenAir()) {
+    if ((playTimer > 60 && !hasOnScreenAir()) || playTimer > 100) {
         // Get better score
 
         if (landedCount) {
