@@ -25,5 +25,6 @@ class Plane {
     void set_position(float left, float top);
     void reset_position();
     void start_round();
+    bool on = true;
 };
 #endif

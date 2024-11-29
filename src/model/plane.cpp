@@ -30,7 +30,7 @@ void Plane::update() {
     pos.left += velocity.x;
     if (pos.left + pos.width < 0) {
         round++;
-        reset_position();
+        this->on = false;
     }
 }
 
@@ -40,6 +40,7 @@ void Plane::draw(sf::RenderWindow *w) {
 }
 
 void Plane::start_round() {
+    on = true;
     round = 1;
     reset_position();
 }

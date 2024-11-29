@@ -62,6 +62,13 @@ class Game {
     bool show_information = false;
     bool syncronism = true;
 
+    uint8_t onPlane = 0;
+    uint8_t onAir = 0;
+    uint8_t onBoat = 0;
+    uint8_t died = 0;
+    uint8_t landedCount = 0;
+    uint8_t sdTotal = 0;
+
     struct profile {
         int completed_phases = 0;
         int lifes = 0;

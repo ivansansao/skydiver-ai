@@ -46,7 +46,6 @@ Game::Game() {
         Skydiver* skydiver = new Skydiver();
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
         skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
-        skydiver->id = i;
         if (i > 0) skydiver->mind.mutate(i, true);
         skydivers.push_back(skydiver);
     }
@@ -58,16 +57,34 @@ enum menuopcs { Play,
 void Game::play() {
     // UPDATE
 
-    uint8_t onPlane = 0;
-    uint8_t onAir = 0;
-    uint8_t onBoat = 0;
-    uint8_t died = 0;
-    uint8_t landedCount = 0;
-    uint8_t sdTotal = 0;
+    onPlane = 0;
+    onAir = 0;
+    onBoat = 0;
+    died = 0;
+    landedCount = 0;
+    sdTotal = 0;
 
     if (!paused) {
-        plane.update();
+        // Update Plane
+
+        if (plane.on) {
+            plane.update();
+            if (!plane.on) {
+                for (auto& skydiver : skydivers) {
+                    if (skydiver->state == skydiver->State::ON_PLANE) {
+                        skydiver->died = true;
+                        skydiver->diedPlace = skydiver->DiedPlace::PLANE;
+                    }
+                }
+            }
+        }
+
+        // Update Boat
+
         boat.update();
+
+        // Update Skydiver
+
         for (auto& skydiver : skydivers) {
             if (!skydiver->died) {
                 if (skydiver->state != skydiver->State::ON_BOAT) {
@@ -84,20 +101,20 @@ void Game::play() {
         }
     }
 
-    if ((playTimer > 60 && !hasOnScreenAir()) || playTimer > 100) {
+    if (playTimer > 60) {
         // Get better score
 
         if (landedCount) {
-            Skydiver* best = skydivers[0];
+            Skydiver* last = skydivers[0];
             for (size_t i = 1; i < skydivers.size(); ++i) {
-                if (skydivers[i]->getScore() > best->getScore()) {
-                    best = skydivers[i];
+                if (skydivers[i]->getScore() > last->getScore()) {
+                    last = skydivers[i];
                 }
             }
 
             // It is good to choose the last best round because boat move of place.
-            if (best->getScore() > 0) {
-                lastBetterSkydiver = best;
+            if (last->getScore() > 0) {
+                lastBetterSkydiver = last;
                 lastBetterSkydiver->round = round;
                 saveWeights(lastBetterSkydiver->mind.getWeights());
                 saveBiases(lastBetterSkydiver->mind.getBias());
@@ -117,7 +134,6 @@ void Game::play() {
             Skydiver* skydiver = new Skydiver();
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
-            skydiver->id = i;
 
             if (i > 0) skydiver->mind.mutate(i, true);
             skydivers.push_back(skydiver);
@@ -152,8 +168,8 @@ void Game::play() {
         info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
         info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
         info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
+        // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
         info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
-        info += "\nTime flying............: " + to_string(lastBetterSkydiver->time_flying);
         info += "\n---------------------------------";
         info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
         info += "\n";
