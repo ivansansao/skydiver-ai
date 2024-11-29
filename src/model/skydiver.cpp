@@ -217,6 +217,11 @@ void Skydiver::update(Plane plane, Boat boat) {
         }
 
         if (state == State::ON_AIR) {
+            // Time on air.
+            if (!died) {
+                time_flying += 1;
+            }
+
             // SAVE SCORES.
             if (velocity.x > grade_max_velocity_right) grade_max_velocity_right = velocity.x;
             if (velocity.x < grade_max_velocity_left) grade_max_velocity_left = velocity.x;
@@ -334,19 +339,20 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
         if (action.find("D") != std::string::npos) Tools::say(w, "D", pos.left + 1, pos.top + 8);
         if (action.find("O") != std::string::npos) Tools::say(w, "O", pos.left + 1, pos.top + 12);
         if (action.find("J") != std::string::npos) Tools::say(w, "J", pos.left + 1, pos.top + 16);
+    }
 
-        if (false) {
-            const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
-            const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
-            const float skydiverState = (state + 0.0) / 100;
-            const float inpParachuteState = (parachuteState + 0.0) / 100;
+    if (false) {
+        const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
+        const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
+        const float skydiverState = (state + 0.0) / 100;
+        const float inpParachuteState = (parachuteState + 0.0) / 100;
 
-            Tools::say(w, "altitudeFromBoat: " + to_string(altitudeFromBoat), pos.left + 20, pos.top - 30);
-            Tools::say(w, "longitudeFromBoat: " + to_string(longitudeFromBoat), pos.left + 20, pos.top - 20);
-            Tools::say(w, "skydiverState: " + to_string(skydiverState), pos.left + 20, pos.top - 10);
-            Tools::say(w, "inpParachuteState: " + to_string(inpParachuteState), pos.left + 20, pos.top - 0);
-            Tools::say(w, "Bias mutated: " + to_string(mind.mutated), pos.left + 20, pos.top + 10);
-        }
+        Tools::say(w, "altitudeFromBoat: " + to_string(altitudeFromBoat), pos.left + 20, pos.top - 30);
+        Tools::say(w, "longitudeFromBoat: " + to_string(longitudeFromBoat), pos.left + 20, pos.top - 20);
+        Tools::say(w, "skydiverState: " + to_string(skydiverState), pos.left + 20, pos.top - 10);
+        Tools::say(w, "inpParachuteState: " + to_string(inpParachuteState), pos.left + 20, pos.top - 0);
+        Tools::say(w, "Bias mutated: " + to_string(mind.mutated), pos.left + 20, pos.top + 10);
+        Tools::say(w, "Time flying: " + to_string(time_flying), pos.left + 20, pos.top + 20);
     }
 
     if (0) {

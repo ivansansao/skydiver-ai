@@ -16,6 +16,8 @@ class Skydiver {
     Skydiver();
     ~Skydiver();
 
+    uint16_t id = 0;
+
     NeuralNetwork mind = NeuralNetwork(7);
 
     Animation skydiverFall;
@@ -67,6 +69,7 @@ class Skydiver {
     void setScore(unsigned int score);
 
     int timer = 0;
+    uint16_t time_flying = 0;
     int last_time_change_direction = 0;
     int last_direction = -1;
     bool visible = true;
