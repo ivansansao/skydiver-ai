@@ -101,6 +101,7 @@ void Game::play() {
         }
     }
 
+    // Finish
     if (playTimer > 60) {
         // Get better score
 
@@ -120,6 +121,8 @@ void Game::play() {
                 saveBiases(lastBetterSkydiver->mind.getBias());
                 saveScore(lastBetterSkydiver->getScore());
             }
+
+            boat.velocity.x *= -1;
         }
 
         playTimer = 0;
@@ -127,7 +130,6 @@ void Game::play() {
 
         plane.start_round();
         boat.start_position_random();
-        boat.velocity.x *= -1;
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
