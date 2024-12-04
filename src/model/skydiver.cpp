@@ -23,7 +23,13 @@ Skydiver::Skydiver() {
     skydiverFall.init(3, 0.5f, "./src/asset/image/skydiver_fall.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
     skydiverParaOpening00.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening00.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
     skydiverParaOpening50.init(1, 0.5f, "./src/asset/image/skydiver_parachutes_opening50.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+
     skydiverParaCenter.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_center.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaLeft.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_left.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaRight.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_right.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaBrake.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_brake.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+    skydiverParaDive.init(3, 0.5f, "./src/asset/image/skydiver_parachutes_flying_dive.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
+
     skydiverParaDiedWater.init(3, 0.15f, "./src/asset/image/skydiver_parachutes_died_on_water.png", sf::IntRect(0, 0, 43, 64), false, moveLeft, moveTop, false);
     skydiverDiedWater.init(2, 0.01f, "./src/asset/image/skydiver_died_on_water.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
     skydiverDiedBoat.init(1, 0, "./src/asset/image/skydiver_died_on_boat.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
@@ -37,6 +43,10 @@ Skydiver::Skydiver() {
     skydiverParaOpening00.setColor(color);
     skydiverParaOpening50.setColor(color);
     skydiverParaCenter.setColor(color);
+    skydiverParaLeft.setColor(color);
+    skydiverParaRight.setColor(color);
+    skydiverParaBrake.setColor(color);
+    skydiverParaDive.setColor(color);
     skydiverParaDiedWater.setColor(color);
     skydiverParaBoatCenter.setColor(color);
     reset_position();
@@ -88,22 +98,22 @@ void Skydiver::think(Plane plane, Boat boat) {
 
     if (greater == 0) {
         jump();
-        action += "J";
+        action = "J";
     } else if (greater == 1) {
         parachutesOpen();
-        action += "O";
+        action = "O";
     } else if (greater == 2) {
         parachutesGoRight();
-        action += "R";
+        action = "R";
     } else if (greater == 3) {
         parachutesGoLeft();
-        action += "L";
+        action = "L";
     } else if (greater == 4) {
         parachutesGoUp();
-        action += "U";
+        action = "U";
     } else if (greater == 5) {
         parachutesGoDown();
-        action += "D";
+        action = "D";
     }
 
     if (state == State::ON_PLANE) {
@@ -308,7 +318,17 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
                     skydiverParaOpening50.draw(pos.left, pos.top, w);
                 }
             } else if (parachuteState == ParachutesState::OPEN) {
-                skydiverParaCenter.draw(pos.left, pos.top, w);
+                if (action == "R") {
+                    skydiverParaRight.draw(pos.left, pos.top, w);
+                } else if (action == "L") {
+                    skydiverParaLeft.draw(pos.left, pos.top, w);
+                } else if (action == "U") {
+                    skydiverParaBrake.draw(pos.left, pos.top, w);
+                } else if (action == "D") {
+                    skydiverParaDive.draw(pos.left, pos.top, w);
+                } else {
+                    skydiverParaCenter.draw(pos.left, pos.top, w);
+                }
             } else {
                 skydiverFall.draw(pos.left, pos.top, w);
             }

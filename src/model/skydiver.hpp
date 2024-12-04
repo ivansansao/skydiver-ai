@@ -25,6 +25,8 @@ class Skydiver {
     Animation skydiverParaOpening50;
     Animation skydiverParaLeft;
     Animation skydiverParaRight;
+    Animation skydiverParaBrake;
+    Animation skydiverParaDive;
     Animation skydiverParaCenter;
     Animation skydiverParaDiedWater;
     Animation skydiverDiedWater;
