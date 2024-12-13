@@ -11,14 +11,29 @@
 using namespace std;
 
 Game::Game() {
+    bool fullscreen = false;
+
+    if (std::getenv("SKYDIVER_FULLSCREEN")) {
+        fullscreen = (std::string)std::getenv("SKYDIVER_FULLSCREEN") == "1";
+    }
+    if (const char* env_p = std::getenv("SKYDIVER_COUNT")) {
+        qtd_skydivers = static_cast<unsigned int>(std::stoi(env_p));
+    } else {
+        qtd_skydivers = 36;
+    }
+
     sf::ContextSettings settings;
-    settings.depthBits = 0;          // Desativar o buffer de profundidade se não for necessário
-    settings.stencilBits = 0;        // Desativar o buffer de stencil se não for necessário
-    settings.antialiasingLevel = 0;  // Manter o antialiasing desativado
-    settings.majorVersion = 2;       // Usar uma versão mais baixa do OpenGL
+    settings.depthBits = 0;
+    settings.stencilBits = 0;
+    settings.antialiasingLevel = 0;
+    settings.majorVersion = 2;
     settings.minorVersion = 1;
 
-    window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
+    if (fullscreen) {
+        window.create(sf::VideoMode::getDesktopMode(), "Skydivers", sf::Style::Fullscreen, settings);
+    } else {
+        window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
+    }
     setWindowIcon(&window);
     window.setVerticalSyncEnabled(true);  // Don't allow more FPS than your monitor support.
     window.setFramerateLimit(60);         // There is a relation between framerate and setVerticalSyncEnabled.
@@ -33,8 +48,6 @@ Game::Game() {
     font_spacemono_regular.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf");
 
     scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
-
-    qtd_skydivers = 40;
 
     skydivers.clear();
 

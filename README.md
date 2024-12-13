@@ -63,6 +63,11 @@ make
 
 Done, skydiver-ai.exe has created! I believe!
 
+#### Envirionment variables
+~~~bash
+export SKYDIVER_FULLSCREEN=1
+export SKYDIVER_COUNT=20
+~~~
 
 ## About Language
 
