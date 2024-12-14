@@ -15,8 +15,10 @@ using namespace std;
 // Com o paraquedas aberto, a velocidade de descida típica é reduzida para 15 a 30 km/h.
 // Com paraquedas de alta performance, a velocidade máxima durante a descida pode chegar a 50 km/h.
 // Velocidade do avião, 150km/h
-
-Skydiver::Skydiver() {
+Skydiver::Skydiver() : id(0) {
+}
+Skydiver::Skydiver(uint16_t id) : id(id) {
+    this->id = id;
     const float moveLeft = -17;
     const float moveTop = -52;
     skydiverOnPlane.init(1, 0.5f, "./src/asset/image/skydiver_on_plane.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
@@ -53,7 +55,7 @@ Skydiver::Skydiver() {
 
     // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
     mind.addLayer(12, [](double x) { return std::max(0.0, x); });
-    mind.addLayer(6, [](double x) { return std::max(0.0, x); });
+    mind.addLayer(7, [](double x) { return std::max(0.0, x); });
     mind.compile();
 
     leftText = std::abs(Tools::getRand()) * 1500;
@@ -75,7 +77,7 @@ void Skydiver::set_position(float left, float top) {
 void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
-void Skydiver::think(Plane plane, Boat boat) {
+void Skydiver::think(Plane plane, Boat boat, bool boot) {
     const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
     const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
     const float skydiverState = (state + 0.0) / 100;
@@ -86,40 +88,51 @@ void Skydiver::think(Plane plane, Boat boat) {
 
     action = "";
 
-    int16_t greater = -1;
-    double maxValue = -1.0;
+    int16_t greater = 0;
+    double maxValue = output[0];
 
-    for (size_t i = 0; i < output.size(); ++i) {
+    for (int16_t i = 0; i < (int16_t)output.size(); ++i) {
         if (output[i] > maxValue) {
+            greater = i;
             maxValue = output[i];
-            greater = static_cast<int16_t>(i);
         }
     }
 
     if (greater == 0) {
-        jump();
         action = "J";
     } else if (greater == 1) {
-        parachutesOpen();
         action = "O";
     } else if (greater == 2) {
-        parachutesGoRight();
         action = "R";
     } else if (greater == 3) {
-        parachutesGoLeft();
         action = "L";
     } else if (greater == 4) {
-        parachutesGoUp();
         action = "U";
     } else if (greater == 5) {
-        parachutesGoDown();
         action = "D";
+    } else if (greater == 6) {
+        action = "";
     }
 
-    if (state == State::ON_PLANE) {
-        if (plane.round > 1) {
+    if (boot) {
+        if (state == State::ON_PLANE) {
             mind.mutate(1);
         }
+    }
+}
+void Skydiver::doAction() {
+    if (action == "J") {
+        jump();
+    } else if (action == "O") {
+        parachutesOpen();
+    } else if (action == "R") {
+        parachutesGoRight();
+    } else if (action == "L") {
+        parachutesGoLeft();
+    } else if (action == "U") {
+        parachutesGoUp();
+    } else if (action == "D") {
+        parachutesGoDown();
     }
 }
 void Skydiver::jump() {
@@ -290,7 +303,19 @@ float Skydiver::getLongitudeFromBoat(Boat boat) {
     return myMidLeft - boat.getLandingPointLeft();
 }
 
-void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
+void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
+    if (this->mind.mutated == 0) {
+        if (show_information) {
+            sf::VertexArray line(sf::Lines, 2);
+            line[0].position = sf::Vector2f(pos.left + (pos.width * 0.5), pos.top - 12);              // Ponto A
+            line[0].color = this->skydiverFall.sprite.getColor();                                     // Cor do ponto A
+            line[1].position = sf::Vector2f(pos.left + (pos.width * 0.5), pos.top + pos.height - 2);  // Ponto B
+            line[1].color = sf::Color::White;                                                         // Cor do ponto A
+            w->draw(line);
+            Tools::say(w, "Master", pos.left - 16, pos.top - 26);
+        }
+    }
+
     if (visible) {
         if (died) {
             if (diedPlace == DiedPlace::WATER) {
@@ -335,8 +360,6 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat) {
             }
         }
     } else {
-        // (pos.left < 0 || pos.left > 1600 + pos.width)
-
         sf::CircleShape circle;
         float radius = std::min(pos.width, pos.height) / 2.0f;
         circle.setRadius(radius);

@@ -61,13 +61,14 @@ class Game {
     int frameCount = 0;
     bool show_information = false;
     bool syncronism = true;
+    bool bootSkydivers = false;
 
-    uint8_t onPlane = 0;
-    uint8_t onAir = 0;
-    uint8_t onBoat = 0;
-    uint8_t died = 0;
-    uint8_t landedCount = 0;
-    uint8_t sdTotal = 0;
+    uint16_t onPlane = 0;
+    uint16_t onAir = 0;
+    uint16_t onBoat = 0;
+    uint16_t died = 0;
+    uint16_t landedCount = 0;
+    uint16_t sdTotal = 0;
 
     struct profile {
         int completed_phases = 0;

@@ -95,7 +95,8 @@
         "syncstream": "cpp",
         "generator": "cpp",
         "print": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "filesystem": "cpp"
     },
     "editor.fontSize": 14
 }

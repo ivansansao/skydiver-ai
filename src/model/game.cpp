@@ -4,6 +4,7 @@
 #include <dirent.h>
 
 #include <cmath>
+#include <filesystem>
 #include <random>
 
 #include "iostream"
@@ -19,7 +20,7 @@ Game::Game() {
     if (const char* env_p = std::getenv("SKYDIVER_COUNT")) {
         qtd_skydivers = static_cast<unsigned int>(std::stoi(env_p));
     } else {
-        qtd_skydivers = 36;
+        qtd_skydivers = 40;
     }
 
     sf::ContextSettings settings;
@@ -51,12 +52,12 @@ Game::Game() {
 
     skydivers.clear();
 
-    lastBetterSkydiver = new Skydiver();
+    lastBetterSkydiver = new Skydiver(0);
     lastBetterSkydiver->mind.setWeights(loadWeights());
     lastBetterSkydiver->mind.setBias(loadBiases());
 
     for (int i{}; i < qtd_skydivers; ++i) {
-        Skydiver* skydiver = new Skydiver();
+        Skydiver* skydiver = new Skydiver(i);
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
         skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
         if (i > 0) skydiver->mind.mutate(i, true);
@@ -99,23 +100,32 @@ void Game::play() {
         // Update Skydiver
 
         for (auto& skydiver : skydivers) {
-            if (!skydiver->died) {
-                if (skydiver->state != skydiver->State::ON_BOAT) {
-                    skydiver->think(plane, boat);
+            if (skydiver->died) {
+                died++;
+            } else {
+                if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
+                    if (skydiver->state != skydiver->State::ON_BOAT) {
+                        skydiver->think(plane, boat, bootSkydivers);
+                    }
                 }
+                skydiver->doAction();
             }
             skydiver->update(plane, boat);
-            if (skydiver->state == skydiver->State::ON_PLANE) onPlane++;
-            if (skydiver->state == skydiver->State::ON_AIR) onAir++;
-            if (skydiver->state == skydiver->State::ON_BOAT) onBoat++;
-            if (skydiver->died) died++;
+
+            if (skydiver->state == skydiver->State::ON_PLANE)
+                onPlane++;
+            else if (skydiver->state == skydiver->State::ON_AIR)
+                onAir++;
+            else if (skydiver->state == skydiver->State::ON_BOAT)
+                onBoat++;
+
             if (skydiver->landed) landedCount++;
             sdTotal++;
         }
     }
 
     // Finish
-    if (playTimer > 60) {
+    if (playTimer > 60 || (died && died == sdTotal)) {
         // Get better score
 
         if (landedCount) {
@@ -146,23 +156,24 @@ void Game::play() {
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
-            Skydiver* skydiver = new Skydiver();
+            Skydiver* skydiver = new Skydiver(i);
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
 
             if (i > 0) skydiver->mind.mutate(i, true);
             skydivers.push_back(skydiver);
         }
+
+        this->bootSkydivers = !std::filesystem::exists("weights.txt");
     }
 
     // DRAW
 
-    // window.clear(sf::Color(255, 255, 255, 255));
     scenario.draw(0, 0, &window);
     plane.draw(&window);
     boat.draw(&window);
     for (auto& skydiver : skydivers) {
-        skydiver->draw(&window, boat);
+        skydiver->draw(&window, boat, show_information);
     }
 
     if (show_information) {
@@ -190,6 +201,7 @@ void Game::play() {
         info += "\n";
         info += "\nOTHER";
         info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
+        info += "\nBOOT SKYDIVERS.........: " + (this->bootSkydivers ? std::string("ON") : std::string("OFF"));
         info += std::string("\nSYNC...................: ") + (syncronism ? std::string("ON") : std::string("OFF"));
 
         Tools::say(&window, info, 10, 8);
