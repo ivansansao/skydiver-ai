@@ -80,10 +80,8 @@ void Skydiver::reset_position() {
 void Skydiver::think(Plane plane, Boat boat, bool boot) {
     const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
     const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
-    const float skydiverState = (state + 0.0) / 100;
-    const float inpParachuteState = (parachuteState + 0.0) / 100;
 
-    std::vector<double> input = {skydiverState, inpParachuteState, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, velocity.x, velocity.y};
+    std::vector<double> input = {state + 0.0, parachuteState + 0.0, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);
 
     action = "";
@@ -263,14 +261,12 @@ void Skydiver::update(Plane plane, Boat boat) {
             landed = true;
             saveScoreLanding(boat);
         } else {
-            diedPlace = DiedPlace::BOAT;
             died = true;
         }
     } else if (pos.top >= getGroundTop()) {
         parachutes_brake.reset();
         state = State::ON_WATER;
         died = true;
-        diedPlace = DiedPlace::WATER;
     } else {
         pos.left += velocity.x;
         pos.top += velocity.y;
@@ -318,7 +314,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
 
     if (visible) {
         if (died) {
-            if (diedPlace == DiedPlace::WATER) {
+            if (state == State::ON_WATER) {
                 if (parachuteState == ParachutesState::OPEN) {
                     skydiverParaDiedWater.draw(pos.left, pos.top, w);
                     skydiverParaDiedWater.animeAuto();
@@ -326,7 +322,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
                     skydiverDiedWater.draw(pos.left, pos.top, w);
                     skydiverDiedWater.animeAuto();
                 }
-            } else if (diedPlace == DiedPlace::BOAT) {
+            } else if (state == State::ON_BOAT) {
                 skydiverDiedBoat.draw(pos.left, pos.top, w);
             }
         } else if (state == State::ON_PLANE) {
@@ -378,12 +374,13 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
         if (action.find("D") != std::string::npos) Tools::say(w, "D", pos.left + 1, pos.top + 8);
         if (action.find("O") != std::string::npos) Tools::say(w, "O", pos.left + 1, pos.top + 12);
         if (action.find("J") != std::string::npos) Tools::say(w, "J", pos.left + 1, pos.top + 16);
+        if (action == "") Tools::say(w, "x", pos.left + 1, pos.top + 20);
 
         if (false) {
             const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
             const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
-            const float skydiverState = (state + 0.0) / 100;
-            const float inpParachuteState = (parachuteState + 0.0) / 100;
+            const float skydiverState = (state + 0.0);
+            const float inpParachuteState = (parachuteState + 0.0);
 
             Tools::say(w, "altitudeFromBoat: " + to_string(altitudeFromBoat), pos.left + 20, pos.top - 30);
             Tools::say(w, "longitudeFromBoat: " + to_string(longitudeFromBoat), pos.left + 20, pos.top - 20);

@@ -87,7 +87,6 @@ void Game::play() {
                 for (auto& skydiver : skydivers) {
                     if (skydiver->state == skydiver->State::ON_PLANE) {
                         skydiver->died = true;
-                        skydiver->diedPlace = skydiver->DiedPlace::PLANE;
                     }
                 }
             }

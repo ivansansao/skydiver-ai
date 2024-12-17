@@ -83,12 +83,6 @@ class Skydiver {
         ON_WATER
     } state = ON_PLANE;
 
-    enum DiedPlace {
-        BOAT,
-        WATER,
-        PLANE
-    } diedPlace;
-
     enum ParachutesState {
         CLOSED,
         OPENING,
