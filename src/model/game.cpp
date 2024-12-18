@@ -26,7 +26,7 @@ Game::Game() {
     sf::ContextSettings settings;
     settings.depthBits = 0;
     settings.stencilBits = 0;
-    settings.antialiasingLevel = 0;
+    settings.antialiasingLevel = 8;
     settings.majorVersion = 2;
     settings.minorVersion = 1;
 

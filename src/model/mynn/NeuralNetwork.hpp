@@ -1,6 +1,7 @@
 #ifndef NEURALNETWORK_HPP
 #define NEURALNETWORK_HPP
 
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 
@@ -8,7 +9,7 @@
 
 class NeuralNetwork {
    public:
-    int inputs;
+    uint16_t inputs;
     std::vector<Layer> layers;
     std::vector<std::vector<std::vector<double>>> weights;
     std::vector<std::vector<double>> biases;
@@ -29,6 +30,7 @@ class NeuralNetwork {
 
     void setBias(const std::string &text);
     std::string getBias() const;
+    void draw(sf::RenderWindow *w, uint16_t left, uint16_t top);
 
    private:
     double getRand();

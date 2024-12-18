@@ -1,5 +1,7 @@
 #include "Neuron.hpp"
 
+#include "iostream"
+
 int Neuron::neuronIdCounter = 1;
 
 Neuron::Neuron(std::function<double(double)> activationFunction) : neuronId(neuronIdCounter++),

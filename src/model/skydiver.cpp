@@ -309,6 +309,8 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
             line[1].color = sf::Color::White;                                                         // Cor do ponto A
             w->draw(line);
             Tools::say(w, "Master", pos.left - 16, pos.top - 26);
+
+            this->mind.draw(w, 400, 0);
         }
     }
 

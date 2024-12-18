@@ -316,3 +316,119 @@ std::string NeuralNetwork::getBias() const {
     }
     return result;
 }
+void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) {
+    // Configurações de layout
+    const float neuronRadius = 15.0f;   // Raio dos neurônios
+    const float layerSpacing = 150.0f;  // Espaçamento entre as camadas
+    const float neuronSpacing = 10.0f;  // Espaçamento entre os neurônios na mesma camada
+
+    // Variáveis de posição inicial
+    float x = left;
+    float y;
+
+    // Lista para armazenar as posições dos neurônios de cada camada
+    std::vector<std::vector<sf::Vector2f>> layersPos;
+
+    /**
+     * Save positions of neurons
+     */
+
+    // INPUT LAYER
+
+    // Calcula a posição inicial para centralizar os neurônios da camada
+    y = top + (window->getSize().y - (inputs * (2 * neuronRadius + neuronSpacing) - neuronSpacing)) / 2.0f;
+
+    // Neurons
+    std::vector<sf::Vector2f> neuronsPos;
+
+    for (size_t neuronIndex = 0; neuronIndex < inputs; ++neuronIndex) {
+        neuronsPos.emplace_back(x, y);
+        y += 2 * neuronRadius + neuronSpacing;
+    }
+
+    layersPos.push_back(neuronsPos);
+
+    // Incrementa a posição horizontal para a próxima camada
+    x += layerSpacing;
+
+    // HIDDEN LAYERS
+
+    for (size_t layerIndex = 0; layerIndex < layers.size(); ++layerIndex) {
+        const auto &layer = layers[layerIndex];
+        size_t numNeurons = layer.neurons.size();
+
+        // Calcula a posição inicial para centralizar os neurônios da camada
+        y = top + (window->getSize().y - (numNeurons * (2 * neuronRadius + neuronSpacing) - neuronSpacing)) / 2.0f;
+
+        // Neurons
+        std::vector<sf::Vector2f> neuronsPos;
+
+        for (size_t neuronIndex = 0; neuronIndex < numNeurons; ++neuronIndex) {
+            neuronsPos.emplace_back(x, y);
+            y += 2 * neuronRadius + neuronSpacing;
+        }
+
+        layersPos.push_back(neuronsPos);
+
+        // Incrementa a posição horizontal para a próxima camada
+        x += layerSpacing;
+    }
+
+    /**
+     * Draw lines
+     */
+
+    for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; ++layerIndex) {
+        const auto &currentLayer = layersPos[layerIndex];
+        const auto &nextLayer = layersPos[layerIndex + 1];
+
+        for (const auto &currentNeuronPos : currentLayer) {
+            for (const auto &nextNeuronPos : nextLayer) {
+                sf::Vertex line[] = {
+                    sf::Vertex(currentNeuronPos, sf::Color::White),
+                    sf::Vertex(nextNeuronPos, sf::Color::White)};
+                window->draw(line, 2, sf::Lines);
+            }
+        }
+    }
+
+    /**
+     * Draw neurons
+     */
+
+    uint16_t l = 0;  // 0 is input layer on layersPos
+    uint16_t n = 0;
+
+    sf::Font font;
+    if (!font.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
+        // Handle error
+    }
+    sf::Text biasText;
+    biasText.setFont(font);
+    biasText.setCharacterSize(8);
+    biasText.setFillColor(sf::Color::White);
+
+    for (const auto &layer : layersPos) {
+        n = 0;
+        for (const auto &neuronPos : layer) {
+            sf::CircleShape neuron(neuronRadius);
+            neuron.setFillColor(sf::Color(128, 128, 128));
+            neuron.setOutlineColor(sf::Color::White);
+            neuron.setOutlineThickness(2);
+            neuron.setPosition(neuronPos.x - neuronRadius, neuronPos.y - neuronRadius);
+            window->draw(neuron);
+
+            // Desenhar o valor do bias
+
+            biasText.setString(std::to_string(0.0));
+            if (l > 0) {
+                const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
+                biasText.setString(sf::String(bias.substr(0, bias.find('.') + 2)));
+            }
+            biasText.setPosition(neuronPos.x - neuronRadius / 2, neuronPos.y - neuronRadius / 2);
+            window->draw(biasText);
+            n++;
+        }
+        l++;
+    }
+}
