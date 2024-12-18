@@ -108,8 +108,8 @@ void Game::play() {
                     }
                 }
                 skydiver->doAction();
+                skydiver->update(plane, boat);
             }
-            skydiver->update(plane, boat);
 
             if (skydiver->state == skydiver->State::ON_PLANE)
                 onPlane++;
