@@ -19,14 +19,6 @@ void NeuralNetwork::compile() {
     // Inputs x 1s layer
     std::vector<std::vector<double>> weightsLayer0;
 
-    // Bias
-    std::vector<double> biasesLayer0(layers[0].neurons.size());
-    for (auto &bias : biasesLayer0) {
-        bias = getRand();
-    }
-    biases.push_back(biasesLayer0);
-    // endBias
-
     weightsLayer0.reserve(inputs);
     for (int i = 0; i < inputs; ++i) {
         std::vector<double> sub;
@@ -41,14 +33,6 @@ void NeuralNetwork::compile() {
     // Hidden layers
     for (unsigned int lay = 1; lay < layers.size(); ++lay) {
         std::vector<std::vector<double>> weightsLayer;
-
-        // Bias
-        std::vector<double> biasesLayer(layers[lay].neurons.size());
-        for (auto &bias : biasesLayer) {
-            bias = getRand();
-        }
-        biases.push_back(biasesLayer);
-        // endBias
 
         weightsLayer.reserve(layers[lay - 1].neurons.size());
         for (unsigned int i = 0; i < layers[lay - 1].neurons.size(); ++i) {
@@ -121,12 +105,12 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
 
         // Mutate bias
         if (getRand() > 0) {
-            for (unsigned int l = 0; l < biases.size(); ++l) {
-                for (unsigned int i = 0; i < biases[l].size(); ++i) {
+            for (unsigned int l = 0; l < layers.size(); l++) {
+                for (unsigned int n = 0; n < layers[l].neurons.size(); n++) {
                     if (getRand() > 0.5) {
-                        biases[l][i] += getRand();
+                        layers[l].neurons[n].bias += getRand();
                         mutated++;
-                        mutatedNeurons += " B" + std::to_string(l) + "/" + std::to_string(i) + ";";
+                        mutatedNeurons += " B" + std::to_string(l) + "/" + std::to_string(n) + ";";
                     }
                 }
             }
@@ -144,12 +128,12 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
         }
 
         // Mutate bias
-        const int l = rand() % biases.size();
-        const int neuronIndex = rand() % biases[l].size();
-        biases[l][neuronIndex] += getRand();
+        const int l = rand() % layers.size();
+        const int n = rand() % layers[l].neurons.size();
+        layers[l].neurons[n].bias += getRand();
 
         mutated++;
-        mutatedNeurons += "B" + std::to_string(l) + "/" + std::to_string(neuronIndex) + ";";
+        mutatedNeurons += "B" + std::to_string(l) + "/" + std::to_string(n) + ";";
     }
 }
 
@@ -192,7 +176,8 @@ void NeuralNetwork::setWeights(const std::string &text) {
         std::vector<double> sub;
         sub.reserve(layers[0].neurons.size());
         for (unsigned int j = 0; j < layers[0].neurons.size(); ++j) {
-            sub.push_back(imported[w++]);
+            sub.push_back(imported[w]);
+            w++;
         }
         weightsLayer0.push_back(sub);
     }
@@ -275,6 +260,8 @@ void NeuralNetwork::printWeightsNoWrap() const {
 }
 
 void NeuralNetwork::setBias(const std::string &text) {
+    if (text.empty()) return;
+
     std::istringstream iss(text);
     std::vector<double> imported;
 
@@ -287,38 +274,32 @@ void NeuralNetwork::setBias(const std::string &text) {
         }
     }
 
-    if (imported.size() <= 0) return;
-
-    biases.clear();
     int index = 0;
 
     for (unsigned int l = 0; l < layers.size(); ++l) {
-        std::vector<double> layerBiases(layers[l].neurons.size());
         for (unsigned int i = 0; i < layers[l].neurons.size(); ++i) {
-            layerBiases[i] = imported[index++];
+            layers[l].neurons[i].bias = imported[index];
+            index++;
         }
-        biases.push_back(layerBiases);
     }
 }
 
 std::string NeuralNetwork::getBias() const {
     std::ostringstream oss;
 
-    for (const auto &layerBiases : biases) {
-        for (const auto &bias : layerBiases) {
-            oss << bias << ",";
+    for (const auto &layer : layers) {
+        for (const auto &neuron : layer.neurons) {
+            if (oss.tellp() > 0) oss << ',';
+            oss << neuron.bias;
         }
     }
 
-    std::string result = oss.str();
-    if (!result.empty() && result.back() == ',') {
-        result.pop_back();
-    }
-    return result;
+    return oss.str();
 }
+
 void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) {
     // Configurações de layout
-    const float neuronRadius = 15.0f;   // Raio dos neurônios
+    const float neuronRadius = 16.0f;   // Raio dos neurônios
     const float layerSpacing = 150.0f;  // Espaçamento entre as camadas
     const float neuronSpacing = 10.0f;  // Espaçamento entre os neurônios na mesma camada
 
@@ -405,14 +386,14 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     }
     sf::Text biasText;
     biasText.setFont(font);
-    biasText.setCharacterSize(8);
+    biasText.setCharacterSize(9);
     biasText.setFillColor(sf::Color::White);
 
     for (const auto &layer : layersPos) {
         n = 0;
         for (const auto &neuronPos : layer) {
             sf::CircleShape neuron(neuronRadius);
-            neuron.setFillColor(sf::Color(128, 128, 128));
+            neuron.setFillColor(sf::Color(128 * l, 128, 128));
             neuron.setOutlineColor(sf::Color::White);
             neuron.setOutlineThickness(2);
             neuron.setPosition(neuronPos.x - neuronRadius, neuronPos.y - neuronRadius);
@@ -423,9 +404,9 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
             biasText.setString(std::to_string(0.0));
             if (l > 0) {
                 const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
-                biasText.setString(sf::String(bias.substr(0, bias.find('.') + 2)));
+                biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
             }
-            biasText.setPosition(neuronPos.x - neuronRadius / 2, neuronPos.y - neuronRadius / 2);
+            biasText.setPosition(neuronPos.x - neuronRadius / 1.1, neuronPos.y - neuronRadius / 2.5);
             window->draw(biasText);
             n++;
         }

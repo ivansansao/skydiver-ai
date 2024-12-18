@@ -12,7 +12,6 @@ class NeuralNetwork {
     uint16_t inputs;
     std::vector<Layer> layers;
     std::vector<std::vector<std::vector<double>>> weights;
-    std::vector<std::vector<double>> biases;
     int mutated = 0;
     std::string mutatedNeurons;
 
