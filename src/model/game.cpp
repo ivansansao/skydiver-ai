@@ -101,6 +101,9 @@ void Game::play() {
         for (auto& skydiver : skydivers) {
             if (skydiver->died) {
                 died++;
+                if (skydiver->state == skydiver->State::ON_BOAT) {
+                    skydiver->update(plane, boat);
+                }
             } else {
                 if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
                     if (skydiver->state != skydiver->State::ON_BOAT) {
