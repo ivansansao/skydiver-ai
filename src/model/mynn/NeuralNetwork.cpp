@@ -299,9 +299,9 @@ std::string NeuralNetwork::getBias() const {
 
 void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) {
     // Configurações de layout
-    const float neuronRadius = 16.0f;   // Raio dos neurônios
+    float neuronRadius = 20.0f;         // Raio dos neurônios
     const float layerSpacing = 150.0f;  // Espaçamento entre as camadas
-    const float neuronSpacing = 10.0f;  // Espaçamento entre os neurônios na mesma camada
+    const float neuronSpacing = 6.0f;   // Espaçamento entre os neurônios na mesma camada
 
     // Variáveis de posição inicial
     float x = left;
@@ -359,16 +359,29 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
      * Draw lines
      */
 
+    uint16_t l = 1;
+    uint16_t n = 0;
+
     for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; ++layerIndex) {
         const auto &currentLayer = layersPos[layerIndex];
         const auto &nextLayer = layersPos[layerIndex + 1];
 
+        n = 0;
         for (const auto &currentNeuronPos : currentLayer) {
             for (const auto &nextNeuronPos : nextLayer) {
+                double out1 = layers[layerIndex].neurons[n].output;
+                double out2 = layers[layerIndex + 1 < layers.size() ? layerIndex + 1 : layerIndex].neurons[n].output;
+
+                out1 = out1 > 0 ? out1 : out1 * -1;
+                out2 = out2 > 0 ? out2 : out2 * -1;
+
+                sf::Color c1 = sf::Color(10 * out1, 255 - (out2 * 10), 10 * out2);
+                sf::Color c2 = sf::Color(255 - (out1 * 10), 10 * out2, 10 * out1);
                 sf::Vertex line[] = {
-                    sf::Vertex(currentNeuronPos, sf::Color::White),
-                    sf::Vertex(nextNeuronPos, sf::Color::White)};
+                    sf::Vertex(currentNeuronPos, c1),
+                    sf::Vertex(nextNeuronPos, c2)};
                 window->draw(line, 2, sf::Lines);
+                n++;
             }
         }
     }
@@ -377,8 +390,8 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
      * Draw neurons
      */
 
-    uint16_t l = 0;  // 0 is input layer on layersPos
-    uint16_t n = 0;
+    l = 0;  // 0 is input layer on layersPos
+    n = 0;
 
     sf::Font font;
     if (!font.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
@@ -403,11 +416,20 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
 
             biasText.setString(std::to_string(0.0));
             if (l > 0) {
-                const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
-                biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
+                // const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
+                // biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
+                biasText.setString(std::to_string(layers[l < layers.size() ? l : l - 1].neurons[n].output));
             }
             biasText.setPosition(neuronPos.x - neuronRadius / 1.1, neuronPos.y - neuronRadius / 2.5);
             window->draw(biasText);
+
+            if (l > 0) {
+                const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
+                biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
+            }
+            biasText.setPosition(neuronPos.x - neuronRadius / 1.4, neuronPos.y + neuronRadius / 4);
+            window->draw(biasText);
+
             n++;
         }
         l++;
