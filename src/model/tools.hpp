@@ -29,5 +29,8 @@ class Tools {
     static void say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize = 12, sf::Color color = sf::Color::Black);
     static double getRand();
     static void printHour();
+    static std::string formatDouble(double value, int decimalPlaces);
+    static sf::Color hslaToRgba(float h, float s, float l, float a);
+    static float map(float x, float a, float b, float c, float d);
 };
 #endif

@@ -54,6 +54,8 @@ Skydiver::Skydiver(uint16_t id) : id(id) {
     reset_position();
 
     // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
+    mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat spped", "Sd side speed", "Sd drop speed"};
+    mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     mind.addLayer(14, [](double x) { return std::max(0.0, x); });
     mind.addLayer(7, [](double x) { return std::max(0.0, x); });
     mind.compile();

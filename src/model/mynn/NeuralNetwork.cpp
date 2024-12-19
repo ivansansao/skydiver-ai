@@ -50,6 +50,8 @@ void NeuralNetwork::compile() {
 std::vector<double> NeuralNetwork::think(const std::vector<double> &input) {
     clearNeurons();
 
+    this->input = input;
+
     // First layer
     for (unsigned int i = 0; i < weights[0].size(); ++i) {
         // Scan weights x input
@@ -302,9 +304,10 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     float neuronRadius = 20.0f;         // Raio dos neurônios
     const float layerSpacing = 150.0f;  // Espaçamento entre as camadas
     const float neuronSpacing = 6.0f;   // Espaçamento entre os neurônios na mesma camada
+    const int inputNamesLength = 130;
 
     // Variáveis de posição inicial
-    float x = left;
+    float x = left + inputNamesLength;
     float y;
 
     // Lista para armazenar as posições dos neurônios de cada camada
@@ -372,11 +375,12 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
                 double out1 = layers[layerIndex].neurons[n].output;
                 double out2 = layers[layerIndex + 1 < layers.size() ? layerIndex + 1 : layerIndex].neurons[n].output;
 
-                out1 = out1 > 0 ? out1 : out1 * -1;
-                out2 = out2 > 0 ? out2 : out2 * -1;
+                // out1 = out1 > 0 ? out1 : out1 * -1;
+                // out2 = out2 > 0 ? out2 : out2 * -1;
+                const double maxOut = out1 > out2 ? out1 : out2;
 
-                sf::Color c1 = sf::Color(10 * out1, 255 - (out2 * 10), 10 * out2);
-                sf::Color c2 = sf::Color(255 - (out1 * 10), 10 * out2, 10 * out1);
+                sf::Color c1 = Tools::hslaToRgba(Tools::map(maxOut, 0, 70, 0, 360), 1.0, 220.0, 360.0);
+                sf::Color c2 = Tools::hslaToRgba(Tools::map(maxOut, 0, 70, 0, 360), 1.0, 220.0, 360.0);
                 sf::Vertex line[] = {
                     sf::Vertex(currentNeuronPos, c1),
                     sf::Vertex(nextNeuronPos, c2)};
@@ -387,7 +391,7 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     }
 
     /**
-     * Draw neurons
+     * Draw neurons (circles)
      */
 
     l = 0;  // 0 is input layer on layersPos
@@ -402,11 +406,19 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     biasText.setCharacterSize(9);
     biasText.setFillColor(sf::Color::White);
 
+    double biggerOutputValue;
+    sf::Vector2f biggerOutputPos;
+
     for (const auto &layer : layersPos) {
         n = 0;
+        biggerOutputValue = layers[0].neurons[0].output;
+        biggerOutputPos = sf::Vector2f(0, 0);
+
         for (const auto &neuronPos : layer) {
+            biasText.setCharacterSize(9);
             sf::CircleShape neuron(neuronRadius);
-            neuron.setFillColor(sf::Color(128 * l, 128, 128));
+            neuron.setFillColor(Tools::hslaToRgba(0, 1.0, 0.0, 360.0));
+
             neuron.setOutlineColor(sf::Color::White);
             neuron.setOutlineThickness(2);
             neuron.setPosition(neuronPos.x - neuronRadius, neuronPos.y - neuronRadius);
@@ -414,24 +426,58 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
 
             // Desenhar o valor do bias
 
+            biasText.setFillColor(sf::Color::White);
             biasText.setString(std::to_string(0.0));
             if (l > 0) {
-                // const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
-                // biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
-                biasText.setString(std::to_string(layers[l < layers.size() ? l : l - 1].neurons[n].output));
+                const double input = layers[l < layers.size() ? l : l - 1].neurons[n].output;
+                biasText.setString(Tools::formatDouble(input, 2));
+                if (input > biggerOutputValue) {
+                    biggerOutputValue = input;
+                    biggerOutputPos = neuronPos;
+                }
+
+            } else {
+                if (n < this->input.size()) {
+                    biasText.setString(Tools::formatDouble(this->input[n], 2));
+                }
             }
-            biasText.setPosition(neuronPos.x - neuronRadius / 1.1, neuronPos.y - neuronRadius / 2.5);
+            biasText.setPosition(neuronPos.x - neuronRadius / 1.3, neuronPos.y - neuronRadius / 2.5);
             window->draw(biasText);
 
             if (l > 0) {
                 const std::string bias = std::to_string(layers[l - 1].neurons[n].bias);
                 biasText.setString(sf::String(bias.substr(0, bias.find('.') + 3)));
+            } else {
+                biasText.setString("-");
             }
             biasText.setPosition(neuronPos.x - neuronRadius / 1.4, neuronPos.y + neuronRadius / 4);
             window->draw(biasText);
 
+            biasText.setCharacterSize(14);
+            if (l == 0) {
+                biasText.setFillColor(sf::Color::Black);
+                biasText.setString(inputNames[n]);
+                biasText.setPosition(neuronPos.x - inputNamesLength - neuronRadius, neuronPos.y - neuronRadius / 2.5);
+                window->draw(biasText);
+            } else if (l == layersPos.size() - 1) {
+                biasText.setFillColor(sf::Color::Black);
+                biasText.setString(outputNames[n]);
+                biasText.setPosition(neuronPos.x + neuronRadius * 2, neuronPos.y - neuronRadius / 2.5);
+                window->draw(biasText);
+            }
+
             n++;
         }
+
+        if (l > 0) {
+            sf::CircleShape neuron(neuronRadius);
+            neuron.setFillColor(sf::Color::Transparent);
+            neuron.setOutlineColor(sf::Color::Red);
+            neuron.setOutlineThickness(4);
+            neuron.setPosition(biggerOutputPos.x - neuronRadius, biggerOutputPos.y - neuronRadius);
+            window->draw(neuron);
+        }
+
         l++;
     }
 }

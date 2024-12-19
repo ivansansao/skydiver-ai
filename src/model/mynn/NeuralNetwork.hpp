@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "../tools.hpp"
 #include "Layer.hpp"
 
 class NeuralNetwork {
@@ -14,6 +15,9 @@ class NeuralNetwork {
     std::vector<std::vector<std::vector<double>>> weights;
     int mutated = 0;
     std::string mutatedNeurons;
+    std::vector<double> input;
+    std::vector<std::string> inputNames;
+    std::vector<std::string> outputNames;
 
     NeuralNetwork(int inputs);
     void addLayer(int size, std::function<double(double)> activationFunction);
