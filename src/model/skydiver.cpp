@@ -54,7 +54,7 @@ Skydiver::Skydiver(uint16_t id) : id(id) {
     reset_position();
 
     // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat spped", "Sd side speed", "Sd drop speed"};
+    mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat speed", "Sd side speed", "Sd drop speed"};
     mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     mind.addLayer(14, [](double x) { return std::max(0.0, x); });
     mind.addLayer(7, [](double x) { return std::max(0.0, x); });
@@ -80,8 +80,8 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::think(Plane plane, Boat boat, bool boot) {
-    const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
-    const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
+    const float altitudeFromBoat = getAltitudeFromBoat(boat) / 100;
+    const float longitudeFromBoat = getLongitudeFromBoat(boat) / 100;
 
     std::vector<double> input = {state + 0.0, parachuteState + 0.0, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);

@@ -208,6 +208,7 @@ void Game::play() {
 
         Tools::say(&window, info, 10, 8);
     }
+
     window.display();
 
     // END DRAW

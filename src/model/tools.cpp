@@ -133,7 +133,20 @@ std::string Tools::formatDouble(double value, int decimalPlaces) {
     oss << std::fixed << std::setprecision(decimalPlaces) << value;
     return oss.str();
 }
+/**
+ * h: 0-359 (If out of bounds Hue will rotate number)
+ * s: 0.0-1.0 (e.g. 0.70 is 70% of saturation)
+ * l: 0.0-1.0 (e.g. 0.70 is 70% of luminous)
+ * a: 0.0-1.0 (e.g. 0.70 is 70% of alpha, 1.0 is transparent)
+ * E.g.: Tools::hslaToRgba(176. 0.7, 0.57, 1) // Solid lime color
+ */
 sf::Color Tools::hslaToRgba(float h, float s, float l, float a) {
+    if (h > 359) {
+        h = std::fmod(h, 359.0f);
+    } else if (h < 0) {
+        h = 359 - std::fmod(std::abs(h), 359.0f);
+    }
+
     float c = (1 - std::abs(2 * l - 1)) * s;
     float x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
     float m = l - c / 2;

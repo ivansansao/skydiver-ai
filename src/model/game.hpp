@@ -63,6 +63,13 @@ class Game {
     bool syncronism = true;
     bool bootSkydivers = false;
 
+    // 176, 70%, 57%
+
+    float hsla_a = 176;
+    float hsla_b = 0.70;
+    float hsla_c = 0.57;
+    float hsla_d = 1;
+
     uint16_t onPlane = 0;
     uint16_t onAir = 0;
     uint16_t onBoat = 0;

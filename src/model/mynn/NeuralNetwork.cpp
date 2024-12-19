@@ -310,6 +310,9 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     float x = left + inputNamesLength;
     float y;
 
+    uint16_t l = 0;
+    uint16_t n = 0;
+
     // Lista para armazenar as posições dos neurônios de cada camada
     std::vector<std::vector<sf::Vector2f>> layersPos;
 
@@ -319,21 +322,45 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
 
     // INPUT LAYER
 
+    std::vector<sf::Vector2f> layerMinMax;
+
     // Calcula a posição inicial para centralizar os neurônios da camada
     y = top + (window->getSize().y - (inputs * (2 * neuronRadius + neuronSpacing) - neuronSpacing)) / 2.0f;
 
     // Neurons
     std::vector<sf::Vector2f> neuronsPos;
 
+    layerMinMax.emplace_back(0, 0);
+
     for (size_t neuronIndex = 0; neuronIndex < inputs; ++neuronIndex) {
         neuronsPos.emplace_back(x, y);
         y += 2 * neuronRadius + neuronSpacing;
+
+        if (neuronIndex < input.size()) {
+            if (input[neuronIndex] < layerMinMax[0].x) layerMinMax[0].x = input[neuronIndex];
+            if (input[neuronIndex] > layerMinMax[0].y) layerMinMax[0].y = input[neuronIndex];
+        }
     }
 
     layersPos.push_back(neuronsPos);
 
     // Incrementa a posição horizontal para a próxima camada
     x += layerSpacing;
+
+    // Get min (x), max (y) outputs
+    l = 0;
+    n = 0;
+    for (const auto &layer : layers) {
+        layerMinMax.emplace_back(0, 0);
+        l++;
+        for (const auto &neu : layer.neurons) {
+            if (l < layerMinMax.size()) {
+                if (neu.output < layerMinMax[l].x) layerMinMax[l].x = neu.output;
+                if (neu.output > layerMinMax[l].y) layerMinMax[l].y = neu.output;
+            }
+            n++;
+        }
+    }
 
     // HIDDEN LAYERS
 
@@ -362,8 +389,8 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
      * Draw lines
      */
 
-    uint16_t l = 1;
-    uint16_t n = 0;
+    l = 1;
+    n = 0;
 
     for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; ++layerIndex) {
         const auto &currentLayer = layersPos[layerIndex];
@@ -375,12 +402,9 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
                 double out1 = layers[layerIndex].neurons[n].output;
                 double out2 = layers[layerIndex + 1 < layers.size() ? layerIndex + 1 : layerIndex].neurons[n].output;
 
-                // out1 = out1 > 0 ? out1 : out1 * -1;
-                // out2 = out2 > 0 ? out2 : out2 * -1;
-                const double maxOut = out1 > out2 ? out1 : out2;
+                sf::Color c1 = Tools::hslaToRgba(Tools::map(out1, layerMinMax[l - 1].x, layerMinMax[l - 1].y, 0, 360), 0.70, 0.57, 1);
+                sf::Color c2 = Tools::hslaToRgba(Tools::map(out2, layerMinMax[l].x, layerMinMax[l].y, 0, 360), 0.70, 0.57, 1);
 
-                sf::Color c1 = Tools::hslaToRgba(Tools::map(maxOut, 0, 70, 0, 360), 1.0, 220.0, 360.0);
-                sf::Color c2 = Tools::hslaToRgba(Tools::map(maxOut, 0, 70, 0, 360), 1.0, 220.0, 360.0);
                 sf::Vertex line[] = {
                     sf::Vertex(currentNeuronPos, c1),
                     sf::Vertex(nextNeuronPos, c2)};
@@ -409,6 +433,26 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     double biggerOutputValue;
     sf::Vector2f biggerOutputPos;
 
+    // TEST
+
+    l = 0;
+
+    for (const auto &point : layerMinMax) {
+        biasText.setFillColor(sf::Color::Black);
+        biasText.setString("Min: " + std::to_string(point.x));
+        biasText.setPosition(left + (inputNamesLength * 0.5) + (layerSpacing * l), 20);
+        window->draw(biasText);
+
+        biasText.setString("Max: " + std::to_string(point.y));
+        biasText.setPosition(left + (inputNamesLength * 0.5) + (layerSpacing * l), 40);
+        window->draw(biasText);
+        l++;
+    }
+
+    // ENDTEST
+
+    l = 0;
+
     for (const auto &layer : layersPos) {
         n = 0;
         biggerOutputValue = layers[0].neurons[0].output;
@@ -429,7 +473,7 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
             biasText.setFillColor(sf::Color::White);
             biasText.setString(std::to_string(0.0));
             if (l > 0) {
-                const double input = layers[l < layers.size() ? l : l - 1].neurons[n].output;
+                const double input = layers[l - 1].neurons[n].output;
                 biasText.setString(Tools::formatDouble(input, 2));
                 if (input > biggerOutputValue) {
                     biggerOutputValue = input;
