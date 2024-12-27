@@ -17,6 +17,18 @@ Plane::Plane() {
     reset_position();
 }
 
+void Plane::reverse_direction(bool condition) {
+    if (condition) {
+        velocity.x = -velocity.x;
+
+        if (velocity.x > 0) {
+            start_pos = sf::FloatRect(-152, 50, 152, 47);
+        } else {
+            start_pos = sf::FloatRect(1600, 50, 152, 47);
+        }
+    }
+}
+
 void Plane::set_position(float left, float top) {
     pos.left = left;
     pos.top = top;
@@ -28,15 +40,31 @@ void Plane::reset_position() {
 }
 void Plane::update() {
     pos.left += velocity.x;
-    if (pos.left + pos.width < 0) {
-        round++;
-        this->on = false;
+
+    // Going to right
+    if (velocity.x > 0) {
+        if (pos.left > 1600) {
+            round++;
+            this->on = false;
+        }
+    } else {  // Going to left
+        if (pos.left + pos.width < 0) {
+            round++;
+            this->on = false;
+        }
     }
 }
 
 void Plane::draw(sf::RenderWindow *w) {
+    // actorJetpack.anime(sf::IntRect(Tools::getStartSprite(actorJetpack.getFrame(), direction_x) * pos.width, 0, direction_x * pos.width, pos.height), direction_x);
+    const int dir_x = velocity.x > 0 ? 1 : -1;
+
     plane.draw(pos.left, pos.top, w);
-    plane.anime(sf::IntRect(plane.getFrame() * pos.width, 0, pos.width, pos.height), 1);
+    if (dir_x > 0) {
+        plane.anime(sf::IntRect(pos.width * (plane.getFrame() + 1), 0, -pos.width, pos.height), dir_x);
+    } else {
+        plane.anime(sf::IntRect(pos.width * plane.getFrame(), 0, pos.width, pos.height), dir_x);
+    }
 }
 
 void Plane::start_round() {

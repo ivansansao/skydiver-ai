@@ -7,6 +7,7 @@
 
 #include "animation.hpp"
 #include "force.hpp"
+#include "tools.hpp"
 
 class Plane {
    public:
@@ -25,6 +26,7 @@ class Plane {
     void set_position(float left, float top);
     void reset_position();
     void start_round();
+    void reverse_direction(bool condition);
     bool on = true;
 };
 #endif

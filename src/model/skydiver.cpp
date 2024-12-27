@@ -57,7 +57,6 @@ Skydiver::Skydiver(uint16_t id) : id(id) {
     mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat speed", "Sd side speed", "Sd drop speed"};
     mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     mind.addLayer(14, [](double x) { return std::max(0.0, x); });
-    mind.addLayer(10, [](double x) { return std::max(0.0, x); });
     mind.addLayer(7, [](double x) { return std::max(0.0, x); });
     mind.compile();
 
@@ -198,7 +197,11 @@ void Skydiver::update(Plane plane, Boat boat) {
     }
     // PLANE
     if (this->state == State::ON_PLANE) {
-        pos.left = plane.pos.left + plane.door.x;
+        if (plane.velocity.x > 0)
+            pos.left = plane.pos.left + plane.pos.width - plane.door.x - pos.width;
+        else
+            pos.left = plane.pos.left + plane.door.x;
+
         pos.top = plane.pos.top + plane.door.y;
         velocity.x = plane.velocity.x;
         velocity.y = plane.velocity.y;

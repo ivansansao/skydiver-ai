@@ -147,6 +147,7 @@ void Game::play() {
                 saveScore(lastBetterSkydiver->getScore());
             }
 
+            plane.reverse_direction(round % 2 == 0);
             boat.velocity.x *= -1;
         }
 
