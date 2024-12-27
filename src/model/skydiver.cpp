@@ -57,6 +57,7 @@ Skydiver::Skydiver(uint16_t id) : id(id) {
     mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat speed", "Sd side speed", "Sd drop speed"};
     mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     mind.addLayer(14, [](double x) { return std::max(0.0, x); });
+    mind.addLayer(10, [](double x) { return std::max(0.0, x); });
     mind.addLayer(7, [](double x) { return std::max(0.0, x); });
     mind.compile();
 
@@ -121,53 +122,71 @@ void Skydiver::think(Plane plane, Boat boat, bool boot) {
     }
 }
 void Skydiver::doAction() {
+    bool success = false;
+
     if (action == "J") {
-        jump();
+        success = jump();
     } else if (action == "O") {
-        parachutesOpen();
+        success = parachutesOpen();
     } else if (action == "R") {
-        parachutesGoRight();
+        success = parachutesGoRight();
     } else if (action == "L") {
-        parachutesGoLeft();
+        success = parachutesGoLeft();
     } else if (action == "U") {
-        parachutesGoUp();
+        success = parachutesGoUp();
     } else if (action == "D") {
-        parachutesGoDown();
+        success = parachutesGoDown();
+    }
+
+    if (success && usedActions.find(action) == std::string::npos) {
+        usedActions += action;
     }
 }
-void Skydiver::jump() {
+bool Skydiver::jump() {
     if (state == State::ON_PLANE) {
         if (pos.left > 0 && pos.left + pos.width < 1600) {
             state = State::ON_AIR;
+            return true;
         }
     }
+    return false;
 }
-void Skydiver::parachutesOpen() {
+bool Skydiver::parachutesOpen() {
     if (state == State::ON_AIR) {
         if (parachuteState == ParachutesState::CLOSED) {
             parachuteState = ParachutesState::OPENING;
+            return true;
         }
     }
+    return false;
 }
-void Skydiver::parachutesGoRight() {
+bool Skydiver::parachutesGoRight() {
     if (parachuteState == ParachutesState::OPEN) {
         velocity.x += 0.01;
+        return true;
     }
+    return false;
 }
-void Skydiver::parachutesGoLeft() {
+bool Skydiver::parachutesGoLeft() {
     if (parachuteState == ParachutesState::OPEN) {
         velocity.x -= 0.01;
+        return true;
     }
+    return false;
 }
-void Skydiver::parachutesGoUp() {
+bool Skydiver::parachutesGoUp() {
     if (parachuteState == ParachutesState::OPEN) {
         parachutes_brake.increase();
+        return true;
     }
+    return false;
 }
-void Skydiver::parachutesGoDown() {
+bool Skydiver::parachutesGoDown() {
     if (parachuteState == ParachutesState::OPEN) {
         parachutes_brake.decrease();
+        return true;
     }
+    return false;
 }
 void Skydiver::update(Plane plane, Boat boat) {
     if (died) {
@@ -521,7 +540,8 @@ void Skydiver::saveScoreLanding(Boat boat) {
 
     grade_time_on_air = (int)gTimeOnAir;
     grade_time_on_air = 0;  // Disabled
+    grade_used_actions = Tools::map(usedActions.size(), 0, 7, 0, 10);
 
     // Set Score
-    score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air;
+    score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
 }

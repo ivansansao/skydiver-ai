@@ -68,6 +68,8 @@ class Skydiver {
     float grade_max_velocity_left = 0;
     int grade_direction_changes = 0;
     int grade_time_on_air = 0;
+    int grade_used_actions = 0;
+    std::string usedActions = "";
     int getScore();
     void setScore(unsigned int score);
 
@@ -96,14 +98,14 @@ class Skydiver {
     void set_position(float left, float top);
     void reset_position();
 
-    void parachutesOpen();
-    void parachutesGoRight();
-    void parachutesGoLeft();
-    void parachutesGoUp();
-    void parachutesGoDown();
+    bool jump();
+    bool parachutesOpen();
+    bool parachutesGoRight();
+    bool parachutesGoLeft();
+    bool parachutesGoUp();
+    bool parachutesGoDown();
 
     void add_gravity();
-    void jump();
     void think(Plane plane, Boat boat, bool boot);
     void doAction();
     float getAltitudeFromBoat(Boat boat);
