@@ -300,6 +300,9 @@ std::string NeuralNetwork::getBias() const {
 }
 
 void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) {
+    if (input.size() < 1) {
+        return;
+    }
     // Configurações de layout
     float neuronRadius = 20.0f;         // Raio dos neurônios
     const float layerSpacing = 150.0f;  // Espaçamento entre as camadas
@@ -327,7 +330,8 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     // Calcula a posição inicial para centralizar os neurônios da camada
     y = top + (window->getSize().y - (inputs * (2 * neuronRadius + neuronSpacing) - neuronSpacing)) / 2.0f;
 
-    // Neurons
+    // Neurons from input layer
+
     std::vector<sf::Vector2f> neuronsPos;
 
     layerMinMax.emplace_back(0, 0);
@@ -392,24 +396,40 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     l = 1;
     n = 0;
 
-    for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; ++layerIndex) {
+    // Scan layers (e.g. 3 layers)
+    double out1;
+    double out2;
+
+    for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; layerIndex++) {
         const auto &currentLayer = layersPos[layerIndex];
         const auto &nextLayer = layersPos[layerIndex + 1];
 
-        n = 0;
-        for (const auto &currentNeuronPos : currentLayer) {
-            for (const auto &nextNeuronPos : nextLayer) {
-                double out1 = layers[layerIndex].neurons[n].output;
-                double out2 = layers[layerIndex + 1 < layers.size() ? layerIndex + 1 : layerIndex].neurons[n].output;
+        // Scan neurons of current layer
+        for (size_t i = 0; i < currentLayer.size(); ++i) {
+            const auto &currentNeuronPos = currentLayer[i];
+            // Scan neurons of next layer
+            for (size_t j = 0; j < nextLayer.size(); ++j) {
+                const auto &nextNeuronPos = nextLayer[j];
 
-                sf::Color c1 = Tools::hslaToRgba(Tools::map(out1, layerMinMax[l - 1].x, layerMinMax[l - 1].y, 0, 360), 0.70, 0.57, 1);
-                sf::Color c2 = Tools::hslaToRgba(Tools::map(out2, layerMinMax[l].x, layerMinMax[l].y, 0, 360), 0.70, 0.57, 1);
+                if (layerIndex == 0) {
+                    out1 = input[i];
+                    out2 = layers[layerIndex].neurons[j].output;
+
+                } else {
+                    out1 = layers[layerIndex - 1].neurons[i].output;
+                    out2 = layers[layerIndex].neurons[j].output;
+                }
+
+                const float map1 = Tools::map(out1, layerMinMax[layerIndex].x, layerMinMax[layerIndex].y, 0, 3600);
+                const float map2 = Tools::map(out2, layerMinMax[layerIndex + 1].x, layerMinMax[layerIndex + 1].y, 0, 3600);
+
+                sf::Color c1 = Tools::hslaToRgba(map1, 0.70, 0.57, 1);
+                sf::Color c2 = Tools::hslaToRgba(map2, 0.70, 0.57, 1);
 
                 sf::Vertex line[] = {
                     sf::Vertex(currentNeuronPos, c1),
                     sf::Vertex(nextNeuronPos, c2)};
                 window->draw(line, 2, sf::Lines);
-                n++;
             }
         }
     }
