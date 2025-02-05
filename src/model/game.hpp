@@ -16,6 +16,12 @@
 #include "skydiver.hpp"
 #include "tools.hpp"
 
+struct Config {
+    int round;
+    float boatVelocityX;
+    float planeVelocityX;
+};
+
 class Game {
    public:
     Game();
@@ -100,5 +106,8 @@ class Game {
     void setWindowIcon(sf::RenderWindow* w);
     bool hasOnScreenAir();
     bool window_has_focus = true;
+
+    void saveConfig(const Config& config, const std::string& arquivo);
+    Config loadConfig(const std::string& arquivo);
 };
 #endif

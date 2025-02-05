@@ -27,6 +27,7 @@ class Plane {
     void reset_position();
     void start_round();
     void reverse_direction(bool condition);
+    void set_start_pos();
     bool on = true;
 };
 #endif

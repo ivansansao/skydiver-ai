@@ -6,12 +6,21 @@
 #include <cmath>
 #include <filesystem>
 #include <random>
+#include <unordered_map>
 
 #include "iostream"
 
 using namespace std;
 
 Game::Game() {
+    Config config = loadConfig("config.txt");
+
+    round = config.round ? config.round : round;
+    plane.velocity.x = config.planeVelocityX ? config.planeVelocityX : plane.velocity.x;
+    boat.velocity.x = config.boatVelocityX ? config.boatVelocityX : boat.velocity.x;
+
+    plane.set_start_pos();
+
     bool fullscreen = false;
 
     if (std::getenv("SKYDIVER_FULLSCREEN")) {
@@ -172,6 +181,9 @@ void Game::play() {
         }
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
+
+        Config config = {round, boat.velocity.x, plane.velocity.x};
+        saveConfig(config, "config.txt");
     }
 
     // DRAW
@@ -304,6 +316,52 @@ unsigned int Game::loadScore() {
         return std::stoi(score);
     }
     return 0;
+}
+
+void Game::saveConfig(const Config& config, const std::string& arquivo) {
+    std::ofstream outFile(arquivo);
+    if (!outFile) {
+        std::cerr << "Erro ao abrir o arquivo para escrita!\n";
+        return;
+    }
+
+    outFile << "round=" << config.round << "\n"
+            << "boatVelocityX=" << config.boatVelocityX << "\n"
+            << "planeVelocityX=" << config.planeVelocityX << "\n";
+
+    outFile.close();
+}
+
+Config Game::loadConfig(const std::string& arquivo) {
+    Config config;
+    std::ifstream inFile(arquivo);
+    if (!inFile) {
+        std::cerr << "Erro ao abrir o arquivo para leitura!\n";
+        return config;
+    }
+
+    std::string linha;
+    std::unordered_map<std::string, std::string> configMap;
+
+    while (std::getline(inFile, linha)) {
+        std::istringstream ss(linha);
+        std::string chave, valor;
+
+        if (std::getline(ss, chave, '=') && std::getline(ss, valor)) {
+            configMap[chave] = valor;
+        }
+    }
+
+    // Converte os valores para os tipos corretos
+    if (configMap.find("round") != configMap.end())
+        config.round = std::stoi(configMap["round"]);
+    if (configMap.find("boatVelocityX") != configMap.end())
+        config.boatVelocityX = std::stof(configMap["boatVelocityX"]);
+    if (configMap.find("planeVelocityX") != configMap.end())
+        config.planeVelocityX = std::stof(configMap["planeVelocityX"]);
+
+    inFile.close();
+    return config;
 }
 
 void Game::setWindowIcon(sf::RenderWindow* w) {

@@ -20,12 +20,15 @@ Plane::Plane() {
 void Plane::reverse_direction(bool condition) {
     if (condition) {
         velocity.x = -velocity.x;
+        set_start_pos();
+    }
+}
 
-        if (velocity.x > 0) {
-            start_pos = sf::FloatRect(-152, 50, 152, 47);
-        } else {
-            start_pos = sf::FloatRect(1600, 50, 152, 47);
-        }
+void Plane::set_start_pos() {
+    if (velocity.x > 0) {
+        start_pos = sf::FloatRect(-152, 50, 152, 47);
+    } else {
+        start_pos = sf::FloatRect(1600, 50, 152, 47);
     }
 }
 

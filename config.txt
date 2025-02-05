@@ -1,0 +1,3 @@
+round=840
+boatVelocityX=-0.1
+planeVelocityX=1.5
