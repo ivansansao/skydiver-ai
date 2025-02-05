@@ -21,9 +21,6 @@ Game::Game() {
     qtd_skydivers = config.qtdSkydivers.has_value() ? config.qtdSkydivers.value() : qtd_skydivers;
     fullscreen = config.fullscreen.has_value() ? config.fullscreen.value() : fullscreen;
 
-    std::cout << "qtd_skydivers: " << qtd_skydivers << std::endl;
-    std::cout << "fullscreen: " << fullscreen << std::endl;
-
     plane.set_start_pos();
 
     sf::ContextSettings settings;
