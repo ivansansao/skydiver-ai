@@ -1,3 +1,5 @@
-round=840
+round=3
 boatVelocityX=-0.1
-planeVelocityX=1.5
+planeVelocityX=-1.5
+qtdSkydivers=8
+fullscreen=0

@@ -15,22 +15,16 @@ using namespace std;
 Game::Game() {
     Config config = loadConfig("config.txt");
 
-    round = config.round ? config.round : round;
-    plane.velocity.x = config.planeVelocityX ? config.planeVelocityX : plane.velocity.x;
-    boat.velocity.x = config.boatVelocityX ? config.boatVelocityX : boat.velocity.x;
+    round = config.round.has_value() ? config.round.value() : round;
+    plane.velocity.x = config.planeVelocityX.has_value() ? config.planeVelocityX.value() : plane.velocity.x;
+    boat.velocity.x = config.boatVelocityX.has_value() ? config.boatVelocityX.value() : boat.velocity.x;
+    qtd_skydivers = config.qtdSkydivers.has_value() ? config.qtdSkydivers.value() : qtd_skydivers;
+    fullscreen = config.fullscreen.has_value() ? config.fullscreen.value() : fullscreen;
+
+    std::cout << "qtd_skydivers: " << qtd_skydivers << std::endl;
+    std::cout << "fullscreen: " << fullscreen << std::endl;
 
     plane.set_start_pos();
-
-    bool fullscreen = false;
-
-    if (std::getenv("SKYDIVER_FULLSCREEN")) {
-        fullscreen = (std::string)std::getenv("SKYDIVER_FULLSCREEN") == "1";
-    }
-    if (const char* env_p = std::getenv("SKYDIVER_COUNT")) {
-        qtd_skydivers = static_cast<unsigned int>(std::stoi(env_p));
-    } else {
-        qtd_skydivers = 40;
-    }
 
     sf::ContextSettings settings;
     settings.depthBits = 0;
@@ -182,7 +176,7 @@ void Game::play() {
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
 
-        Config config = {round, boat.velocity.x, plane.velocity.x};
+        Config config = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen};
         saveConfig(config, "config.txt");
     }
 
@@ -325,9 +319,11 @@ void Game::saveConfig(const Config& config, const std::string& arquivo) {
         return;
     }
 
-    outFile << "round=" << config.round << "\n"
-            << "boatVelocityX=" << config.boatVelocityX << "\n"
-            << "planeVelocityX=" << config.planeVelocityX << "\n";
+    outFile << "round=" << config.round.value() << "\n"
+            << "boatVelocityX=" << config.boatVelocityX.value() << "\n"
+            << "planeVelocityX=" << config.planeVelocityX.value() << "\n"
+            << "qtdSkydivers=" << config.qtdSkydivers.value() << "\n"
+            << "fullscreen=" << config.fullscreen.value() << "\n";
 
     outFile.close();
 }
@@ -359,6 +355,10 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.boatVelocityX = std::stof(configMap["boatVelocityX"]);
     if (configMap.find("planeVelocityX") != configMap.end())
         config.planeVelocityX = std::stof(configMap["planeVelocityX"]);
+    if (configMap.find("qtdSkydivers") != configMap.end())
+        config.qtdSkydivers = std::stoi(configMap["qtdSkydivers"]);
+    if (configMap.find("fullscreen") != configMap.end())
+        config.fullscreen = (configMap["fullscreen"] == "1");
 
     inFile.close();
     return config;

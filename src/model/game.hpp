@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <thread>
 #include <vector>
 
@@ -17,9 +18,11 @@
 #include "tools.hpp"
 
 struct Config {
-    int round;
-    float boatVelocityX;
-    float planeVelocityX;
+    std::optional<int> round;
+    std::optional<float> boatVelocityX;
+    std::optional<float> planeVelocityX;
+    std::optional<int> qtdSkydivers;
+    std::optional<bool> fullscreen;
 };
 
 class Game {
@@ -28,7 +31,8 @@ class Game {
 
     std::vector<Skydiver*> skydivers;
     bool paused = false;
-    int qtd_skydivers = 0;
+    bool fullscreen = false;
+    int qtd_skydivers = 40;
 
     Animation scenario;
     Plane plane;
