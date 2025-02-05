@@ -284,7 +284,7 @@ void Skydiver::update(Plane plane, Boat boat, int positionCounter) {
         setBoatTouchPlace(boat);
         if (this->isLand(boat)) {
             landed = true;
-            this->position = positionCounter;
+            this->position = positionCounter + 1;
             saveScoreLanding(boat);
         } else {
             died = true;
@@ -526,16 +526,13 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_max_velocity_right = (int)grade_max_velocity_right;
     grade_max_velocity_left = (int)grade_max_velocity_left;
 
-    // Means 100 points each direction change
-    grade_direction_changes = grade_direction_changes * 100;
-
     // Time on air
     float gTimeOnAir;
     gTimeOnAir = grade_time_on_air > 3000 ? 3000 : grade_time_on_air;
     gTimeOnAir = gTimeOnAir / 3000 * 100;
 
     // Define some importance to each grade.
-    grade_direction_changes = grade_direction_changes * 0.4;
+    grade_direction_changes = grade_direction_changes * 2;
     grade_landing_softly = grade_landing_softly * 0.25;
     grade_landing_place = grade_landing_place * 0.15;
     gTimeOnAir = gTimeOnAir * 0.10;

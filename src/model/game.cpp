@@ -123,9 +123,7 @@ void Game::play() {
 
             if (skydiver->landed) {
                 landedCount++;
-                if (skydiver->position == -1) {
-                    positionCounter++;
-                }
+                positionCounter = positionCounter > skydiver->position ? positionCounter : skydiver->position;
             };
             sdTotal++;
         }
