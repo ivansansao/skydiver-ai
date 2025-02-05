@@ -188,7 +188,7 @@ bool Skydiver::parachutesGoDown() {
     }
     return false;
 }
-void Skydiver::update(Plane plane, Boat boat, int positionCounter) {
+void Skydiver::update(Plane plane, Boat boat, int positionCounter, std::function<void()> onLand) {
     if (died) {
         if (state == State::ON_BOAT) {
             pos.left = boat.pos.left + boatTouchPlaceLeft;
@@ -284,6 +284,9 @@ void Skydiver::update(Plane plane, Boat boat, int positionCounter) {
         setBoatTouchPlace(boat);
         if (this->isLand(boat)) {
             landed = true;
+            if (onLand) {
+                onLand();
+            }
             this->position = positionCounter + 1;
             saveScoreLanding(boat);
         } else {

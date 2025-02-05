@@ -13,7 +13,7 @@
 using namespace std;
 
 Game::Game() {
-    Config config = loadConfig("config.txt");
+    config = loadConfig("config.txt");
 
     round = config.round.has_value() ? config.round.value() : round;
     plane.velocity.x = config.planeVelocityX.has_value() ? config.planeVelocityX.value() : plane.velocity.x;
@@ -69,6 +69,11 @@ Game::Game() {
 enum menuopcs { Play,
                 Exit };
 
+void Game::onLand() {
+    if (config.commandOnLand.has_value()) {
+        std::system(config.commandOnLand.value().c_str());
+    }
+}
 void Game::play() {
     // UPDATE
 
@@ -112,7 +117,7 @@ void Game::play() {
                     }
                 }
                 skydiver->doAction();
-                skydiver->update(plane, boat, positionCounter);
+                skydiver->update(plane, boat, positionCounter, std::bind(&Game::onLand, this));
             }
 
             if (skydiver->state == skydiver->State::ON_PLANE)
@@ -173,8 +178,8 @@ void Game::play() {
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
 
-        Config config = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore()};
-        saveConfig(config, "config.txt");
+        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or("")};
+        saveConfig(pconfig, "config.txt");
     }
 
     // DRAW
@@ -285,19 +290,20 @@ std::string Game::loadBiases() {
     return biases;
 }
 
-void Game::saveConfig(const Config& config, const std::string& arquivo) {
+void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
     std::ofstream outFile(arquivo);
     if (!outFile) {
         std::cerr << "Erro ao abrir o arquivo para escrita!\n";
         return;
     }
 
-    outFile << "round=" << config.round.value() << "\n"
-            << "boatVelocityX=" << config.boatVelocityX.value() << "\n"
-            << "planeVelocityX=" << config.planeVelocityX.value() << "\n"
-            << "qtdSkydivers=" << config.qtdSkydivers.value() << "\n"
-            << "fullscreen=" << config.fullscreen.value() << "\n"
-            << "score=" << config.score.value() << "\n";
+    outFile << "round=" << pconfig.round.value() << "\n"
+            << "boatVelocityX=" << pconfig.boatVelocityX.value() << "\n"
+            << "planeVelocityX=" << pconfig.planeVelocityX.value() << "\n"
+            << "qtdSkydivers=" << pconfig.qtdSkydivers.value() << "\n"
+            << "fullscreen=" << pconfig.fullscreen.value() << "\n"
+            << "score=" << pconfig.score.value() << "\n"
+            << "commandOnLand=" << pconfig.commandOnLand.value() << "\n";
 
     outFile.close();
 }
@@ -306,7 +312,7 @@ Config Game::loadConfig(const std::string& arquivo) {
     Config config;
     std::ifstream inFile(arquivo);
     if (!inFile) {
-        std::cerr << "Erro ao abrir o arquivo para leitura!\n";
+        std::cerr << "Erro ao abrir o arquivo config.txt para leitura!\n";
         return config;
     }
 
@@ -335,6 +341,8 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.fullscreen = (configMap["fullscreen"] == "1");
     if (configMap.find("score") != configMap.end())
         config.score = std::stoi(configMap["score"]);
+    if (configMap.find("commandOnLand") != configMap.end())
+        config.commandOnLand = configMap["commandOnLand"];
 
     inFile.close();
     return config;

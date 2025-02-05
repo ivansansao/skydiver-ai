@@ -1,6 +1,7 @@
-round=4
+round=7
 boatVelocityX=-0.1
-planeVelocityX=-1.5
+planeVelocityX=1.5
 qtdSkydivers=30
 fullscreen=0
-score=0
+score=96
+commandOnLand=DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) cvlc --play-and-exit "/home/ivan/Músicas/Sons/sound-bip-alert-190038.mp3" &

@@ -24,6 +24,7 @@ struct Config {
     std::optional<int> qtdSkydivers;
     std::optional<bool> fullscreen;
     std::optional<int> score;
+    std::optional<std::string> commandOnLand;
 };
 
 class Game {
@@ -33,12 +34,14 @@ class Game {
     std::vector<Skydiver*> skydivers;
     bool paused = false;
     bool fullscreen = false;
-    int qtd_skydivers = 40;
+    int qtd_skydivers = 30;
 
     Animation scenario;
     Plane plane;
     Boat boat;
     Skydiver* lastBetterSkydiver;
+
+    Config config;
 
     sf::RenderWindow window;
 
@@ -112,5 +115,7 @@ class Game {
 
     void saveConfig(const Config& config, const std::string& arquivo);
     Config loadConfig(const std::string& arquivo);
+
+    void onLand();
 };
 #endif
