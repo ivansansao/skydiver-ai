@@ -23,6 +23,7 @@ struct Config {
     std::optional<float> planeVelocityX;
     std::optional<int> qtdSkydivers;
     std::optional<bool> fullscreen;
+    std::optional<int> score;
 };
 
 class Game {
@@ -104,8 +105,6 @@ class Game {
     void saveBiases(std::string biases);
     std::string loadWeights();
     std::string loadBiases();
-    void saveScore(unsigned int score);
-    unsigned int loadScore();
 
     void setWindowIcon(sf::RenderWindow* w);
     bool hasOnScreenAir();

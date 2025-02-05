@@ -55,6 +55,7 @@ Game::Game() {
     lastBetterSkydiver = new Skydiver(0, qtd_skydivers);
     lastBetterSkydiver->mind.setWeights(loadWeights());
     lastBetterSkydiver->mind.setBias(loadBiases());
+    lastBetterSkydiver->score = config.score.has_value() ? config.score.value() : 0;
 
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver(i, qtd_skydivers);
@@ -147,7 +148,6 @@ void Game::play() {
                 lastBetterSkydiver->round = round;
                 saveWeights(lastBetterSkydiver->mind.getWeights());
                 saveBiases(lastBetterSkydiver->mind.getBias());
-                saveScore(lastBetterSkydiver->getScore());
             }
 
             plane.reverse_direction(round % 2 == 0);
@@ -173,7 +173,7 @@ void Game::play() {
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
 
-        Config config = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen};
+        Config config = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore()};
         saveConfig(config, "config.txt");
     }
 
@@ -284,30 +284,6 @@ std::string Game::loadBiases() {
 
     return biases;
 }
-void Game::saveScore(unsigned int score) {
-    std::ofstream outFile("score.txt");
-    if (outFile.is_open()) {
-        outFile << score;
-        outFile.close();
-    } else {
-        std::cerr << "Erro opening weights file to save!" << std::endl;
-    }
-}
-unsigned int Game::loadScore() {
-    std::ifstream inFile("score.txt");
-    std::string score = "";
-    if (inFile.is_open()) {
-        std::getline(inFile, score);
-        inFile.close();
-    } else {
-        std::cerr << "Don't used weights.txt file!" << std::endl;
-    }
-
-    if (score.length() > 0) {
-        return std::stoi(score);
-    }
-    return 0;
-}
 
 void Game::saveConfig(const Config& config, const std::string& arquivo) {
     std::ofstream outFile(arquivo);
@@ -320,7 +296,8 @@ void Game::saveConfig(const Config& config, const std::string& arquivo) {
             << "boatVelocityX=" << config.boatVelocityX.value() << "\n"
             << "planeVelocityX=" << config.planeVelocityX.value() << "\n"
             << "qtdSkydivers=" << config.qtdSkydivers.value() << "\n"
-            << "fullscreen=" << config.fullscreen.value() << "\n";
+            << "fullscreen=" << config.fullscreen.value() << "\n"
+            << "score=" << config.score.value() << "\n";
 
     outFile.close();
 }
@@ -356,6 +333,8 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.qtdSkydivers = std::stoi(configMap["qtdSkydivers"]);
     if (configMap.find("fullscreen") != configMap.end())
         config.fullscreen = (configMap["fullscreen"] == "1");
+    if (configMap.find("score") != configMap.end())
+        config.score = std::stoi(configMap["score"]);
 
     inFile.close();
     return config;

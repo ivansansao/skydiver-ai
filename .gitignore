@@ -45,4 +45,4 @@ build/Makefile
 
 weights*.txt
 biases*.txt
-score.txt
+config.txt
