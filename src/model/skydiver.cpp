@@ -88,8 +88,8 @@ void Skydiver::think(Plane plane, Boat boat, bool boot) {
 
     action = "";
 
-    int16_t greater = 0;
-    double maxValue = output[0];
+    int16_t greater = 6;
+    double maxValue = output[6];
 
     for (int16_t i = 0; i < (int16_t)output.size(); ++i) {
         if (output[i] > maxValue) {
