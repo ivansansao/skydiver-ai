@@ -14,7 +14,7 @@
 class Skydiver {
    public:
     Skydiver();
-    Skydiver(uint16_t id);
+    Skydiver(uint16_t id, int qtd_skydivers);
     ~Skydiver();
 
     NeuralNetwork mind = NeuralNetwork(7);
@@ -43,6 +43,7 @@ class Skydiver {
     sf::Vector2f velocity = sf::Vector2f(0.f, 0.f);
 
     uint16_t id = 0;
+    uint16_t qtd_skydivers = 0;
 
     float boatTouchPlaceLeft = 0;
 
@@ -69,9 +70,10 @@ class Skydiver {
     int grade_direction_changes = 0;
     int grade_time_on_air = 0;
     int grade_used_actions = 0;
+    int position = -1;
+    int grade_position = 0;
     std::string usedActions = "";
     int getScore();
-    void setScore(unsigned int score);
 
     int timer = 0;
     int last_time_change_direction = 0;
@@ -94,7 +96,7 @@ class Skydiver {
     std::string action = "";
 
     void draw(sf::RenderWindow* w, Boat boat, bool show_information);
-    void update(Plane plane, Boat boat);
+    void update(Plane plane, Boat boat, int positionCounter);
     void set_position(float left, float top);
     void reset_position();
 

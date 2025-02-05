@@ -17,8 +17,9 @@ using namespace std;
 // Velocidade do avião, 150km/h
 Skydiver::Skydiver() : id(0) {
 }
-Skydiver::Skydiver(uint16_t id) : id(id) {
+Skydiver::Skydiver(uint16_t id, int qtd_skydivers) : id(id), qtd_skydivers(qtd_skydivers) {
     this->id = id;
+    this->qtd_skydivers = qtd_skydivers;
     const float moveLeft = -17;
     const float moveTop = -52;
     skydiverOnPlane.init(1, 0.5f, "./src/asset/image/skydiver_on_plane.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
@@ -187,7 +188,7 @@ bool Skydiver::parachutesGoDown() {
     }
     return false;
 }
-void Skydiver::update(Plane plane, Boat boat) {
+void Skydiver::update(Plane plane, Boat boat, int positionCounter) {
     if (died) {
         if (state == State::ON_BOAT) {
             pos.left = boat.pos.left + boatTouchPlaceLeft;
@@ -283,6 +284,7 @@ void Skydiver::update(Plane plane, Boat boat) {
         setBoatTouchPlace(boat);
         if (this->isLand(boat)) {
             landed = true;
+            this->position = positionCounter;
             saveScoreLanding(boat);
         } else {
             died = true;
@@ -394,6 +396,7 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
     }
 
     if (false) {
+        // Tools::say(w, to_string(position) + " / " + to_string(grade_position), pos.left + 1, pos.top + 8);
         if (action.find("L") != std::string::npos) Tools::say(w, "L", pos.left - 4, pos.top - 4);
         if (action.find("R") != std::string::npos) Tools::say(w, "R", pos.left + 10, pos.top - 4);
         if (action.find("U") != std::string::npos) Tools::say(w, "U", pos.left + 1, pos.top - 26);
@@ -505,9 +508,7 @@ void Skydiver::setBoatTouchPlace(Boat boat) {
 int Skydiver::getScore() {
     return score;
 }
-void Skydiver::setScore(unsigned int score) {
-    this->score = score;
-}
+
 void Skydiver::saveScoreLanding(Boat boat) {
     // Landing velocity - Heigher is better.
     const int max_velocity = max_slide_speed + max_fall_speed;
@@ -545,6 +546,8 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_time_on_air = 0;  // Disabled
     grade_used_actions = Tools::map(usedActions.size(), 0, 7, 0, 10);
 
+    grade_position = this->qtd_skydivers - this->position;
+
     // Set Score
-    score = grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
+    score = grade_position + grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
 }

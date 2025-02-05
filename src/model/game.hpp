@@ -76,6 +76,7 @@ class Game {
     uint16_t died = 0;
     uint16_t landedCount = 0;
     uint16_t sdTotal = 0;
+    uint16_t positionCounter = 0;
 
     struct profile {
         int completed_phases = 0;

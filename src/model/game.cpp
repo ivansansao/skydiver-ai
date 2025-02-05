@@ -52,12 +52,12 @@ Game::Game() {
 
     skydivers.clear();
 
-    lastBetterSkydiver = new Skydiver(0);
+    lastBetterSkydiver = new Skydiver(0, qtd_skydivers);
     lastBetterSkydiver->mind.setWeights(loadWeights());
     lastBetterSkydiver->mind.setBias(loadBiases());
 
     for (int i{}; i < qtd_skydivers; ++i) {
-        Skydiver* skydiver = new Skydiver(i);
+        Skydiver* skydiver = new Skydiver(i, qtd_skydivers);
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
         skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
         if (i > 0) skydiver->mind.mutate(i, true);
@@ -102,7 +102,7 @@ void Game::play() {
             if (skydiver->died) {
                 died++;
                 if (skydiver->state == skydiver->State::ON_BOAT) {
-                    skydiver->update(plane, boat);
+                    skydiver->update(plane, boat, positionCounter);
                 }
             } else {
                 if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
@@ -111,7 +111,7 @@ void Game::play() {
                     }
                 }
                 skydiver->doAction();
-                skydiver->update(plane, boat);
+                skydiver->update(plane, boat, positionCounter);
             }
 
             if (skydiver->state == skydiver->State::ON_PLANE)
@@ -121,7 +121,12 @@ void Game::play() {
             else if (skydiver->state == skydiver->State::ON_BOAT)
                 onBoat++;
 
-            if (skydiver->landed) landedCount++;
+            if (skydiver->landed) {
+                landedCount++;
+                if (skydiver->position == -1) {
+                    positionCounter++;
+                }
+            };
             sdTotal++;
         }
     }
@@ -153,13 +158,14 @@ void Game::play() {
 
         playTimer = 0;
         round++;
+        positionCounter = 0;
 
         plane.start_round();
         boat.start_position_random();
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
-            Skydiver* skydiver = new Skydiver(i);
+            Skydiver* skydiver = new Skydiver(i, qtd_skydivers);
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
 
@@ -193,7 +199,8 @@ void Game::play() {
         info += "\n";
         info += "\nLAST BEST SKYDIVER";
         info += "\n";
-        info += "\nGRADE: Landing place ..: " + to_string(lastBetterSkydiver->grade_landing_place);
+        info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
+        info += "\nGRADE: Landing place...: " + to_string(lastBetterSkydiver->grade_landing_place);
         info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
         info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
         info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
