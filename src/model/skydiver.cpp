@@ -538,9 +538,9 @@ void Skydiver::saveScoreLanding(Boat boat) {
     gTimeOnAir = gTimeOnAir / 3000 * 100;
 
     // Define some importance to each grade.
-    grade_direction_changes = grade_direction_changes * 2;
-    grade_landing_softly = grade_landing_softly * 0.25;
-    grade_landing_place = grade_landing_place * 0.15;
+    grade_direction_changes = grade_direction_changes * 7;
+    grade_landing_softly = grade_landing_softly * 0.10;
+    grade_landing_place = grade_landing_place * 0.05;
     gTimeOnAir = gTimeOnAir * 0.10;
     grade_max_velocity_right = grade_max_velocity_right * 0.05;
     grade_max_velocity_left = grade_max_velocity_left * 0.05;
