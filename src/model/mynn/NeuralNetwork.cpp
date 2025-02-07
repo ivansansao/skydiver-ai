@@ -96,7 +96,7 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
         for (unsigned int w = 0; w < weights.size(); ++w) {
             for (unsigned int row = 0; row < weights[w].size(); ++row) {
                 for (unsigned int column = 0; column < weights[w][row].size(); ++column) {
-                    if (getRand() > 0.5) {
+                    if (getRand() > 0.4) {
                         weights[w][row][column] += getRand();
                         mutated++;
                         mutatedNeurons += " N" + std::to_string(w) + "/" + std::to_string(row) + "/" + std::to_string(column);

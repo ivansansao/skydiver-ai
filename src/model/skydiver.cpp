@@ -120,7 +120,7 @@ void Skydiver::think(Plane plane, Boat boat, bool boot) {
 
     if (boot) {
         if (state == State::ON_PLANE) {
-            mind.mutate(1);
+            mind.mutate(1, true);
         }
     }
 }
