@@ -46,3 +46,4 @@ build/Makefile
 weights*.txt
 biases*.txt
 config.txt
+score.txt

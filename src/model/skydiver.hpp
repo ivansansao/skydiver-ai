@@ -14,7 +14,7 @@
 class Skydiver {
    public:
     Skydiver();
-    Skydiver(uint16_t id, int qtd_skydivers);
+    Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers = 1);
     ~Skydiver();
 
     NeuralNetwork mind = NeuralNetwork(7);
@@ -44,6 +44,7 @@ class Skydiver {
 
     uint16_t id = 0;
     uint16_t qtd_skydivers = 0;
+    int hiddenLayers = 1;
 
     float boatTouchPlaceLeft = 0;
 
