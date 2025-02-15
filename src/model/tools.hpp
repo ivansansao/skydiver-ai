@@ -26,11 +26,13 @@ class Tools {
     static int wordOccurrence(std::string sentence, std::string word);
     static bool hasString(std::string line, std::string str);
     static std::string get_lines_from_dtm(std::string filename, std::string tag, std::string endLine);
-    static void say(sf::RenderWindow *w, std::string text, int left, int top, int fontSize = 12, sf::Color color = sf::Color::Black);
+    static void say(sf::RenderWindow* w, std::string text, int left, int top, int fontSize = 12, sf::Color color = sf::Color::Black);
     static double getRand();
     static void printHour();
     static std::string formatDouble(double value, int decimalPlaces);
     static sf::Color hslaToRgba(float h, float s, float l, float a);
     static float map(float x, float a, float b, float c, float d);
+    static void fileLog(std::string log, const std::string& arquivo);
+    static std::string onOff(bool logicVar);
 };
 #endif

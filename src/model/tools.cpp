@@ -187,3 +187,18 @@ sf::Color Tools::hslaToRgba(float h, float s, float l, float a) {
 float Tools::map(float x, float a, float b, float c, float d) {
     return c + (x - a) * (d - c) / (b - a);
 }
+
+void Tools::fileLog(std::string log, const std::string& arquivo) {
+    std::ofstream outFile(arquivo, std::ios::app);
+    if (!outFile) {
+        std::cerr << "Erro ao abrir o arquivo para escrita!\n";
+        return;
+    }
+
+    outFile << log << "\n";
+
+    outFile.close();
+}
+std::string Tools::onOff(bool logicVar) {
+    return logicVar ? std::string("ON") : std::string("OFF");
+}

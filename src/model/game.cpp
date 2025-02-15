@@ -64,6 +64,9 @@ Game::Game() {
         if (i > 0) skydiver->mind.mutate(i, true);
         skydivers.push_back(skydiver);
     }
+
+    sf::Clock roundClock;
+    plane.start_round();
 }
 
 enum menuopcs { Play,
@@ -89,7 +92,9 @@ void Game::play() {
 
         if (plane.on) {
             plane.update();
-            if (!plane.on) {
+
+            // Eliminate skydivers that are out of screen e no final do round?
+            if (!plane.on && playTimer > 10) {
                 for (auto& skydiver : skydivers) {
                     if (skydiver->state == skydiver->State::ON_PLANE) {
                         skydiver->died = true;
@@ -134,9 +139,17 @@ void Game::play() {
             sdTotal++;
         }
     }
+    const bool endForTraining = training && (landedCount + died == sdTotal);
 
     // Finish
-    if (playTimer > 60 || (died && died == sdTotal)) {
+    if (playTimer > 60 || (died && died == sdTotal) || endForTraining) {
+        // Imprime o tempo que levou
+        float roundTime = roundClock.getElapsedTime().asSeconds();  // Tempo decorrido
+        roundClock.restart();
+
+        // Save statistics
+        std::string log = "Round " + to_string(round) + " lasted " + to_string(roundTime) + " seconds. Skydivers: " + to_string(qtd_skydivers) + " Training: " + Tools::onOff(training) + " Drawing: " + Tools::onOff(drawing) + " Syncronism: " + Tools::onOff(syncronism) + " Landed: " + to_string(landedCount);
+
         // Get better score
 
         if (landedCount) {
@@ -180,51 +193,57 @@ void Game::play() {
 
         Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1)};
         saveConfig(pconfig, "config.txt");
+
+        log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
+
+        Tools::fileLog(log, "log.txt");
     }
 
     // DRAW
+    if (drawing) {
+        scenario.draw(0, 0, &window);
+        plane.draw(&window);
+        boat.draw(&window);
+        for (auto& skydiver : skydivers) {
+            skydiver->draw(&window, boat, show_information);
+        }
 
-    scenario.draw(0, 0, &window);
-    plane.draw(&window);
-    boat.draw(&window);
-    for (auto& skydiver : skydivers) {
-        skydiver->draw(&window, boat, show_information);
+        if (show_information) {
+            std::string info = "";
+            info += "ROUND.......: " + to_string(round);
+            info += "\n";
+            info += "\nTOTAL.......: " + to_string(sdTotal);
+            info += "\nON PLANE....: " + to_string(onPlane);
+            info += "\nON AIR......: " + to_string(onAir);
+            info += "\nON BOAT.....: " + to_string(onBoat);
+            info += "\nLANDED......: " + to_string(landedCount);
+            info += "\nDIED........: " + to_string(died);
+            info += "\nPLAY TIMER..: " + to_string(playTimer);
+            info += "\n";
+            info += "\nLAST BEST SKYDIVER";
+            info += "\n";
+            info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
+            info += "\nGRADE: Landing place...: " + to_string(lastBetterSkydiver->grade_landing_place);
+            info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
+            info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
+            info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
+            // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
+            info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
+            info += "\nGRADE: Used actions....: " + to_string(lastBetterSkydiver->grade_used_actions);
+            info += "\n---------------------------------";
+            info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
+            info += "\n";
+            info += "\nOTHER";
+            info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
+            info += "\nBOOT SKYDIVERS.........: " + Tools::onOff(this->bootSkydivers);
+            info += std::string("\nSYNC...................: ") + Tools::onOff(this->syncronism);
+            info += "\nTRAINING...............: " + Tools::onOff(this->training);
+
+            Tools::say(&window, info, 10, 8);
+        }
+
+        window.display();
     }
-
-    if (show_information) {
-        std::string info = "";
-        info += "ROUND.......: " + to_string(round);
-        info += "\n";
-        info += "\nTOTAL.......: " + to_string(sdTotal);
-        info += "\nON PLANE....: " + to_string(onPlane);
-        info += "\nON AIR......: " + to_string(onAir);
-        info += "\nON BOAT.....: " + to_string(onBoat);
-        info += "\nLANDED......: " + to_string(landedCount);
-        info += "\nDIED........: " + to_string(died);
-        info += "\nPLAY TIMER..: " + to_string(playTimer);
-        info += "\n";
-        info += "\nLAST BEST SKYDIVER";
-        info += "\n";
-        info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
-        info += "\nGRADE: Landing place...: " + to_string(lastBetterSkydiver->grade_landing_place);
-        info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
-        info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
-        info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
-        // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
-        info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
-        info += "\nGRADE: Used actions....: " + to_string(lastBetterSkydiver->grade_used_actions);
-        info += "\n---------------------------------";
-        info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
-        info += "\n";
-        info += "\nOTHER";
-        info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
-        info += "\nBOOT SKYDIVERS.........: " + (this->bootSkydivers ? std::string("ON") : std::string("OFF"));
-        info += std::string("\nSYNC...................: ") + (syncronism ? std::string("ON") : std::string("OFF"));
-
-        Tools::say(&window, info, 10, 8);
-    }
-
-    window.display();
 
     // END DRAW
 
@@ -388,6 +407,10 @@ void Game::loop_events() {
                         window.setFramerateLimit(60);
                     else
                         window.setFramerateLimit(0);
+                } else if (event.key.code == sf::Keyboard::F9) {
+                    drawing = !drawing;
+                } else if (event.key.code == sf::Keyboard::F10) {
+                    training = !training;
                 }
             }
         }

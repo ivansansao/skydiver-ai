@@ -47,3 +47,4 @@ weights*.txt
 biases*.txt
 config.txt
 score.txt
+log.txt

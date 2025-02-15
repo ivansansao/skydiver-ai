@@ -43,6 +43,7 @@ class Game {
     Skydiver* lastBetterSkydiver;
 
     Config config;
+    sf::Clock roundClock;
 
     sf::RenderWindow window;
 
@@ -53,6 +54,9 @@ class Game {
     float playTimer = 0;
 
     bool gameover_loaded = false;
+    bool drawing = true;
+    bool training = false;
+
     int phase_current = 0;
     int phase_total = 0;
     int round = 1;
