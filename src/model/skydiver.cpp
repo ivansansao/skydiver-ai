@@ -216,28 +216,10 @@ void Skydiver::update(Plane plane, Boat boat, int positionCounter, std::function
     }
 
     // SKYDIVER
-    if (parachuteState == ParachutesState::OPEN) {
-        if (false) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                parachutesGoRight();
-            } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                parachutesGoLeft();
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                parachutesGoUp();
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                parachutesGoDown();
-            }
-        }
-    } else if (parachuteState == ParachutesState::CLOSED) {
+    if (parachuteState == ParachutesState::CLOSED) {
         if (this->state == State::ON_AIR) {
             velocity.x = velocity.x * 0.9974;  // Consider the wind!
         }
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        parachutesOpen();
     }
 
     if (velocity.x > max_slide_speed) velocity.x = max_slide_speed;    // 180 km/h
