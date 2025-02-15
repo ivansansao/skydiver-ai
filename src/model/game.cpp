@@ -65,6 +65,7 @@ Game::Game() {
         skydivers.push_back(skydiver);
     }
 
+    this->bootSkydivers = !std::filesystem::exists("weights.txt");
     sf::Clock roundClock;
     plane.start_round();
 }
