@@ -120,5 +120,6 @@ class Skydiver {
     bool isLand(Boat boat);
     void setBoatTouchPlace(Boat boat);
     void saveScoreLanding(Boat boat);
+    bool isMaster();
 };
 #endif

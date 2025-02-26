@@ -161,6 +161,16 @@ void Game::play() {
                 }
             }
 
+            // Keep master if he could land
+            if (config.keepMaster) {
+                for (auto& skydiver : skydivers) {
+                    if (skydiver->isMaster() && skydiver->landed) {
+                        last = skydiver;
+                        break;
+                    }
+                }
+            }
+
             // It is good to choose the last best round because boat move of place.
             if (last->getScore() > 0) {
                 lastBetterSkydiver = last;
@@ -172,6 +182,8 @@ void Game::play() {
             plane.reverse_direction(round % 2 == 0);
             boat.velocity.x *= -1;
         }
+
+        log = log + " Mutations: " + to_string(lastBetterSkydiver->mind.mutated);
 
         playTimer = 0;
         round++;
@@ -192,7 +204,7 @@ void Game::play() {
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
 
-        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1)};
+        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.keepMaster.value_or(0)};
         saveConfig(pconfig, "config.txt");
 
         log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
@@ -324,7 +336,8 @@ void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
             << "fullscreen=" << pconfig.fullscreen.value() << "\n"
             << "score=" << pconfig.score.value() << "\n"
             << "commandOnLand=" << pconfig.commandOnLand.value() << "\n"
-            << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n";
+            << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n"
+            << "keepMaster=" << pconfig.keepMaster.value() << "\n";
 
     outFile.close();
 }
@@ -366,6 +379,8 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.commandOnLand = configMap["commandOnLand"];
     if (configMap.find("hiddenLayers") != configMap.end())
         config.hiddenLayers = std::stoi(configMap["hiddenLayers"]);
+    if (configMap.find("keepMaster") != configMap.end())
+        config.keepMaster = (configMap["keepMaster"] == "1");
 
     inFile.close();
     return config;

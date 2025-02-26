@@ -313,8 +313,12 @@ float Skydiver::getLongitudeFromBoat(Boat boat) {
     return myMidLeft - boat.getLandingPointLeft();
 }
 
+bool Skydiver::isMaster() {
+    return this->mind.mutated == 0;
+}
+
 void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
-    if (this->mind.mutated == 0) {
+    if (this->isMaster()) {
         if (show_information) {
             sf::VertexArray line(sf::Lines, 2);
             line[0].position = sf::Vector2f(pos.left + (pos.width * 0.5), pos.top - 12);              // Ponto A
