@@ -533,8 +533,8 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_max_velocity_left = grade_max_velocity_left * 0.1;
 
     grade_time_on_air = (int)gTimeOnAir;
-    grade_time_on_air = 0;                    // Disabled
-    grade_used_actions = usedActions.size();  // Tools::map(usedActions.size(), 0, 7, 0, 10);
+    grade_time_on_air = 0;                         // Disabled
+    grade_used_actions = usedActions.size() * 10;  // Tools::map(usedActions.size(), 0, 7, 0, 10);
 
     grade_position = this->qtd_skydivers - this->position;
 
