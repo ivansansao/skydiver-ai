@@ -17,10 +17,11 @@ using namespace std;
 // Velocidade do avião, 150km/h
 Skydiver::Skydiver() : id(0) {
 }
-Skydiver::Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers) : id(id), qtd_skydivers(qtd_skydivers), hiddenLayers(hiddenLayers) {
+Skydiver::Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers, int layersSize) : id(id), qtd_skydivers(qtd_skydivers), hiddenLayers(hiddenLayers), layersSize(layersSize) {
     this->id = id;
     this->qtd_skydivers = qtd_skydivers;
     this->hiddenLayers = hiddenLayers;
+    this->layersSize = layersSize;
     const float moveLeft = -17;
     const float moveTop = -52;
     skydiverOnPlane.init(1, 0.5f, "./src/asset/image/skydiver_on_plane.png", sf::IntRect(0, 0, 43, 64), true, moveLeft, moveTop, false);
@@ -59,7 +60,7 @@ Skydiver::Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers) : id(id), q
     mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat speed", "Sd side speed", "Sd drop speed"};
     mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     for (int i = 0; i < hiddenLayers; i++) {
-        mind.addLayer(14, [](double x) { return std::max(0.0, x); });
+        mind.addLayer(layersSize, [](double x) { return std::max(0.0, x); });
     }
     mind.addLayer(7, [](double x) { return std::max(0.0, x); });
     mind.compile();

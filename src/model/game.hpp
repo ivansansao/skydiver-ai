@@ -26,6 +26,7 @@ struct Config {
     std::optional<int> score;
     std::optional<std::string> commandOnLand;
     std::optional<int> hiddenLayers;
+    std::optional<int> layersSize;
     std::optional<bool> keepMaster;
 };
 

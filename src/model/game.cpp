@@ -52,13 +52,13 @@ Game::Game() {
 
     skydivers.clear();
 
-    lastBetterSkydiver = new Skydiver(0, qtd_skydivers, config.hiddenLayers.value_or(1));
+    lastBetterSkydiver = new Skydiver(0, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
     lastBetterSkydiver->mind.setWeights(loadWeights());
     lastBetterSkydiver->mind.setBias(loadBiases());
     lastBetterSkydiver->score = config.score.has_value() ? config.score.value() : 0;
 
     for (int i{}; i < qtd_skydivers; ++i) {
-        Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1));
+        Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
         skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
         skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
         if (i > 0) skydiver->mind.mutate(i, true);
@@ -194,7 +194,7 @@ void Game::play() {
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
-            Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1));
+            Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
 
@@ -204,7 +204,7 @@ void Game::play() {
 
         this->bootSkydivers = !std::filesystem::exists("weights.txt");
 
-        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.keepMaster.value_or(0)};
+        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0)};
         saveConfig(pconfig, "config.txt");
 
         log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
@@ -337,6 +337,7 @@ void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
             << "score=" << pconfig.score.value() << "\n"
             << "commandOnLand=" << pconfig.commandOnLand.value() << "\n"
             << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n"
+            << "layersSize=" << pconfig.layersSize.value() << "\n"
             << "keepMaster=" << pconfig.keepMaster.value() << "\n";
 
     outFile.close();
@@ -379,6 +380,8 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.commandOnLand = configMap["commandOnLand"];
     if (configMap.find("hiddenLayers") != configMap.end())
         config.hiddenLayers = std::stoi(configMap["hiddenLayers"]);
+    if (configMap.find("layersSize") != configMap.end())
+        config.layersSize = std::stoi(configMap["layersSize"]);
     if (configMap.find("keepMaster") != configMap.end())
         config.keepMaster = (configMap["keepMaster"] == "1");
 

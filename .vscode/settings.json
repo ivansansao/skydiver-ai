@@ -96,7 +96,11 @@
         "generator": "cpp",
         "print": "cpp",
         "text_encoding": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "flat_map": "cpp",
+        "flat_set": "cpp",
+        "queue": "cpp",
+        "stack": "cpp"
     },
     "editor.fontSize": 14
 }

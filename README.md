@@ -72,6 +72,9 @@ export SKYDIVER_COUNT=20
 ## About Language
 
 Use gdp to debug your application is necessary
-Inside it type: 
-run 2 
-bt
+
+gdb ./skydiver-ai
+# Inside of GDB, type:
+run
+# After crash, type:
+bt  # (for backtrace)
