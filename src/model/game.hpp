@@ -25,11 +25,11 @@ struct Config {
     std::optional<bool> fullscreen;
     std::optional<int> score;
     std::optional<std::string> commandOnLand;
-    // std::optional<std::string> biases;
-    // std::optional<std::string> weights;
     std::optional<int> hiddenLayers;
     std::optional<int> layersSize;
     std::optional<bool> keepMaster;
+    std::optional<std::string> weights;
+    std::optional<std::string> biases;
 };
 
 class Game {
@@ -113,10 +113,10 @@ class Game {
 
     void loop_events();
     void run();
-    void saveWeights(std::string weights);
-    void saveBiases(std::string biases);
-    std::string loadWeights();
-    std::string loadBiases();
+    // void saveWeights(std::string weights);
+    // void saveBiases(std::string biases);
+    // std::string loadWeights();
+    // std::string loadBiases();
 
     void setWindowIcon(sf::RenderWindow* w);
     bool hasOnScreenAir();

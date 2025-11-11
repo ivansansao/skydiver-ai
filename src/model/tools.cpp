@@ -202,3 +202,7 @@ void Tools::fileLog(std::string log, const std::string& arquivo) {
 std::string Tools::onOff(bool logicVar) {
     return logicVar ? std::string("ON") : std::string("OFF");
 }
+
+void Tools::log(std::string log) {
+    std::cout << log << std::endl;
+};

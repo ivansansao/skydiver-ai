@@ -53,8 +53,8 @@ Game::Game() {
     skydivers.clear();
 
     lastBetterSkydiver = new Skydiver(0, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
-    lastBetterSkydiver->mind.setWeights(loadWeights());
-    lastBetterSkydiver->mind.setBias(loadBiases());
+    lastBetterSkydiver->mind.setWeights(config.weights.value_or(""));
+    lastBetterSkydiver->mind.setBias(config.biases.value_or(""));
     lastBetterSkydiver->score = config.score.has_value() ? config.score.value() : 0;
 
     for (int i{}; i < qtd_skydivers; ++i) {
@@ -65,7 +65,7 @@ Game::Game() {
         skydivers.push_back(skydiver);
     }
 
-    this->bootSkydivers = !std::filesystem::exists("weights.txt");
+    this->bootSkydivers = config.weights.value_or("") == "";
     sf::Clock roundClock;
     plane.start_round();
 }
@@ -175,8 +175,8 @@ void Game::play() {
             if (last->getScore() > 0) {
                 lastBetterSkydiver = last;
                 lastBetterSkydiver->round = round;
-                saveWeights(lastBetterSkydiver->mind.getWeights());
-                saveBiases(lastBetterSkydiver->mind.getBias());
+                config.weights = lastBetterSkydiver->mind.getWeights();
+                config.biases = lastBetterSkydiver->mind.getBias();
             }
 
             plane.reverse_direction(round % 2 == 0);
@@ -202,9 +202,13 @@ void Game::play() {
             skydivers.push_back(skydiver);
         }
 
-        this->bootSkydivers = !std::filesystem::exists("weights.txt");
+        if (this->bootSkydivers) {
+            if (landedCount) {
+                this->bootSkydivers = false;
+            }
+        }
 
-        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0)};
+        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0), config.weights.value_or(""), config.biases.value_or("")};
         saveConfig(pconfig, "config.txt");
 
         log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
@@ -279,49 +283,6 @@ bool Game::hasOnScreenAir() {
     return false;
 }
 
-void Game::saveWeights(std::string weights) {
-    std::ofstream outFile("weights.txt");
-    if (outFile.is_open()) {
-        outFile << weights;
-        outFile.close();
-    } else {
-        std::cerr << "Erro opening weights file to save!" << std::endl;
-    }
-}
-void Game::saveBiases(std::string biases) {
-    std::ofstream outFile("biases.txt");
-    if (outFile.is_open()) {
-        outFile << biases;
-        outFile.close();
-    } else {
-        std::cerr << "Erro opening biases file to save!" << std::endl;
-    }
-}
-std::string Game::loadWeights() {
-    std::ifstream inFile("weights.txt");
-    std::string weights;
-    if (inFile.is_open()) {
-        std::getline(inFile, weights);
-        inFile.close();
-    } else {
-        std::cerr << "Don't used weights.txt file!" << std::endl;
-    }
-
-    return weights;
-}
-std::string Game::loadBiases() {
-    std::ifstream inFile("biases.txt");
-    std::string biases;
-    if (inFile.is_open()) {
-        std::getline(inFile, biases);
-        inFile.close();
-    } else {
-        std::cerr << "Don't used biases.txt file!" << std::endl;
-    }
-
-    return biases;
-}
-
 void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
     std::ofstream outFile(arquivo);
     if (!outFile) {
@@ -338,7 +299,9 @@ void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
             << "commandOnLand=" << pconfig.commandOnLand.value() << "\n"
             << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n"
             << "layersSize=" << pconfig.layersSize.value() << "\n"
-            << "keepMaster=" << pconfig.keepMaster.value() << "\n";
+            << "keepMaster=" << pconfig.keepMaster.value() << "\n"
+            << "weights=" << pconfig.weights.value() << "\n"
+            << "biases=" << pconfig.biases.value() << "\n";
 
     outFile.close();
 }
@@ -384,6 +347,10 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.layersSize = std::stoi(configMap["layersSize"]);
     if (configMap.find("keepMaster") != configMap.end())
         config.keepMaster = (configMap["keepMaster"] == "1");
+    if (configMap.find("weights") != configMap.end())
+        config.weights = configMap["weights"];
+    if (configMap.find("biases") != configMap.end())
+        config.biases = configMap["biases"];
 
     inFile.close();
     return config;

@@ -47,7 +47,7 @@ void NeuralNetwork::compile() {
     }
 }
 
-std::vector<double> NeuralNetwork::think(const std::vector<double> &input) {
+std::vector<double> NeuralNetwork::think(const std::vector<double>& input) {
     clearNeurons();
 
     this->input = input;
@@ -84,7 +84,7 @@ std::vector<double> NeuralNetwork::think(const std::vector<double> &input) {
 
     std::vector<double> result;
     result.reserve(layers.back().neurons.size());
-    for (const auto &neuron : layers.back().neurons) {
+    for (const auto& neuron : layers.back().neurons) {
         result.push_back(neuron.output);
     }
 
@@ -140,14 +140,14 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
 }
 
 void NeuralNetwork::clearNeurons() {
-    for (auto &layer : layers) {
-        for (auto &neuron : layer.neurons) {
+    for (auto& layer : layers) {
+        for (auto& neuron : layer.neurons) {
             neuron.clear();
         }
     }
 }
 
-void NeuralNetwork::setWeights(const std::string &text) {
+void NeuralNetwork::setWeights(const std::string& text) {
     std::istringstream iss(text);
     std::vector<double> imported;
 
@@ -157,9 +157,9 @@ void NeuralNetwork::setWeights(const std::string &text) {
         try {
             double value = std::stod(token);  // Converte a string para double
             imported.push_back(value);
-        } catch (const std::invalid_argument &e) {
+        } catch (const std::invalid_argument& e) {
             std::cerr << "Invalid number: " << token << std::endl;
-        } catch (const std::out_of_range &e) {
+        } catch (const std::out_of_range& e) {
             std::cerr << "Number out of range: " << token << std::endl;
         }
     }
@@ -216,9 +216,9 @@ double NeuralNetwork::getRand() {
 std::string NeuralNetwork::getWeights() const {
     std::ostringstream weightsString;
 
-    for (const auto &layerWeights : weights) {
-        for (const auto &row : layerWeights) {
-            for (const auto &value : row) {
+    for (const auto& layerWeights : weights) {
+        for (const auto& row : layerWeights) {
+            for (const auto& value : row) {
                 weightsString << value << ",";
             }
         }
@@ -261,7 +261,7 @@ void NeuralNetwork::printWeightsNoWrap() const {
     std::cout << std::endl;
 }
 
-void NeuralNetwork::setBias(const std::string &text) {
+void NeuralNetwork::setBias(const std::string& text) {
     if (text.empty()) return;
 
     std::istringstream iss(text);
@@ -289,8 +289,8 @@ void NeuralNetwork::setBias(const std::string &text) {
 std::string NeuralNetwork::getBias() const {
     std::ostringstream oss;
 
-    for (const auto &layer : layers) {
-        for (const auto &neuron : layer.neurons) {
+    for (const auto& layer : layers) {
+        for (const auto& neuron : layer.neurons) {
             if (oss.tellp() > 0) oss << ',';
             oss << neuron.bias;
         }
@@ -299,7 +299,7 @@ std::string NeuralNetwork::getBias() const {
     return oss.str();
 }
 
-void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) {
+void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) {
     if (input.size() < 1) {
         return;
     }
@@ -354,10 +354,10 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     // Get min (x), max (y) outputs
     l = 0;
     n = 0;
-    for (const auto &layer : layers) {
+    for (const auto& layer : layers) {
         layerMinMax.emplace_back(0, 0);
         l++;
-        for (const auto &neu : layer.neurons) {
+        for (const auto& neu : layer.neurons) {
             if (l < layerMinMax.size()) {
                 if (neu.output < layerMinMax[l].x) layerMinMax[l].x = neu.output;
                 if (neu.output > layerMinMax[l].y) layerMinMax[l].y = neu.output;
@@ -369,7 +369,7 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     // HIDDEN LAYERS
 
     for (size_t layerIndex = 0; layerIndex < layers.size(); ++layerIndex) {
-        const auto &layer = layers[layerIndex];
+        const auto& layer = layers[layerIndex];
         size_t numNeurons = layer.neurons.size();
 
         // Calcula a posição inicial para centralizar os neurônios da camada
@@ -401,15 +401,15 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
     double out2;
 
     for (size_t layerIndex = 0; layerIndex < layersPos.size() - 1; layerIndex++) {
-        const auto &currentLayer = layersPos[layerIndex];
-        const auto &nextLayer = layersPos[layerIndex + 1];
+        const auto& currentLayer = layersPos[layerIndex];
+        const auto& nextLayer = layersPos[layerIndex + 1];
 
         // Scan neurons of current layer
         for (size_t i = 0; i < currentLayer.size(); ++i) {
-            const auto &currentNeuronPos = currentLayer[i];
+            const auto& currentNeuronPos = currentLayer[i];
             // Scan neurons of next layer
             for (size_t j = 0; j < nextLayer.size(); ++j) {
-                const auto &nextNeuronPos = nextLayer[j];
+                const auto& nextNeuronPos = nextLayer[j];
 
                 if (layerIndex == 0) {
                     out1 = input[i];
@@ -457,7 +457,7 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
 
     l = 0;
 
-    for (const auto &point : layerMinMax) {
+    for (const auto& point : layerMinMax) {
         biasText.setFillColor(sf::Color::Black);
         biasText.setString("Min: " + std::to_string(point.x));
         biasText.setPosition(left + (inputNamesLength * 0.5) + (layerSpacing * l), 20);
@@ -473,12 +473,12 @@ void NeuralNetwork::draw(sf::RenderWindow *window, uint16_t left, uint16_t top) 
 
     l = 0;
 
-    for (const auto &layer : layersPos) {
+    for (const auto& layer : layersPos) {
         n = 0;
         biggerOutputValue = layers[0].neurons[0].output;
         biggerOutputPos = sf::Vector2f(0, 0);
 
-        for (const auto &neuronPos : layer) {
+        for (const auto& neuronPos : layer) {
             biasText.setCharacterSize(9);
             sf::CircleShape neuron(neuronRadius);
             neuron.setFillColor(Tools::hslaToRgba(0, 1.0, 0.0, 360.0));

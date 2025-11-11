@@ -34,5 +34,6 @@ class Tools {
     static float map(float x, float a, float b, float c, float d);
     static void fileLog(std::string log, const std::string& arquivo);
     static std::string onOff(bool logicVar);
+    static void log(std::string log);
 };
 #endif
