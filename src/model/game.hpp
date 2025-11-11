@@ -25,6 +25,8 @@ struct Config {
     std::optional<bool> fullscreen;
     std::optional<int> score;
     std::optional<std::string> commandOnLand;
+    // std::optional<std::string> biases;
+    // std::optional<std::string> weights;
     std::optional<int> hiddenLayers;
     std::optional<int> layersSize;
     std::optional<bool> keepMaster;
