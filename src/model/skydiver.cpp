@@ -539,5 +539,6 @@ void Skydiver::saveScoreLanding(Boat boat) {
     grade_position = this->qtd_skydivers - this->position;
 
     // Set Score
-    score = grade_position + grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
+    // score = grade_position + grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
+    score = grade_landing_softly + grade_landing_place + grade_used_actions;
 }
