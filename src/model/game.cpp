@@ -6,7 +6,6 @@
 #include <cmath>
 #include <filesystem>
 #include <random>
-#include <unordered_map>
 
 #include "iostream"
 
@@ -93,20 +92,17 @@ void Game::play() {
 
         if (plane.on) {
             plane.update();
-
-            // Eliminate skydivers that are out of screen e no final do round?
-            if (!plane.on && playTimer > 10) {
-                for (auto& skydiver : skydivers) {
-                    if (skydiver->state == skydiver->State::ON_PLANE) {
-                        skydiver->died = true;
-                    }
-                }
-            }
         }
 
         // Update Boat
 
         boat.update();
+
+        if (drawing) {
+            scenario.draw(0, 0, &window);
+            plane.draw(&window);
+            boat.draw(&window);
+        }
 
         // Update Skydiver
 
@@ -124,8 +120,16 @@ void Game::play() {
                 }
                 skydiver->doAction();
                 skydiver->update(plane, boat, positionCounter, std::bind(&Game::onLand, this));
+
+                // Eliminate skydivers that are out of screen e no final do round?
+                if (!plane.on && playTimer > 10) {
+                    if (skydiver->state == skydiver->State::ON_PLANE) {
+                        skydiver->died = true;
+                    }
+                }
             }
 
+            // PROCESS STATISTICS
             if (skydiver->state == skydiver->State::ON_PLANE)
                 onPlane++;
             else if (skydiver->state == skydiver->State::ON_AIR)
@@ -138,8 +142,12 @@ void Game::play() {
                 positionCounter = positionCounter > skydiver->position ? positionCounter : skydiver->position;
             };
             sdTotal++;
+
+            // DRAW SKYDIVER IN THIS LOOP
+            skydiver->draw(&window, boat, show_information);
         }
     }
+
     const bool endForTraining = training && (landedCount + died == sdTotal);
 
     // Finish
@@ -218,13 +226,6 @@ void Game::play() {
 
     // DRAW
     if (drawing) {
-        scenario.draw(0, 0, &window);
-        plane.draw(&window);
-        boat.draw(&window);
-        for (auto& skydiver : skydivers) {
-            skydiver->draw(&window, boat, show_information);
-        }
-
         if (show_information) {
             std::string info = "";
             info += "ROUND.......: " + to_string(round);

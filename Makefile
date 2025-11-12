@@ -2,6 +2,7 @@ CXX=g++
 DEBUG=-g
 OPT=-O0
 WARN=-Wall
+OMPFLAGS=-fopenmp # Enable the using of more than one CPU core
 CPPVERSION=-std=c++17
 ifeq ($(OS), Windows_NT)	
 	TARGET=skydiver-ai.exe
@@ -12,7 +13,7 @@ else
 	REMOVE=rm -f *.o
 	SFML=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 endif
-CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(SFML) $(CPPVERSION)
+CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(OMPFLAGS) $(SFML) $(CPPVERSION)
 LD=g++
 OBJS= main.o game.o tools.o animation.o skydiver.o force.o plane.o boat.o Layer.o NeuralNetwork.o Neuron.o 
 all: $(OBJS)
