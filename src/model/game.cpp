@@ -87,6 +87,8 @@ void Game::play() {
     landedCount = 0;
     sdTotal = 0;
 
+    // drawing = frameCount % 60 == 0;
+
     if (!paused) {
         // Update Plane
 
@@ -119,7 +121,7 @@ void Game::play() {
                     }
                 }
                 skydiver->doAction();
-                skydiver->update(plane, boat, positionCounter, std::bind(&Game::onLand, this));
+                skydiver->update(plane, boat, positionCounter, this);
 
                 // Eliminate skydivers that are out of screen e no final do round?
                 if (!plane.on && playTimer > 10) {
@@ -143,8 +145,10 @@ void Game::play() {
             };
             sdTotal++;
 
-            // DRAW SKYDIVER IN THIS LOOP
-            skydiver->draw(&window, boat, show_information);
+            if (drawing) {
+                // DRAW SKYDIVER IN THIS LOOP
+                skydiver->draw(&window, boat, show_information);
+            }
         }
     }
 

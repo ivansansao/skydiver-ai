@@ -4,6 +4,7 @@
 
 #include "iostream"
 #include "tools.hpp"
+#include "game.hpp"
 
 using namespace std;
 
@@ -192,7 +193,7 @@ bool Skydiver::parachutesGoDown() {
     }
     return false;
 }
-void Skydiver::update(Plane plane, Boat boat, int positionCounter, std::function<void()> onLand) {
+void Skydiver::update(Plane plane, Boat boat, int positionCounter, Game* game) {
     if (died) {
         if (state == State::ON_BOAT) {
             pos.left = boat.pos.left + boatTouchPlaceLeft;
@@ -270,8 +271,8 @@ void Skydiver::update(Plane plane, Boat boat, int positionCounter, std::function
         setBoatTouchPlace(boat);
         if (this->isLand(boat)) {
             landed = true;
-            if (onLand) {
-                onLand();
+            if (game) {
+                game->onLand();
             }
             this->position = positionCounter + 1;
             saveScoreLanding(boat);

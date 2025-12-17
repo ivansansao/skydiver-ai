@@ -4,13 +4,14 @@
 #define SKYDIVER_H
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include <functional>
 
 #include "animation.hpp"
 #include "boat.hpp"
 #include "force.hpp"
 #include "mynn/NeuralNetwork.hpp"
 #include "plane.hpp"
+
+class Game;
 class Skydiver {
    public:
     Skydiver();
@@ -98,7 +99,7 @@ class Skydiver {
     std::string action = "";
 
     void draw(sf::RenderWindow* w, Boat boat, bool show_information);
-    void update(Plane plane, Boat boat, int positionCounter, std::function<void()> onLand = nullptr);
+    void update(Plane plane, Boat boat, int positionCounter, Game* game = nullptr);
 
     void set_position(float left, float top);
     void reset_position();
