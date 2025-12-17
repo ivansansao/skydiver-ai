@@ -87,7 +87,7 @@ void Game::play() {
     landedCount = 0;
     sdTotal = 0;
 
-    // drawing = frameCount % 60 == 0;
+    const bool drawFrame = this->training ? (frameCount % config.drawInterval.value_or(1) == 0) : true;
 
     if (!paused) {
         // Update Plane
@@ -100,7 +100,7 @@ void Game::play() {
 
         boat.update();
 
-        if (drawing) {
+        if (drawing && drawFrame) {
             scenario.draw(0, 0, &window);
             plane.draw(&window);
             boat.draw(&window);
@@ -145,7 +145,7 @@ void Game::play() {
             };
             sdTotal++;
 
-            if (drawing) {
+            if (drawing && drawFrame) {
                 // DRAW SKYDIVER IN THIS LOOP
                 skydiver->draw(&window, boat, show_information);
             }
@@ -220,7 +220,7 @@ void Game::play() {
             }
         }
 
-        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0), config.weights.value_or(""), config.biases.value_or("")};
+        Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, config.drawInterval.value_or(1), lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0), config.weights.value_or(""), config.biases.value_or("")};
         saveConfig(pconfig, "config.txt");
 
         log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
@@ -229,7 +229,7 @@ void Game::play() {
     }
 
     // DRAW
-    if (drawing) {
+    if (drawing && drawFrame) {
         if (show_information) {
             std::string info = "";
             info += "ROUND.......: " + to_string(round);
@@ -258,8 +258,10 @@ void Game::play() {
             info += "\nOTHER";
             info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
             info += "\nBOOT SKYDIVERS.........: " + Tools::onOff(this->bootSkydivers);
-            info += std::string("\nSYNC...................: ") + Tools::onOff(this->syncronism);
-            info += "\nTRAINING...............: " + Tools::onOff(this->training);
+            info += "\nPAUSE............(F7)..: " + Tools::onOff(this->paused);
+            info += "\nSYNC.............(F8)..: " + Tools::onOff(this->syncronism);
+            info += "\nMOSTRAR..........(F9)..: " + Tools::onOff(this->drawing);
+            info += "\nTRAINING.........(F10).: " + Tools::onOff(this->training);
 
             Tools::say(&window, info, 10, 8);
         }
@@ -300,6 +302,7 @@ void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
             << "planeVelocityX=" << pconfig.planeVelocityX.value() << "\n"
             << "qtdSkydivers=" << pconfig.qtdSkydivers.value() << "\n"
             << "fullscreen=" << pconfig.fullscreen.value() << "\n"
+            << "drawInterval=" << pconfig.drawInterval.value() << "\n"
             << "score=" << pconfig.score.value() << "\n"
             << "commandOnLand=" << pconfig.commandOnLand.value() << "\n"
             << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n"
@@ -342,6 +345,8 @@ Config Game::loadConfig(const std::string& arquivo) {
         config.qtdSkydivers = std::stoi(configMap["qtdSkydivers"]);
     if (configMap.find("fullscreen") != configMap.end())
         config.fullscreen = (configMap["fullscreen"] == "1");
+    if (configMap.find("drawInterval") != configMap.end())
+        config.drawInterval = std::stoi(configMap["drawInterval"]);
     if (configMap.find("score") != configMap.end())
         config.score = std::stoi(configMap["score"]);
     if (configMap.find("commandOnLand") != configMap.end())
