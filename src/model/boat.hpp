@@ -19,7 +19,7 @@ class Boat {
     sf::Vector2f velocity;
 
     void draw(sf::RenderWindow *w);
-    void update();
+    void update(sf::RenderWindow *window);
     void set_position(float left, float top);
     void reset_position();
     void start_position_random();

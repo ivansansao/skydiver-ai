@@ -98,7 +98,7 @@ void Game::play() {
 
         // Update Boat
 
-        boat.update();
+        boat.update(&window);
 
         if (drawing && drawFrame) {
             scenario.draw(0, 0, &window);

@@ -30,8 +30,20 @@ void Boat::start_position_random() {
     pos.left = 800 - 50 + (Tools::getRand() * 200);
     pos.left = (int)pos.left;
 }
-void Boat::update() {
+void Boat::update(sf::RenderWindow *window) {
     pos.left += velocity.x;
+
+    const float screenLeft = 0.f;
+    const float screenRight = window ? window->getView().getSize().x : 1600.f;
+
+    // Clamp to the visible area and invert direction when touching the borders.
+    if (pos.left < screenLeft) {
+        pos.left = screenLeft;
+        velocity.x = std::abs(velocity.x);
+    } else if (pos.left + pos.width > screenRight) {
+        pos.left = screenRight - pos.width;
+        velocity.x = -std::abs(velocity.x);
+    }
 }
 
 float Boat::getLandingPointLeft() {
