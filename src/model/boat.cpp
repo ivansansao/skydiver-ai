@@ -26,9 +26,16 @@ void Boat::set_position(float left, float top) {
 void Boat::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, start_pos.width, start_pos.height);
 }
-void Boat::start_position_random() {
-    pos.left = 800 - 50 + (Tools::getRand() * 200);
-    pos.left = (int)pos.left;
+void Boat::start_position_random(sf::RenderWindow *window) {
+    const float screenWidth = window ? window->getView().getSize().x : 1600.f;
+    float maxLeft = screenWidth - pos.width;
+    if (maxLeft < 0.f) {
+        maxLeft = 0.f;
+    }
+
+    const float normalizedRand = (static_cast<float>(Tools::getRand()) + 1.f) * 0.5f;  // convert [-1,1] to [0,1]
+    pos.left = normalizedRand * maxLeft;
+    pos.left = std::floor(pos.left);
 }
 void Boat::update(sf::RenderWindow *window) {
     pos.left += velocity.x;

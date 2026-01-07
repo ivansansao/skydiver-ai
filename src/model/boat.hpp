@@ -22,7 +22,7 @@ class Boat {
     void update(sf::RenderWindow *window);
     void set_position(float left, float top);
     void reset_position();
-    void start_position_random();
+    void start_position_random(sf::RenderWindow* window = nullptr);
     float getLandingPointLeft();
     float getLandingPointTop();
     float getLandingPointRadius();

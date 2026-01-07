@@ -202,7 +202,7 @@ void Game::play() {
         positionCounter = 0;
 
         plane.start_round();
-        boat.start_position_random();
+        boat.start_position_random(&window);
 
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
