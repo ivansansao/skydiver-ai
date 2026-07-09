@@ -2,9 +2,9 @@
 
 #include <cmath>
 
+#include "game.hpp"
 #include "iostream"
 #include "tools.hpp"
-#include "game.hpp"
 
 using namespace std;
 
@@ -58,7 +58,7 @@ Skydiver::Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers, int layersS
     reset_position();
 
     // mind.addLayer(6, [](double x) { return 1.0 / (1.0 + std::exp(-x)); });
-    mind.inputNames = {"Place", "Parachutes", "Altitude", "Longitude", "Boat speed", "Sd side speed", "Sd drop speed"};
+    mind.inputNames = {"Place", "Parachutes", "Altitude", "Boat longitude", "Boat speed", "Sd longitude", "Sd side speed", "Sd drop speed"};
     mind.outputNames = {"Jump", "Open parachutes", "Right", "Left", "Up", "Down", "Wait"};
     for (int i = 0; i < hiddenLayers; i++) {
         mind.addLayer(layersSize, [](double x) { return std::max(0.0, x); });
@@ -88,8 +88,9 @@ void Skydiver::reset_position() {
 void Skydiver::think(Plane plane, Boat boat, bool boot) {
     const float altitudeFromBoat = getAltitudeFromBoat(boat) / 100;
     const float longitudeFromBoat = getLongitudeFromBoat(boat) / 100;
+    const float sdLongitude = this->pos.left / 1000;
 
-    std::vector<double> input = {state + 0.0, parachuteState + 0.0, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, velocity.x, velocity.y};
+    std::vector<double> input = {state + 0.0, parachuteState + 0.0, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, sdLongitude, velocity.x, velocity.y};
     std::vector<double> output = mind.think(input);
 
     action = "";

@@ -18,7 +18,7 @@ class Skydiver {
     Skydiver(uint16_t id, int qtd_skydivers, int hiddenLayers = 1, int layersSize = 14);
     ~Skydiver();
 
-    NeuralNetwork mind = NeuralNetwork(7);
+    NeuralNetwork mind = NeuralNetwork(8);
 
     Animation skydiverFall;
     Animation skydiverOnPlane;

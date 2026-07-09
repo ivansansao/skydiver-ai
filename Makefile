@@ -11,7 +11,7 @@ ifeq ($(OS), Windows_NT)
 else
 	TARGET=./skydiver-ai
 	REMOVE=rm -f *.o
-	SFML=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+	SFML=-I/usr/local/include -L/usr/local/lib -Wl,--disable-new-dtags -Wl,-rpath,/usr/local/lib -Wl,-rpath,'$$ORIGIN/lib' -Wl,-rpath-link,./lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 endif
 CXXFLAGS=$(DEBUG) $(OPT) $(WARN) $(OMPFLAGS) $(SFML) $(CPPVERSION)
 LD=g++
