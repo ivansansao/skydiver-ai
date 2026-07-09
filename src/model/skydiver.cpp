@@ -86,11 +86,14 @@ void Skydiver::reset_position() {
     this->pos = sf::FloatRect(start_pos.left, start_pos.top, 8.f, 12.f);
 }
 void Skydiver::think(Plane plane, Boat boat, bool boot) {
-    const float altitudeFromBoat = getAltitudeFromBoat(boat) / 100;
-    const float longitudeFromBoat = getLongitudeFromBoat(boat) / 100;
-    const float sdLongitude = this->pos.left / 1000;
+    const float altitudeFromBoat = getAltitudeFromBoat(boat) / 1000;
+    const float longitudeFromBoat = getLongitudeFromBoat(boat) / 1000;
+    const float sdLongitude = this->pos.left / 10000;
 
-    std::vector<double> input = {state + 0.0, parachuteState + 0.0, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, sdLongitude, velocity.x, velocity.y};
+    const float place = (state + 0.0) / 10;
+    const float statusParachute = (parachuteState + 0.0) / 10;
+
+    std::vector<double> input = {place, statusParachute, altitudeFromBoat, longitudeFromBoat, boat.velocity.x, sdLongitude, velocity.x / 10, velocity.y / 10};
     std::vector<double> output = mind.think(input);
 
     action = "";

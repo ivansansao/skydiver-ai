@@ -502,7 +502,7 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
 
             } else {
                 if (n < this->input.size()) {
-                    biasText.setString(Tools::formatDouble(this->input[n], 2));
+                    biasText.setString(Tools::formatDouble(this->input[n], 10));
                 }
             }
             biasText.setPosition(neuronPos.x - neuronRadius / 1.3, neuronPos.y - neuronRadius / 2.5);
