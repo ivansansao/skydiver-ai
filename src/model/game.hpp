@@ -81,6 +81,7 @@ class Game {
     int menuopc_selected = 0;
     bool key_released = true;
     bool editing = false;
+    bool endForTraining = false;
     int editing_framecount = 1;
     int frameCount = 0;
     bool show_information = false;

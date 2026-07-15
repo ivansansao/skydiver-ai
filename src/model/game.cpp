@@ -142,6 +142,10 @@ void Game::play() {
             if (skydiver->landed) {
                 landedCount++;
                 positionCounter = positionCounter > skydiver->position ? positionCounter : skydiver->position;
+
+                if (skydiver->isMaster()) {
+                    this->endForTraining = true;
+                }
             };
             sdTotal++;
 
@@ -152,10 +156,14 @@ void Game::play() {
         }
     }
 
-    const bool endForTraining = training && (landedCount + died == sdTotal);
+    if (training) {
+        if (!this->endForTraining) this->endForTraining = training && (landedCount + died == sdTotal);
+    }
 
     // Finish
-    if (playTimer > 60 || (died && died == sdTotal) || endForTraining) {
+    if (playTimer > 60 || (died && died == sdTotal) || this->endForTraining) {
+        this->endForTraining = false;
+
         // Imprime o tempo que levou
         float roundTime = roundClock.getElapsedTime().asSeconds();  // Tempo decorrido
         roundClock.restart();
