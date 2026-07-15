@@ -121,7 +121,7 @@ void Skydiver::think(Plane plane, Boat boat, bool boot) {
     } else if (greater == 5) {
         action = "D";
     } else if (greater == 6) {
-        action = "";
+        action = "W";
     }
 
     if (boot) {
@@ -145,6 +145,8 @@ void Skydiver::doAction() {
         success = parachutesGoUp();
     } else if (action == "D") {
         success = parachutesGoDown();
+    } else if (action == "W") {
+        success = true;
     }
 
     if (success && usedActions.find(action) == std::string::npos) {

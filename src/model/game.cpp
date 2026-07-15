@@ -230,6 +230,7 @@ void Game::play() {
         saveConfig(pconfig, "config.txt");
 
         log = log + " Score: " + Tools::formatDouble(lastBetterSkydiver->getScore(), 2);
+        log = log + " Actions: " + lastBetterSkydiver->usedActions;
 
         Tools::fileLog(log, "log.txt");
     }
