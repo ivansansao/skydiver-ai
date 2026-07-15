@@ -10,7 +10,7 @@ Neuron::Neuron(std::function<double(double)> activationFunction) : neuronId(neur
 
 void Neuron::active() {
     double rsSum = std::accumulate(weightsSums.begin(), weightsSums.end(), 0.0);
-    output = activationFunction(rsSum + bias);
+    output = activationFunction(rsSum + (useBias ? bias : 0.0));
 }
 
 void Neuron::clear() {

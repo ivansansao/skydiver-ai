@@ -11,8 +11,21 @@ NeuralNetwork::NeuralNetwork(int inputs) : inputs(inputs),
                                            mutated(0),
                                            mutatedNeurons("") {}
 
+void NeuralNetwork::setUseBias(bool value) {
+    useBias = value;
+
+    for (auto& layer : layers) {
+        for (auto& neuron : layer.neurons) {
+            neuron.useBias = value;
+        }
+    }
+}
+
 void NeuralNetwork::addLayer(int size, std::function<double(double)> activationFunction) {
     layers.emplace_back(size, activationFunction);
+    for (auto& neuron : layers.back().neurons) {
+        neuron.useBias = useBias;
+    }
 }
 
 void NeuralNetwork::compile() {
@@ -106,7 +119,7 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
         }
 
         // Mutate bias
-        if (getRand() > 0) {
+        if (useBias && getRand() > 0) {
             for (unsigned int l = 0; l < layers.size(); l++) {
                 for (unsigned int n = 0; n < layers[l].neurons.size(); n++) {
                     if (getRand() > 0.5) {
@@ -130,12 +143,14 @@ void NeuralNetwork::mutate(int many, bool tryAll) {
         }
 
         // Mutate bias
-        const int l = rand() % layers.size();
-        const int n = rand() % layers[l].neurons.size();
-        layers[l].neurons[n].bias += getRand();
+        if (useBias) {
+            const int l = rand() % layers.size();
+            const int n = rand() % layers[l].neurons.size();
+            layers[l].neurons[n].bias += getRand();
 
-        mutated++;
-        mutatedNeurons += "B" + std::to_string(l) + "/" + std::to_string(n) + ";";
+            mutated++;
+            mutatedNeurons += "B" + std::to_string(l) + "/" + std::to_string(n) + ";";
+        }
     }
 }
 

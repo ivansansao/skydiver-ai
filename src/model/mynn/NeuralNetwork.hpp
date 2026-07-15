@@ -20,6 +20,7 @@ class NeuralNetwork {
     std::vector<std::string> outputNames;
 
     NeuralNetwork(int inputs);
+    void setUseBias(bool value);
     void addLayer(int size, std::function<double(double)> activationFunction);
     void compile();
     std::vector<double> think(const std::vector<double> &input);
@@ -37,6 +38,7 @@ class NeuralNetwork {
     void draw(sf::RenderWindow *w, uint16_t left, uint16_t top);
 
    private:
+    bool useBias = false;
     double getRand();
 };
 

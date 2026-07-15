@@ -12,6 +12,7 @@ class Neuron {
     std::vector<double> weightsSums;
     double output;
     double bias = 0.0;
+    bool useBias = false;
     std::function<double(double)> activationFunction;
 
     Neuron(std::function<double(double)> activationFunction);
