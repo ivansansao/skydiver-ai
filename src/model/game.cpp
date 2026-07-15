@@ -54,7 +54,7 @@ Game::Game() {
     lastBetterSkydiver = new Skydiver(0, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
     lastBetterSkydiver->mind.setWeights(config.weights.value_or(""));
     lastBetterSkydiver->mind.setBias(config.biases.value_or(""));
-    lastBetterSkydiver->score = config.score.has_value() ? config.score.value() : 0;
+    lastBetterSkydiver->score = config.score.has_value() ? config.score.value() : 0.f;
 
     for (int i{}; i < qtd_skydivers; ++i) {
         Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));
@@ -173,32 +173,30 @@ void Game::play() {
 
         // Get better score
 
+        Skydiver* last = skydivers[0];
+        for (size_t i = 1; i < skydivers.size(); ++i) {
+            if (skydivers[i]->getScore() > last->getScore()) {
+                last = skydivers[i];
+            }
+        }
+
+        // Keep master if he could land
+        if (config.keepMaster) {
+            for (auto& skydiver : skydivers) {
+                if (skydiver->isMaster() && skydiver->landed) {
+                    last = skydiver;
+                    break;
+                }
+            }
+        }
+
+        // It is good to choose the last best round because boat move of place.
+        lastBetterSkydiver = last;
+        lastBetterSkydiver->round = round;
+        config.weights = lastBetterSkydiver->mind.getWeights();
+        config.biases = lastBetterSkydiver->mind.getBias();
+
         if (landedCount) {
-            Skydiver* last = skydivers[0];
-            for (size_t i = 1; i < skydivers.size(); ++i) {
-                if (skydivers[i]->getScore() > last->getScore()) {
-                    last = skydivers[i];
-                }
-            }
-
-            // Keep master if he could land
-            if (config.keepMaster) {
-                for (auto& skydiver : skydivers) {
-                    if (skydiver->isMaster() && skydiver->landed) {
-                        last = skydiver;
-                        break;
-                    }
-                }
-            }
-
-            // It is good to choose the last best round because boat move of place.
-            if (last->getScore() > 0) {
-                lastBetterSkydiver = last;
-                lastBetterSkydiver->round = round;
-                config.weights = lastBetterSkydiver->mind.getWeights();
-                config.biases = lastBetterSkydiver->mind.getBias();
-            }
-
             plane.reverse_direction(round % 2 == 0);
             boat.velocity.x *= -1;
         }
@@ -231,7 +229,7 @@ void Game::play() {
         Config pconfig = {round, boat.velocity.x, plane.velocity.x, qtd_skydivers, fullscreen, config.drawInterval.value_or(1), lastBetterSkydiver->getScore(), config.commandOnLand.value_or(""), config.hiddenLayers.value_or(1), config.layersSize.value_or(14), config.keepMaster.value_or(0), config.weights.value_or(""), config.biases.value_or("")};
         saveConfig(pconfig, "config.txt");
 
-        log = log + " Score: " + to_string(lastBetterSkydiver->getScore());
+        log = log + " Score: " + Tools::formatDouble(lastBetterSkydiver->getScore(), 2);
 
         Tools::fileLog(log, "log.txt");
     }
@@ -252,16 +250,17 @@ void Game::play() {
             info += "\n";
             info += "\nLAST BEST SKYDIVER";
             info += "\n";
-            info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
-            info += "\nGRADE: Landing place...: " + to_string(lastBetterSkydiver->grade_landing_place);
-            info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
-            info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
-            info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
+            // info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
+            // info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
+            info += "\nGRADE: Landing place...: " + Tools::formatDouble(lastBetterSkydiver->grade_landing_place, 4);
+            // info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
+            // info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
             // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
-            info += "\nGRADE: Direc changes...: " + to_string(lastBetterSkydiver->grade_direction_changes);
-            info += "\nGRADE: Used actions....: " + to_string(lastBetterSkydiver->grade_used_actions);
+            info += "\nGRADE: Direc changes...: " + Tools::formatDouble(lastBetterSkydiver->grade_direction_changes, 4);
+            info += "\nGRADE: Used actions....: " + Tools::formatDouble(lastBetterSkydiver->grade_used_actions, 4);
+            info += "\nGRADE: Landed..........: " + Tools::formatDouble(lastBetterSkydiver->landed ? 1000 : 0, 4);
             info += "\n---------------------------------";
-            info += "\nSCORE..................: " + to_string(lastBetterSkydiver->getScore());
+            info += "\nSCORE..................: " + Tools::formatDouble(lastBetterSkydiver->getScore(), 4);
             info += "\n";
             info += "\nOTHER";
             info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
@@ -311,7 +310,7 @@ void Game::saveConfig(const Config& pconfig, const std::string& arquivo) {
             << "qtdSkydivers=" << pconfig.qtdSkydivers.value() << "\n"
             << "fullscreen=" << pconfig.fullscreen.value() << "\n"
             << "drawInterval=" << pconfig.drawInterval.value() << "\n"
-            << "score=" << pconfig.score.value() << "\n"
+            << "score=" << Tools::formatDouble(pconfig.score.value(), 2) << "\n"
             << "commandOnLand=" << pconfig.commandOnLand.value() << "\n"
             << "hiddenLayers=" << pconfig.hiddenLayers.value() << "\n"
             << "layersSize=" << pconfig.layersSize.value() << "\n"
@@ -356,7 +355,7 @@ Config Game::loadConfig(const std::string& arquivo) {
     if (configMap.find("drawInterval") != configMap.end())
         config.drawInterval = std::stoi(configMap["drawInterval"]);
     if (configMap.find("score") != configMap.end())
-        config.score = std::stoi(configMap["score"]);
+        config.score = std::stof(configMap["score"]);
     if (configMap.find("commandOnLand") != configMap.end())
         config.commandOnLand = configMap["commandOnLand"];
     if (configMap.find("hiddenLayers") != configMap.end())

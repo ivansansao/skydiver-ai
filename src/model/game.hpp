@@ -24,7 +24,7 @@ struct Config {
     std::optional<int> qtdSkydivers;
     std::optional<bool> fullscreen;
     std::optional<int> drawInterval;
-    std::optional<int> score;
+    std::optional<float> score;
     std::optional<std::string> commandOnLand;
     std::optional<int> hiddenLayers;
     std::optional<int> layersSize;
