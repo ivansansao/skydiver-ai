@@ -216,7 +216,7 @@ void Game::play() {
             skydiver->mind.setWeights(lastBetterSkydiver->mind.getWeights());
             skydiver->mind.setBias(lastBetterSkydiver->mind.getBias());
 
-            if (i > 0) skydiver->mind.mutate(i * 2, true);
+            if (i > 0) skydiver->mind.mutate(skydiver->mind.countWeights(), true);
             skydivers.push_back(skydiver);
         }
 

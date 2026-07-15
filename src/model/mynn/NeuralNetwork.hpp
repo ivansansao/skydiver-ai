@@ -28,6 +28,7 @@ class NeuralNetwork {
     std::string version() const;
     void setWeights(const std::string &text);
     std::string getWeights() const;
+    size_t countWeights() const;
     void printWeights() const;
     void printWeightsNoWrap() const;
 
