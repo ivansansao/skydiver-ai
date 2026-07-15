@@ -98,15 +98,12 @@ void Skydiver::think(Plane plane, Boat boat, bool boot) {
 
     action = "";
 
-    int16_t greater = 6;
-    double maxValue = output[6];
-
-    for (int16_t i = 0; i < (int16_t)output.size(); ++i) {
-        if (output[i] > maxValue) {
-            greater = i;
-            maxValue = output[i];
-        }
+    if (output.empty()) {
+        return;
     }
+
+    auto maxOutput = std::max_element(output.begin(), output.end());
+    int16_t greater = std::distance(output.begin(), maxOutput);
 
     if (greater == 0) {
         action = "J";
