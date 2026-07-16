@@ -101,6 +101,7 @@ void Game::play() {
         boat.update(&window);
 
         if (drawing && drawFrame) {
+            window.clear();
             scenario.draw(0, 0, &window);
             plane.draw(&window);
             boat.draw(&window);
@@ -406,11 +407,13 @@ void Game::loop_events() {
                     paused = !paused;
                 } else if (event.key.code == sf::Keyboard::F8) {
                     syncronism = !syncronism;
-                    window.setVerticalSyncEnabled(syncronism);
-                    if (syncronism)
-                        window.setFramerateLimit(60);
-                    else
+                    if (syncronism) {
+                        window.setVerticalSyncEnabled(true);
                         window.setFramerateLimit(0);
+                    } else {
+                        window.setVerticalSyncEnabled(false);
+                        window.setFramerateLimit(60);
+                    }
                 } else if (event.key.code == sf::Keyboard::F9) {
                     drawing = !drawing;
                 } else if (event.key.code == sf::Keyboard::F10) {
