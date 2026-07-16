@@ -107,7 +107,18 @@ void Game::play() {
             boat.draw(&window);
         }
 
-        // Update Skydiver
+        // Think
+        if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
+            for (auto& skydiver : skydivers) {
+                if (!skydiver->died) {
+                    if (skydiver->state != skydiver->State::ON_BOAT) {
+                        skydiver->think(plane, boat, bootSkydivers);
+                    }
+                }
+            }
+        }
+
+        // Update/draw Skydiver
 
         for (auto& skydiver : skydivers) {
             if (skydiver->died) {
@@ -116,11 +127,11 @@ void Game::play() {
                     skydiver->update(plane, boat, positionCounter);
                 }
             } else {
-                if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
-                    if (skydiver->state != skydiver->State::ON_BOAT) {
-                        skydiver->think(plane, boat, bootSkydivers);
-                    }
-                }
+                // if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
+                //     if (skydiver->state != skydiver->State::ON_BOAT) {
+                //         skydiver->think(plane, boat, bootSkydivers);
+                //     }
+                // }
                 skydiver->doAction();
                 skydiver->update(plane, boat, positionCounter, this);
 
