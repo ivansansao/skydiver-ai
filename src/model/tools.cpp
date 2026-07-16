@@ -5,13 +5,15 @@
 #include <iomanip>
 #include <random>
 
-sf::Text Tools::objText;
 sf::Font Tools::font_spacemono_regular;
+sf::Text Tools::objText(Tools::font_spacemono_regular);
 
 Tools::Tools() {
 }
 void Tools::configure() {
-    font_spacemono_regular.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf");
+    if (!font_spacemono_regular.openFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
+        std::cerr << "Erro ao carregar a fonte SpaceMono-Regular.ttf." << std::endl;
+    }
     objText.setFont(font_spacemono_regular);
 }
 int Tools::getStartSprite(int index, int direction) {
@@ -182,7 +184,7 @@ sf::Color Tools::hslaToRgba(float h, float s, float l, float a) {
     g = (g + m) * 255;
     b = (b + m) * 255;
 
-    return sf::Color(static_cast<sf::Uint8>(r), static_cast<sf::Uint8>(g), static_cast<sf::Uint8>(b), static_cast<sf::Uint8>(a * 255));
+    return sf::Color(static_cast<std::uint8_t>(r), static_cast<std::uint8_t>(g), static_cast<std::uint8_t>(b), static_cast<std::uint8_t>(a * 255));
 }
 float Tools::map(float x, float a, float b, float c, float d) {
     return c + (x - a) * (d - c) / (b - a);

@@ -452,9 +452,9 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
                 sf::Color c2 = Tools::hslaToRgba(map2, 0.70, 0.57, 1);
 
                 sf::Vertex line[] = {
-                    sf::Vertex(currentNeuronPos, c1),
-                    sf::Vertex(nextNeuronPos, c2)};
-                window->draw(line, 2, sf::Lines);
+                    sf::Vertex{currentNeuronPos, c1},
+                    sf::Vertex{nextNeuronPos, c2}};
+                window->draw(line, 2, sf::PrimitiveType::Lines);
             }
         }
     }
@@ -467,11 +467,10 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
     n = 0;
 
     sf::Font font;
-    if (!font.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
+    if (!font.openFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
         // Handle error
     }
-    sf::Text biasText;
-    biasText.setFont(font);
+    sf::Text biasText(font);
     biasText.setCharacterSize(9);
     biasText.setFillColor(sf::Color::White);
 
@@ -485,11 +484,11 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
     for (const auto& point : layerMinMax) {
         biasText.setFillColor(sf::Color::Black);
         biasText.setString("Min: " + std::to_string(point.x));
-        biasText.setPosition(left + (inputNamesLength * 0.5) + (layerSpacing * l), 20);
+        biasText.setPosition(sf::Vector2f(left + (inputNamesLength * 0.5) + (layerSpacing * l), 20));
         window->draw(biasText);
 
         biasText.setString("Max: " + std::to_string(point.y));
-        biasText.setPosition(left + (inputNamesLength * 0.5) + (layerSpacing * l), 40);
+        biasText.setPosition(sf::Vector2f(left + (inputNamesLength * 0.5) + (layerSpacing * l), 40));
         window->draw(biasText);
         l++;
     }
@@ -510,7 +509,7 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
 
             neuron.setOutlineColor(sf::Color::White);
             neuron.setOutlineThickness(2);
-            neuron.setPosition(neuronPos.x - neuronRadius, neuronPos.y - neuronRadius);
+            neuron.setPosition(sf::Vector2f(neuronPos.x - neuronRadius, neuronPos.y - neuronRadius));
             window->draw(neuron);
 
             // Desenhar o valor do bias
@@ -530,7 +529,7 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
                     biasText.setString(Tools::formatDouble(this->input[n], 10));
                 }
             }
-            biasText.setPosition(neuronPos.x - neuronRadius / 1.3, neuronPos.y - neuronRadius / 2.5);
+            biasText.setPosition(sf::Vector2f(neuronPos.x - neuronRadius / 1.3, neuronPos.y - neuronRadius / 2.5));
             window->draw(biasText);
 
             if (l > 0) {
@@ -539,19 +538,19 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
             } else {
                 biasText.setString("-");
             }
-            biasText.setPosition(neuronPos.x - neuronRadius / 1.4, neuronPos.y + neuronRadius / 4);
+            biasText.setPosition(sf::Vector2f(neuronPos.x - neuronRadius / 1.4, neuronPos.y + neuronRadius / 4));
             window->draw(biasText);
 
             biasText.setCharacterSize(14);
             if (l == 0) {
                 biasText.setFillColor(sf::Color::Black);
                 biasText.setString(inputNames[n]);
-                biasText.setPosition(neuronPos.x - inputNamesLength - neuronRadius, neuronPos.y - neuronRadius / 2.5);
+                biasText.setPosition(sf::Vector2f(neuronPos.x - inputNamesLength - neuronRadius, neuronPos.y - neuronRadius / 2.5));
                 window->draw(biasText);
             } else if (l == layersPos.size() - 1) {
                 biasText.setFillColor(sf::Color::Black);
                 biasText.setString(outputNames[n]);
-                biasText.setPosition(neuronPos.x + neuronRadius * 2, neuronPos.y - neuronRadius / 2.5);
+                biasText.setPosition(sf::Vector2f(neuronPos.x + neuronRadius * 2, neuronPos.y - neuronRadius / 2.5));
                 window->draw(biasText);
             }
 
@@ -563,7 +562,7 @@ void NeuralNetwork::draw(sf::RenderWindow* window, uint16_t left, uint16_t top) 
             neuron.setFillColor(sf::Color::Transparent);
             neuron.setOutlineColor(sf::Color::Red);
             neuron.setOutlineThickness(4);
-            neuron.setPosition(biggerOutputPos.x - neuronRadius, biggerOutputPos.y - neuronRadius);
+            neuron.setPosition(sf::Vector2f(biggerOutputPos.x - neuronRadius, biggerOutputPos.y - neuronRadius));
             window->draw(neuron);
         }
 

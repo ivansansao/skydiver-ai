@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Animation::Animation() {
+Animation::Animation() : sprite(texture) {
 }
 void Animation::init(int q_frame, float step, std::string file, sf::IntRect rect, bool circularSprite, float moveLeft, float moveTop, bool onTime) {
     this->q_frame = q_frame;  // Needed 'this' cause same name param and prop.
@@ -23,8 +23,8 @@ void Animation::anime(sf::IntRect rect, int direction_x) {
     this->next();
 }
 void Animation::animeAuto() {
-    const float left = this->getFrame() * this->rect.width;
-    const sf::IntRect nextImage = sf::IntRect(left, this->rect.top, this->rect.width, this->rect.height);
+    const float left = this->getFrame() * this->rect.size.x;
+    const sf::IntRect nextImage = sf::IntRect({static_cast<int>(left), this->rect.position.y}, {this->rect.size.x, this->rect.size.y});
     this->setTextureRect(nextImage);
     if (oneTime) {
         if (i_frame < q_frame - 1) {
@@ -58,14 +58,16 @@ void Animation::draw(float i, float j, sf::RenderWindow *w) {
     w->draw(this->sprite);
 }
 void Animation::setTexture(std::string file) {
-    texture.loadFromFile(file);
+    if (!texture.loadFromFile(file)) {
+        std::cerr << "Erro ao carregar textura: " << file << std::endl;
+    }
     sprite.setTexture(texture);
 }
 void Animation::setTextureRect(sf::IntRect rect) {
     sprite.setTextureRect(rect);
 }
 void Animation::setPosition(float i, float j) {
-    sprite.setPosition(i, j);
+    sprite.setPosition(sf::Vector2f(i, j));
 }
 int Animation::getFrame() {
     return (int)this->i_frame;

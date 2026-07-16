@@ -55,7 +55,6 @@ class Game {
     sf::View view;
     sf::Font font_roboto;
     sf::Font font_spacemono_regular;
-    sf::Text text_gameover;
     float playTimer = 0;
 
     bool gameover_loaded = false;
@@ -65,9 +64,6 @@ class Game {
     int phase_current = 0;
     int phase_total = 0;
     int round = 1;
-
-    sf::Text text_gamewin;
-    sf::Text text_generic;
 
     Skydiver skydiver;
 

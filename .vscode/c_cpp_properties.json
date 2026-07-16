@@ -3,13 +3,18 @@
         {
             "name": "Linux",
             "includePath": [
+                "${workspaceFolder}/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc", // Ou /usr/bin/g++ se você estiver compilando C++
+            "compilerPath": "/usr/bin/g++",
+            "compilerArgs": [
+                "-I${workspaceFolder}/include"
+            ],
             "cStandard": "c17",
             "cppStandard": "c++17", // Atualizado para C++17
             "intelliSenseMode": "linux-gcc-x64",
+            "mergeConfigurations": true,
             "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],

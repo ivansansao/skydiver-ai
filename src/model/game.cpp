@@ -25,29 +25,33 @@ Game::Game() {
     sf::ContextSettings settings;
     settings.depthBits = 0;
     settings.stencilBits = 0;
-    settings.antialiasingLevel = 8;
+    settings.antiAliasingLevel = 8;
     settings.majorVersion = 2;
     settings.minorVersion = 1;
 
     if (fullscreen) {
-        window.create(sf::VideoMode::getDesktopMode(), "Skydivers", sf::Style::Fullscreen, settings);
+        window.create(sf::VideoMode::getDesktopMode(), "Skydivers", sf::State::Fullscreen, settings);
     } else {
-        window.create(sf::VideoMode(1600, 900), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, settings);
+        window.create(sf::VideoMode(sf::Vector2u(1600, 900)), "Skydiver-ai @ivansansao", sf::Style::Titlebar | sf::Style::Close, sf::State::Windowed, settings);
     }
     setWindowIcon(&window);
     window.setVerticalSyncEnabled(true);  // Don't allow more FPS than your monitor support.
     window.setFramerateLimit(60);         // There is a relation between framerate and setVerticalSyncEnabled.
     window.setPosition(sf::Vector2i(0, 0));
-    view.reset(sf::FloatRect(0.f, 0.f, 1600, 900));
+    view = sf::View(sf::FloatRect({0.f, 0.f}, {1600.f, 900.f}));
     window.setView(this->view);
     window.setMouseCursorVisible(true);
 
     Tools::configure();
 
-    font_roboto.loadFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf");
-    font_spacemono_regular.loadFromFile("./src/asset/fonts/SpaceMono-Regular.ttf");
+    if (!font_roboto.openFromFile("./src/asset/fonts/RobotoFlex-Regular.ttf")) {
+        std::cerr << "Erro ao carregar a fonte RobotoFlex-Regular.ttf." << std::endl;
+    }
+    if (!font_spacemono_regular.openFromFile("./src/asset/fonts/SpaceMono-Regular.ttf")) {
+        std::cerr << "Erro ao carregar a fonte SpaceMono-Regular.ttf." << std::endl;
+    }
 
-    scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect(0, 0, 1600, 900), true, 0, 0, false);
+    scenario.init(1, 0.5f, "./src/asset/image/scenario.png", sf::IntRect({0, 0}, {1600, 900}), true, 0, 0, false);
 
     skydivers.clear();
 
@@ -306,7 +310,7 @@ void Game::play() {
 bool Game::hasOnScreenAir() {
     for (auto& skydiver : skydivers) {
         if (skydiver->state == skydiver->State::ON_AIR) {
-            if (skydiver->pos.left > 0 && skydiver->pos.left + skydiver->pos.width < 1600) {
+            if (skydiver->pos.position.x > 0 && skydiver->pos.position.x + skydiver->pos.size.x < 1600) {
                 return true;
             }
         }
@@ -396,7 +400,7 @@ void Game::setWindowIcon(sf::RenderWindow* w) {
     if (!icon.loadFromFile("./src/asset/image/icon.png")) {
         std::cerr << "Erro ao carregar o ícone." << std::endl;
     } else {
-        w->setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+        w->setIcon(icon);
     }
 }
 
@@ -405,23 +409,22 @@ void Game::close() {
 };
 
 void Game::loop_events() {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
+    while (const std::optional<sf::Event> event = window.pollEvent()) {
+        if (event->is<sf::Event::Closed>()) {
             window.close();
-        } else if (event.type == sf::Event::GainedFocus) {
+        } else if (event->is<sf::Event::FocusGained>()) {
             window_has_focus = true;
-        } else if (event.type == sf::Event::LostFocus) {
+        } else if (event->is<sf::Event::FocusLost>()) {
             window_has_focus = false;
-        } else if (event.type == sf::Event::KeyReleased) {
+        } else if (event->is<sf::Event::KeyReleased>()) {
             key_released = true;
-        } else if (event.type == sf::Event::KeyPressed) {
+        } else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
             if (window_has_focus) {
-                if (event.key.code == sf::Keyboard::I) {
+                if (keyPressed->code == sf::Keyboard::Key::I) {
                     show_information = !show_information;  // Inverte o estado da variável
-                } else if (event.key.code == sf::Keyboard::F7) {
+                } else if (keyPressed->code == sf::Keyboard::Key::F7) {
                     paused = !paused;
-                } else if (event.key.code == sf::Keyboard::F8) {
+                } else if (keyPressed->code == sf::Keyboard::Key::F8) {
                     syncronism = !syncronism;
                     if (syncronism) {
                         window.setVerticalSyncEnabled(true);
@@ -430,9 +433,9 @@ void Game::loop_events() {
                         window.setVerticalSyncEnabled(false);
                         window.setFramerateLimit(60);
                     }
-                } else if (event.key.code == sf::Keyboard::F9) {
+                } else if (keyPressed->code == sf::Keyboard::Key::F9) {
                     drawing = !drawing;
-                } else if (event.key.code == sf::Keyboard::F10) {
+                } else if (keyPressed->code == sf::Keyboard::Key::F10) {
                     training = !training;
                 }
             }
