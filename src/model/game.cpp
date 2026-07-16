@@ -109,6 +109,7 @@ void Game::play() {
 
         // Think
         if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
+#pragma omp parallel for
             for (auto& skydiver : skydivers) {
                 if (!skydiver->died) {
                     if (skydiver->state != skydiver->State::ON_BOAT) {
@@ -222,6 +223,10 @@ void Game::play() {
         plane.start_round();
         boat.start_position_random(&window);
 
+        // // A tried this but segment faults
+        // for (auto* skydiver : skydivers) {
+        //     delete skydiver;
+        // }
         skydivers.clear();
         for (int i{}; i < qtd_skydivers; ++i) {
             Skydiver* skydiver = new Skydiver(i, qtd_skydivers, config.hiddenLayers.value_or(1), config.layersSize.value_or(14));

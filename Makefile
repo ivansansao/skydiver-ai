@@ -1,6 +1,7 @@
 CXX=g++
 DEBUG=-g
-OPT=-O0
+# OPT=-O0 # Diz ao compilador para não otimizar para debug mas isso destrói a performance.
+OPT=-O3 -march=native # Otimização máxima para a arquitetura do processador.
 WARN=-Wall
 OMPFLAGS=-fopenmp # Enable the using of more than one CPU core
 CPPVERSION=-std=c++17
