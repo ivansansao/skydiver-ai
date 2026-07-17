@@ -78,7 +78,10 @@ enum menuopcs { Play,
 
 void Game::onLand() {
     if (config.commandOnLand.has_value()) {
-        std::system(config.commandOnLand.value().c_str());
+        const int status = std::system(config.commandOnLand.value().c_str());
+        if (status != 0) {
+            std::cerr << "Erro ao executar commandOnLand. Status: " << status << std::endl;
+        }
     }
 }
 void Game::play() {
@@ -273,24 +276,25 @@ void Game::play() {
             info += "\nLAST BEST SKYDIVER";
             info += "\n";
             // info += "\nGRADE: Position........: " + to_string(lastBetterSkydiver->grade_position);
-            // info += "\nGRADE: Landing softly..: " + to_string(lastBetterSkydiver->grade_landing_softly);
-            info += "\nGRADE: Landing place...: " + Tools::formatDouble(lastBetterSkydiver->grade_landing_place, 4);
             // info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
             // info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
             // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
-            info += "\nGRADE: Direc changes...: " + Tools::formatDouble(lastBetterSkydiver->grade_direction_changes, 4);
-            info += "\nGRADE: Used actions....: " + Tools::formatDouble(lastBetterSkydiver->grade_used_actions, 4);
-            info += "\nGRADE: Landed..........: " + Tools::formatDouble(lastBetterSkydiver->landed ? 1000 : 0, 4);
-            info += "\n---------------------------------";
-            info += "\nSCORE..................: " + Tools::formatDouble(lastBetterSkydiver->getScore(), 4);
+            info += "\nGRADE: Horizontal velocity..: " + Tools::formatDouble(lastBetterSkydiver->grade_horizontal_velocity, 4);
+            info += "\nGRADE: Vertical velocity....: " + Tools::formatDouble(lastBetterSkydiver->grade_vertical_velocity, 4);
+            info += "\nGRADE: Landing place........: " + Tools::formatDouble(lastBetterSkydiver->grade_landing_place, 4);
+            info += "\nGRADE: Direc changes........: " + Tools::formatDouble(lastBetterSkydiver->grade_direction_changes, 4);
+            info += "\nGRADE: Used actions.........: " + Tools::formatDouble(lastBetterSkydiver->grade_used_actions, 4);
+            info += "\nGRADE: Landed...............: " + Tools::formatDouble(lastBetterSkydiver->landed ? 1000 : 0, 4);
+            info += "\n--------------------------------------";
+            info += "\nSCORE.......................: " + Tools::formatDouble(lastBetterSkydiver->getScore(), 4);
             info += "\n";
             info += "\nOTHER";
-            info += "\nROUND..................: " + to_string(lastBetterSkydiver->round);
-            info += "\nBOOT SKYDIVERS.........: " + Tools::onOff(this->bootSkydivers);
-            info += "\nPAUSE............(F7)..: " + Tools::onOff(this->paused);
-            info += "\nSYNC.............(F8)..: " + Tools::onOff(this->syncronism);
-            info += "\nMOSTRAR..........(F9)..: " + Tools::onOff(this->drawing);
-            info += "\nTRAINING.........(F10).: " + Tools::onOff(this->training);
+            info += "\nROUND.......................: " + to_string(lastBetterSkydiver->round);
+            info += "\nBOOT SKYDIVERS..............: " + Tools::onOff(this->bootSkydivers);
+            info += "\nPAUSE............(F7).......: " + Tools::onOff(this->paused);
+            info += "\nSYNC.............(F8).......: " + Tools::onOff(this->syncronism);
+            info += "\nMOSTRAR..........(F9).......: " + Tools::onOff(this->drawing);
+            info += "\nTRAINING.........(F10)......: " + Tools::onOff(this->training);
 
             Tools::say(&window, info, 10, 8);
         }

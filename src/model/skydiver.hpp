@@ -66,7 +66,8 @@ class Skydiver {
     bool landed = false;
     bool died = false;
 
-    unsigned int grade_landing_softly = 0;
+    float grade_horizontal_velocity = 0;
+    float grade_vertical_velocity = 0;
     float grade_landing_place = 0;
     float grade_max_velocity_right = 0;
     float grade_max_velocity_left = 0;

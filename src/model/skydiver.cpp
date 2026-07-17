@@ -329,9 +329,9 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
         if (show_information) {
             sf::VertexArray line(sf::PrimitiveType::Lines, 2);
             line[0].position = sf::Vector2f(pos.position.x + (pos.size.x * 0.5), pos.position.y - 12);              // Ponto A
-            line[0].color = this->skydiverFall.sprite.getColor();                                     // Cor do ponto A
+            line[0].color = this->skydiverFall.sprite.getColor();                                                   // Cor do ponto A
             line[1].position = sf::Vector2f(pos.position.x + (pos.size.x * 0.5), pos.position.y + pos.size.y - 2);  // Ponto B
-            line[1].color = sf::Color::White;                                                         // Cor do ponto A
+            line[1].color = sf::Color::White;                                                                       // Cor do ponto A
             w->draw(line);
             Tools::say(w, "Master", pos.position.x - 16, pos.position.y - 26);
 
@@ -430,10 +430,10 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
 
     if (0 && state == State::ON_BOAT && landed) {
         sf::VertexArray line(sf::PrimitiveType::Lines, 2);
-        line[0].position = sf::Vector2f(leftText, topText);  // Ponto A
-        line[0].color = sf::Color::Red;                      // Cor do ponto A
+        line[0].position = sf::Vector2f(leftText, topText);               // Ponto A
+        line[0].color = sf::Color::Red;                                   // Cor do ponto A
         line[1].position = sf::Vector2f(pos.position.x, pos.position.y);  // Ponto B
-        line[1].color = sf::Color::Blue;                     // Cor do ponto B
+        line[1].color = sf::Color::Blue;                                  // Cor do ponto B
         w->draw(line);
 
         const int grade_mvl = grade_max_velocity_left;
@@ -464,7 +464,6 @@ void Skydiver::draw(sf::RenderWindow* w, Boat boat, bool show_information) {
             "Time on air...0-3000.(%)....: " + to_string(grade_time_on_air),
             "SCORE  " + to_string(getScore()),
             "Grade - Landing place ..: " + to_string(grade_landing_place),
-            "Grade - Landing softly..: " + to_string(grade_landing_softly),
             "Grade - Max vel right...: " + to_string(grade_mvr),
             "Grade - Max vel left....: " + to_string(grade_mvl),
             "Grade - Direct changes..: " + to_string(grade_direction_changes)};
@@ -492,7 +491,7 @@ bool Skydiver::touchedBoat(Boat boat) {
         float footLeft = pos.position.x + (pos.size.x / 2);
         float footTop = pos.position.y + pos.size.y;
 
-        if (footLeft > boat.pos.position.x && footLeft < boat.pos.position.x + boat.pos.size.x) {        // It is in the boat area
+        if (footLeft > boat.pos.position.x && footLeft < boat.pos.position.x + boat.pos.size.x) {         // It is in the boat area
             if (footTop >= boat.pos.position.y - 1 && footTop < boat.pos.position.y + boat.pos.size.y) {  // Touched ground
                 return true;
             }
@@ -509,12 +508,13 @@ float Skydiver::getScore() {
 }
 
 void Skydiver::saveScoreLanding(Boat boat) {
-    // Landing velocity - Heigher is better.
-    const int max_velocity = max_slide_speed + max_fall_speed;
-    grade_landing_softly = (max_velocity - std::abs(velocity.x) + std::abs(velocity.y)) / max_velocity * 100;
+    if (landed) {
+        grade_horizontal_velocity = max_slide_speed - (std::abs(velocity.x) / max_slide_speed);
+        grade_vertical_velocity = max_fall_speed - (std::abs(velocity.y) / max_fall_speed);
+    }
 
     // Place - How much near center higher
-    int landingLength = std::abs(boat.getLandingPointLeft() - boat.pos.position.x);
+    // int landingLength = std::abs(boat.getLandingPointLeft() - boat.pos.position.x);
     float footLeft = pos.position.x + (pos.size.x / 2);
     float distance_mast = std::abs(boat.getLandingPointLeft() - footLeft);
     float width_screen = 1600;
@@ -523,7 +523,6 @@ void Skydiver::saveScoreLanding(Boat boat) {
 
     grade_max_velocity_right = std::abs(grade_max_velocity_right) / max_slide_speed * 100;
     grade_max_velocity_left = std::abs(grade_max_velocity_left) / max_slide_speed * 100;
-
     grade_max_velocity_right = (int)grade_max_velocity_right;
     grade_max_velocity_left = (int)grade_max_velocity_left;
 
@@ -534,10 +533,7 @@ void Skydiver::saveScoreLanding(Boat boat) {
 
     // Define some importance to each grade.
     grade_direction_changes = grade_direction_changes;
-    grade_landing_softly = grade_landing_softly * 0.1;
     gTimeOnAir = gTimeOnAir * 0.1;
-    grade_max_velocity_right = grade_max_velocity_right * 0.1;
-    grade_max_velocity_left = grade_max_velocity_left * 0.1;
 
     grade_time_on_air = (int)gTimeOnAir;
     grade_time_on_air = 0;                          // Disabled
@@ -552,8 +548,8 @@ void Skydiver::saveScoreLanding(Boat boat) {
     // if (!landed) grade_landing_place = 0;
 
     // Set Score
-    // score = grade_position + grade_landing_softly + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
-    score = grade_landing_place + grade_direction_changes + grade_used_actions;
+    // score = grade_position + grade_landing_place + grade_max_velocity_right + grade_max_velocity_left + grade_direction_changes + grade_time_on_air + grade_used_actions;
+    score = grade_horizontal_velocity + grade_vertical_velocity + grade_landing_place + grade_direction_changes + grade_used_actions;
 
     if (landed) {
         score += 1000;
