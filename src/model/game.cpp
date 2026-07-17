@@ -115,7 +115,7 @@ void Game::play() {
         }
 
         // Think
-        if (frameCount % 8 == 0) {  // Reaction time each ~0,133s (133ms) means can react 7,5 times per seconds.
+        if (frameCount % 20 == 0) {
 #pragma omp parallel for
             for (auto& skydiver : skydivers) {
                 if (!skydiver->died) {
@@ -279,10 +279,10 @@ void Game::play() {
             // info += "\nGRADE: Max vel right...: " + to_string((int)lastBetterSkydiver->grade_max_velocity_right);
             // info += "\nGRADE: Max vel left....: " + to_string((int)lastBetterSkydiver->grade_max_velocity_left);
             // info += "\nGRADE: Time on air.....: " + to_string(lastBetterSkydiver->grade_time_on_air);
+            // info += "\nGRADE: Direc changes........: " + Tools::formatDouble(lastBetterSkydiver->grade_direction_changes, 4);
             info += "\nGRADE: Horizontal velocity..: " + Tools::formatDouble(lastBetterSkydiver->grade_horizontal_velocity, 4);
             info += "\nGRADE: Vertical velocity....: " + Tools::formatDouble(lastBetterSkydiver->grade_vertical_velocity, 4);
             info += "\nGRADE: Landing place........: " + Tools::formatDouble(lastBetterSkydiver->grade_landing_place, 4);
-            info += "\nGRADE: Direc changes........: " + Tools::formatDouble(lastBetterSkydiver->grade_direction_changes, 4);
             info += "\nGRADE: Used actions.........: " + Tools::formatDouble(lastBetterSkydiver->grade_used_actions, 4);
             info += "\nGRADE: Landed...............: " + Tools::formatDouble(lastBetterSkydiver->landed ? 1000 : 0, 4);
             info += "\n--------------------------------------";
